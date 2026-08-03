@@ -12,7 +12,9 @@ function TypingBox() {
 
     const [typedText, setTypedText] = useState("");
 
-    const [time, setTime] = useState(30);
+    const [selectedTime, setSelectedTime] = useState(30);
+
+const [time, setTime] = useState(30);
 
     const [isRunning, setIsRunning] = useState(false);
 
@@ -99,7 +101,7 @@ const wpm = minutes === 0
 
     return (
 
-        <div className="typing-box">
+<div className="typing-box">
 
 
 {
@@ -107,9 +109,55 @@ const wpm = minutes === 0
 
 <>
 
-    <div className="timer">
-        Time Left: {time}s
-    </div>
+
+<div className="time-selector">
+
+{
+[30,60,120].map((seconds)=>(
+
+
+<button
+
+key={seconds}
+
+className={
+selectedTime === seconds
+?
+"active-time"
+:
+""
+}
+
+
+onClick={()=>{
+
+setSelectedTime(seconds);
+
+setTime(seconds);
+
+}}
+
+
+>
+
+{seconds}s
+
+</button>
+
+
+))
+
+}
+
+</div>
+
+
+
+<div className="timer">
+
+Time Left: {time}s
+
+</div>
 
 
     <div className="paragraph">
@@ -150,13 +198,19 @@ const wpm = minutes === 0
 
     <textarea
 
-        value={typedText}
+value={typedText}
 
-        onChange={handleTyping}
+onChange={handleTyping}
 
-        placeholder="Start typing here..."
+onPaste={(e)=>e.preventDefault()}
 
-    />
+spellCheck="false"
+
+autoComplete="off"
+
+>
+
+</textarea>
 
 
 
@@ -196,7 +250,7 @@ finished && (
 
         setTypedText("");
 
-        setTime(30);
+        setTime(selectedTime);
 
         setFinished(false);
 

@@ -211,3 +211,78 @@ textarea {
     background:#38bdf8;
 
 }
+
+.paragraph {
+
+    user-select:none;
+
+    -webkit-user-select:none;
+
+    cursor:text;
+
+}
+
+.typing-box {
+
+background:
+rgba(255,255,255,0.08);
+
+backdrop-filter:
+blur(15px);
+
+border:
+
+1px solid rgba(255,255,255,0.1);
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,0.4);
+
+animation:
+
+fadeIn 0.6s ease;
+
+}
+
+
+@keyframes fadeIn {
+
+from{
+
+opacity:0;
+
+transform:translateY(20px);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+.time-selector button {
+
+background:#1e293b;
+
+color:white;
+
+border:1px solid #334155;
+
+}
+
+
+.active-time {
+
+background:#2563eb !important;
+
+box-shadow:
+
+0 0 20px #2563eb;
+
+}
