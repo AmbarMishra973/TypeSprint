@@ -286,3 +286,72 @@ box-shadow:
 0 0 20px #2563eb;
 
 }
+
+
+.typing-text{
+
+font-size:28px;
+
+line-height:1.8;
+
+color:#94a3b8;
+
+user-select:none;
+
+}
+
+
+.typing-text span{
+
+transition:0.1s;
+
+}
+
+
+.typing-text .correct{
+
+color:#22c55e;
+
+}
+
+
+.typing-text .wrong{
+
+color:#ef4444;
+
+}
+
+
+.typing-text .current{
+
+color:white;
+
+border-bottom:3px solid #38bdf8;
+
+animation:blink 1s infinite;
+
+}
+
+
+
+@keyframes blink{
+
+50%{
+
+border-color:transparent;
+
+}
+
+}
+
+
+
+.hidden-input{
+
+position:absolute;
+
+opacity:0;
+
+pointer-events:none;
+
+}

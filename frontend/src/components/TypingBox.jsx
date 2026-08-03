@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import TypingText from "./TypingText";
 import Stats from "./Stats";
 import Result from "./Result";
 
@@ -160,57 +161,27 @@ Time Left: {time}s
 </div>
 
 
-    <div className="paragraph">
+    <TypingText
 
-        {
-            paragraph.split("").map((char,index)=>{
+paragraph={paragraph}
 
-                let color = "";
+typedText={typedText}
 
-                if(index < typedText.length){
-
-                    color = char === typedText[index]
-                    ? "correct"
-                    : "wrong";
-
-                }
-
-
-                return (
-
-                    <span 
-                    key={index}
-                    className={color}
-                    >
-
-                    {char}
-
-                    </span>
-
-                );
-
-            })
-        }
-
-    </div>
+/>
 
 
 
-    <textarea
+   <textarea
+
+className="hidden-input"
 
 value={typedText}
 
 onChange={handleTyping}
 
-onPaste={(e)=>e.preventDefault()}
+autoFocus
 
-spellCheck="false"
-
-autoComplete="off"
-
->
-
-</textarea>
+/>
 
 
 
