@@ -1,5 +1,6 @@
-import Stats from "./Stats";
 import { useState, useEffect } from "react";
+import Stats from "./Stats";
+import Result from "./Result";
 
 
 function TypingBox() {
@@ -101,95 +102,116 @@ const wpm = minutes === 0
         <div className="typing-box">
 
 
-            <div className="timer">
+{
+!finished && (
 
-                Time Left: {time}s
+<>
 
-            </div>
-
-
-
-            <div className="paragraph">
-
-
-            {
-                paragraph.split("").map((char,index)=>{
+    <div className="timer">
+        Time Left: {time}s
+    </div>
 
 
-                    let color="";
+    <div className="paragraph">
 
+        {
+            paragraph.split("").map((char,index)=>{
 
-                    if(index < typedText.length){
+                let color = "";
 
+                if(index < typedText.length){
 
-                        if(char === typedText[index]){
+                    color = char === typedText[index]
+                    ? "correct"
+                    : "wrong";
 
-                            color="correct";
-
-                        }
-                        else{
-
-                            color="wrong";
-
-                        }
-
-
-                    }
-
-
-
-                    return(
-
-                        <span 
-                        key={index}
-                        className={color}
-                        >
-
-                            {char}
-
-                        </span>
-
-                    )
-
-
-                })
-            }
-
-
-            </div>
-
-
-
-            <textarea
-
-                value={typedText}
-
-                onChange={handleTyping}
-
-                disabled={finished}
-
-                placeholder={
-                    finished 
-                    ? "Test finished!"
-                    : "Start typing here..."
                 }
 
-            />
 
-            <Stats
+                return (
 
-time={time}
+                    <span 
+                    key={index}
+                    className={color}
+                    >
 
-typedText={typedText}
+                    {char}
 
-accuracy={accuracy}
+                    </span>
 
-wpm={wpm}
+                );
+
+            })
+        }
+
+    </div>
+
+
+
+    <textarea
+
+        value={typedText}
+
+        onChange={handleTyping}
+
+        placeholder="Start typing here..."
+
+    />
+
+
+
+    <Stats
+
+        time={time}
+
+        typedText={typedText}
+
+        accuracy={accuracy}
+
+        wpm={wpm}
+
+    />
+
+</>
+
+)
+
+
+
+}
+
+
+{
+finished && (
+
+<Result
+
+    wpm={wpm}
+
+    accuracy={accuracy}
+
+    characters={typedText.length}
+
+    restart={()=>{
+
+        setTypedText("");
+
+        setTime(30);
+
+        setFinished(false);
+
+        setIsRunning(false);
+
+    }}
 
 />
 
+)
 
-        </div>
+}
+
+
+</div>
 
     );
 

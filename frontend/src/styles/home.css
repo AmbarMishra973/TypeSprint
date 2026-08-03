@@ -142,3 +142,72 @@ textarea {
     font-weight: bold;
 
 }
+
+.result-card {
+
+    background: rgba(255,255,255,0.1);
+
+    padding:40px;
+
+    border-radius:20px;
+
+    margin-top:30px;
+
+}
+
+
+.result-card h2 {
+
+    font-size:32px;
+
+    margin-bottom:30px;
+
+}
+
+
+.result-stats {
+
+    display:flex;
+
+    justify-content:space-around;
+
+    margin-bottom:30px;
+
+}
+
+
+.result-stats div {
+
+    background:rgba(255,255,255,0.08);
+
+    padding:20px;
+
+    border-radius:15px;
+
+}
+
+
+.restart-btn {
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:15px 35px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+}
+
+
+.restart-btn:hover {
+
+    background:#38bdf8;
+
+}
