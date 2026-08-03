@@ -104,3 +104,29 @@ textarea {
     min-width: 120px;
 
 }
+
+.paragraph {
+
+    font-size: 20px;
+
+    line-height: 1.8;
+
+    text-align: left;
+
+    margin-bottom: 25px;
+
+}
+
+
+.correct {
+
+    color: #22c55e;
+
+}
+
+
+.wrong {
+
+    color: #ef4444;
+
+}
