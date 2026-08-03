@@ -1,3 +1,4 @@
+import Stats from "./Stats";
 import { useState, useEffect } from "react";
 
 
@@ -15,6 +16,24 @@ function TypingBox() {
     const [isRunning, setIsRunning] = useState(false);
 
     const [finished, setFinished] = useState(false);
+
+    const correctCharacters = typedText
+.split("")
+.filter((char,index)=>char === paragraph[index])
+.length;
+
+
+const accuracy = typedText.length === 0 
+? 100
+: ((correctCharacters / typedText.length) * 100).toFixed(1);
+
+
+const minutes = (30-time)/60;
+
+
+const wpm = minutes === 0
+? 0
+: Math.round((correctCharacters/5)/minutes);
 
 
 
@@ -156,6 +175,18 @@ function TypingBox() {
                 }
 
             />
+
+            <Stats
+
+time={time}
+
+typedText={typedText}
+
+accuracy={accuracy}
+
+wpm={wpm}
+
+/>
 
 
         </div>

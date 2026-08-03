@@ -22,7 +22,7 @@ function Home() {
 
                 <TypingBox />
 
-                <Stats />
+                
 
             </main>
 
