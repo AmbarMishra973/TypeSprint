@@ -1,0 +1,106 @@
+.home {
+    min-height: 100vh;
+    background: #0f172a;
+    color: white;
+    padding: 30px;
+}
+
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+
+main {
+    max-width: 900px;
+    margin: auto;
+    text-align: center;
+}
+
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 40px;
+}
+
+
+.time-selector button {
+
+    background: #2563eb;
+    color: white;
+
+    border: none;
+    padding: 12px 25px;
+
+    margin: 10px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.time-selector button:hover {
+
+    background: #38bdf8;
+    transform: translateY(-3px);
+
+}
+
+
+.typing-box {
+
+    margin-top: 40px;
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+}
+
+
+textarea {
+
+    width: 100%;
+
+    height: 120px;
+
+    margin-top: 20px;
+
+    padding: 20px;
+
+    font-size: 18px;
+
+    border-radius: 10px;
+
+}
+
+
+.stats {
+
+    display: flex;
+
+    justify-content: space-around;
+
+    margin-top: 40px;
+
+}
+
+
+.stats div {
+
+    background: rgba(255,255,255,0.1);
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    min-width: 120px;
+
+}
