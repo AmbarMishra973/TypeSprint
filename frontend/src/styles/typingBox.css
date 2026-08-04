@@ -407,3 +407,22 @@
     }
 
 }
+
+.typing-line{
+
+display:flex;
+
+gap:12px;
+
+white-space:nowrap;
+
+margin-bottom:12px;
+
+}
+
+
+.typing-word{
+
+display:inline-block;
+
+}

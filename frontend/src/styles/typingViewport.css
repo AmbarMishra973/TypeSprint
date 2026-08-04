@@ -1,190 +1,76 @@
 .typing-viewport {
-
-
-    width:100%;
-
-    max-width:1000px;
-
-    height:180px;
-
-    margin:40px auto;
-
-
-    overflow:hidden;
-
-    user-select:none;
-
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-
+    width: 100%;
+    max-width: 1000px;
+    height: 180px;
+    margin: 40px auto;
+    overflow: hidden;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
 }
 
-
+/* DYNAMIC WORD MEASUREMENT */
+.measure-box {
+    position: absolute;
+    visibility: hidden;
+    display: flex;
+    gap: 12px;           /* JS uses this exact 12px gap */
+    white-space: nowrap; /* Prevents wrapping so we can measure true width */
+    z-index: -1;
+}
 
 .typing-line {
-
-
-    min-height:60px;
-
-    display:flex;
-
-    align-items:center;
-
-
-    flex-wrap:nowrap;
-
-
-    overflow:hidden;
-
-
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 12px;           /* Must match the measure-box and JS GAP */
+    margin-bottom: 12px;
 }
-
-
 
 .typing-word {
-
-
-    display:inline-flex;
-
-
-    flex-shrink:0;
-
-
-    margin-right:18px;
-
-
-    font-size:32px;
-
-
-    line-height:60px;
-
-
-    letter-spacing:1px;
-
-
-    color:#8b95a5;
-
-
+    flex-shrink: 0;
+    display: inline-flex;
+    font-size: 32px;
+    line-height: 60px;
+    letter-spacing: 1px;
+    color: #8b95a5;
+    /* REMOVED: margin-right: 18px; (This was causing the desync!) */
 }
-
-
 
 .active-word {
-
-
-    color:white;
-
-
+    color: white;
 }
-
-
 
 .correct-char {
-
-
-    color:#39d353;
-
-
+    color: #39d353;
 }
-
-
 
 .wrong-char {
-
-
-    color:#ff4d4f;
-
-
+    color: #ff4d4f;
 }
-
-
 
 .cursor {
-
-
-    border-left:3px solid white;
-
-
-    animation:blink 0.8s infinite;
-
-
+    border-left: 3px solid white;
+    animation: blink 0.8s infinite;
 }
 
-
-
 @keyframes blink {
-
-
-    50% {
-
-
-        border-color:transparent;
-
-
-    }
-
-
+    50% { border-color: transparent; }
 }
 
 .floating-ghost {
+    position: absolute;
+    width: 3px;
+    height: 42px;
+    background: #7c3aed;
+    opacity: 0.8;
+    border-radius: 3px;
 
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1); 
 
-position:absolute;
-
-
-width:3px;
-
-
-height:42px;
-
-
-background:#7c3aed;
-
-
-opacity:0.8;
-
-
-border-radius:3px;
-
-
-transition:
-transform 0.1s linear;
-
-
-pointer-events:none;
-
-
-box-shadow:
-0 0 8px #7c3aed;
-
-
-}
-
-.typing-viewport {
-
-    width:100%;
-
-    max-width:1000px;
-
-    height:180px;
-
-    margin:40px auto;
-
-    overflow:hidden;
-
-    user-select:none;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:flex-start;
-
-    position:relative;
-
+    pointer-events: none;
+    box-shadow: 0 0 8px #7c3aed;
 }
