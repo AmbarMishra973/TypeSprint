@@ -5,7 +5,9 @@ import Stats from "./Stats";
 import Result from "./Result";
 import "../styles/typingBox.css";
 
+
 function TypingBox() {
+
 
     const {
 
@@ -41,7 +43,16 @@ function TypingBox() {
 
         calculateWPM,
 
-        totalCharacters
+        calculateRawWPM,
+
+correctCharacters,
+
+incorrectCharacters,
+
+wpmHistory,
+
+addWpmPoint
+
 
     } = useTypingEngine();
 
@@ -55,39 +66,58 @@ function TypingBox() {
 
     useEffect(() => {
 
+
         let timer;
 
-        if (isRunning && time > 0) {
 
-            timer = setInterval(() => {
+        if(isRunning && time>0){
 
-                setTime(t => t - 1);
 
-            }, 1000);
+            timer=setInterval(()=>{
+
+    setTime(t=>t-1);
+
+    addWpmPoint();
+
+},1000);
+
 
         }
 
-        if (time === 0) {
+
+
+        if(time===0){
+
 
             setFinished(true);
 
             setIsRunning(false);
 
+
         }
 
-        return () => clearInterval(timer);
-
-    }, [isRunning, time]);
 
 
+        return ()=>clearInterval(timer);
 
 
 
-    function keyHandler(e) {
+    },[isRunning,time]);
+
+
+
+
+
+
+
+    function keyHandler(e){
+
 
         e.preventDefault();
 
+
         handleKey(e.key);
+
 
     }
 
@@ -95,133 +125,200 @@ function TypingBox() {
 
 
 
-    return (
 
-        <div className="typing-box">
 
-            <div className="time-selector">
+return (
 
-                {[30, 60, 120].map(seconds => (
+<div className="typing-box">
 
-                    <button
 
-                        key={seconds}
 
-                        className={
-                            selectedTime === seconds
-                                ? "active-time"
-                                : ""
-                        }
+<div className="time-selector">
 
-                        onClick={() => {
 
-                            setSelectedTime(seconds);
-                            setTime(seconds);
+{
+[30,60,120].map(seconds=>(
 
-                        }}
 
-                    >
+<button
 
-                        {seconds}s
+key={seconds}
 
-                    </button>
+className={
+selectedTime===seconds
+?
+"active-time"
+:
+""
+}
 
-                ))}
 
-            </div>
+onClick={()=>{
 
 
+setSelectedTime(seconds);
 
+setTime(seconds);
 
 
-            <div className="timer">
+}}
 
-                Time Left : {time}s
+>
 
-            </div>
 
+{seconds}s
 
 
+</button>
 
 
-            {
-
-                !finished &&
-
-                <>
-
-                    <TypingViewport
-
-                        words={words}
-
-                        typed={typed}
-
-                        currentIndex={currentIndex}
-
-                        currentChar={currentChar}
-
-                    />
-
-
-
-                    <Stats
-
-                        time={time}
-
-                        typedText={totalCharacters}
-
-                        accuracy={calculateAccuracy()}
-
-                        wpm={calculateWPM()}
-
-                    />
-
-
-
-                    <input
-
-                        ref={inputRef}
-
-                        autoFocus
-
-                        className="hidden-input"
-
-                        onKeyDown={keyHandler}
-
-                        onBlur={() => inputRef.current.focus()}
-
-                    />
-
-                </>
-
-            }
-
-
-
-
-
-            {
-
-                finished &&
-
-                <Result
-
-                    wpm={calculateWPM()}
-
-                    accuracy={calculateAccuracy()}
-
-                    characters={totalCharacters}
-
-                    restart={restart}
-
-                />
-
-            }
-
-        </div>
-
-    );
+))
 
 }
+
+
+</div>
+
+
+
+
+
+
+<div className="timer">
+
+Time Left : {time}s
+
+</div>
+
+
+
+
+
+
+
+{
+
+!finished &&
+
+
+<>
+
+
+<TypingViewport
+
+
+words={words}
+
+typed={typed}
+
+currentIndex={currentIndex}
+
+currentChar={currentChar}
+
+
+/>
+
+
+
+
+
+
+<Stats
+
+
+time={time}
+
+
+wpm={calculateWPM()}
+
+
+rawWpm={calculateRawWPM()}
+
+
+accuracy={calculateAccuracy()}
+
+
+characters={correctCharacters}
+
+
+errors={incorrectCharacters}
+
+
+/>
+
+
+
+
+
+
+<input
+
+
+ref={inputRef}
+
+
+autoFocus
+
+
+className="hidden-input"
+
+
+onKeyDown={keyHandler}
+
+
+onBlur={()=>
+inputRef.current.focus()
+}
+
+
+/>
+
+
+</>
+
+
+}
+
+
+
+
+
+
+
+{
+
+finished &&
+
+
+<Result
+
+wpm={calculateWPM()}
+
+rawWpm={calculateRawWPM()}
+
+accuracy={calculateAccuracy()}
+
+characters={correctCharacters}
+
+errors={incorrectCharacters}
+
+history={wpmHistory}
+
+restart={restart}
+
+/>
+
+}
+
+
+
+</div>
+
+
+);
+
+
+}
+
 
 export default TypingBox;

@@ -102,3 +102,71 @@
     margin-left:8px;
 
 }
+
+.graph-container{
+
+    margin-top:30px;
+
+    text-align:center;
+
+}
+
+
+
+.wpm-graph{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:12px;
+
+    padding:10px;
+
+}
+
+.axis-wrapper{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+
+.y-axis{
+
+    writing-mode:vertical-rl;
+
+    transform:rotate(180deg);
+
+    margin-right:10px;
+
+    color:white;
+
+}
+
+
+
+.x-axis{
+
+    text-align:center;
+
+    margin-top:8px;
+
+    color:white;
+
+}
+
+
+
+.wpm-graph{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:10px;
+
+}
