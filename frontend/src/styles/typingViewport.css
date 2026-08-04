@@ -1,79 +1,132 @@
-.typing-viewport{
+.typing-viewport {
 
 
-width:900px;
+    width:100%;
 
-height:150px;
+    max-width:1000px;
 
-overflow:hidden;
+    height:180px;
 
-margin:auto;
-
-padding:20px;
+    margin:40px auto;
 
 
-font-size:28px;
+    overflow:hidden;
 
-line-height:50px;
+    user-select:none;
+
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
 
 
 }
 
 
-.word{
 
-color:#94a3b8;
+.typing-line {
 
-margin-right:12px;
+
+    min-height:60px;
+
+    display:flex;
+
+    align-items:center;
+
+
+    flex-wrap:nowrap;
+
+
+    overflow:hidden;
+
 
 }
 
 
 
-.current-word{
+.typing-word {
 
-color:white;
 
-margin-right:12px;
+    display:inline-flex;
+
+
+    flex-shrink:0;
+
+
+    margin-right:18px;
+
+
+    font-size:32px;
+
+
+    line-height:60px;
+
+
+    letter-spacing:1px;
+
+
+    color:#8b95a5;
+
 
 }
 
 
 
-.correct-char{
-
-color:#22c55e;
-
-}
+.active-word {
 
 
-.wrong-char{
+    color:white;
 
-color:#ef4444;
 
 }
 
 
 
-.cursor{
+.correct-char {
 
-border-bottom:3px solid cyan;
+
+    color:#39d353;
+
 
 }
 
 
 
-.hidden-input{
+.wrong-char {
 
-position:absolute;
 
-opacity:0;
+    color:#ff4d4f;
+
 
 }
 
 
-body{
 
-overflow-x:hidden;
+.cursor {
+
+
+    border-left:3px solid white;
+
+
+    animation:blink 0.8s infinite;
+
+
+}
+
+
+
+@keyframes blink {
+
+
+    50% {
+
+
+        border-color:transparent;
+
+
+    }
+
 
 }

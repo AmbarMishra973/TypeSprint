@@ -40,7 +40,14 @@ Accuracy:
 Characters:
 
 <strong>
-{typedText.length}
+
+{
+typeof typedText === "number"
+?
+typedText
+:
+typedText.length
+}
 
 </strong>
 

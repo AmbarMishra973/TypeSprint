@@ -1,131 +1,228 @@
 import "../styles/typingViewport.css";
 
+
 function TypingViewport({
+
     words,
+
     typed,
+
     currentIndex,
+
     currentChar
+
 }) {
 
-    // Show only a window of words around the current word
-    const start = Math.max(0, currentIndex - 3);
-    const end = start + 30;
 
-    const visible = words.slice(start, end);
+    const WORDS_PER_LINE = 7;
+
+    const VISIBLE_LINES = 3;
+
+
+
+    const currentLine =
+    Math.floor(currentIndex / WORDS_PER_LINE);
+
+
+
+    const startWord =
+    currentLine * WORDS_PER_LINE;
+
+
+
+    const visibleWords =
+    words.slice(
+        startWord,
+        startWord + WORDS_PER_LINE * VISIBLE_LINES
+    );
+
+
 
     return (
 
         <div className="typing-viewport">
 
+
             {
+                Array.from({
+                    length: VISIBLE_LINES
+                }).map((_, lineIndex)=>{
 
-                visible.map((word, index) => {
 
-                    const actualIndex = start + index;
+                    const lineWords =
+                    visibleWords.slice(
+                        lineIndex * WORDS_PER_LINE,
+                        (lineIndex + 1) * WORDS_PER_LINE
+                    );
 
-                    const active = actualIndex === currentIndex;
 
                     return (
 
-                        <span
+                        <div
 
-                            key={actualIndex}
+                            className="typing-line"
 
-                            className={
-                                active
-                                    ? "current-word"
-                                    : "word"
-                            }
+                            key={lineIndex}
 
                         >
 
+
                             {
+                                lineWords.map((word,index)=>{
 
-                                Array.from({
 
-    length: Math.max(word.length, typed.length)
+                                    const wordIndex =
+                                    startWord +
+                                    lineIndex * WORDS_PER_LINE +
+                                    index;
 
-}).map((_,i)=>{
 
-    const expectedChar = word[i];
-    const typedChar = typed[i];
 
-    let className = "";
-    let displayChar = expectedChar;
+                                    const isActive =
+                                    wordIndex === currentIndex;
 
-    if(active){
 
-        if(i < typed.length){
 
-            if(i >= word.length){
+                                    return (
 
-                className = "wrong-char";
-                displayChar = typedChar;
+                                        <span
 
-            }
+                                            className={
+                                                isActive
+                                                ?
+                                                "typing-word active-word"
+                                                :
+                                                "typing-word"
+                                            }
 
-            else if(typedChar === expectedChar){
+                                            key={wordIndex}
 
-                className = "correct-char";
+                                        >
 
-            }
 
-            else{
+                                            {
+                                                word.split("").map(
+                                                    (char,charIndex)=>{
 
-                className = "wrong-char";
 
-            }
+                                                        let className="";
 
-        }
 
-        if(i === currentChar){
+                                                        if(isActive){
 
-            className += " cursor";
 
-        }
+                                                            if(
+                                                                charIndex < typed.length
+                                                            ){
 
-    }
 
-    if(displayChar === undefined){
+                                                                className =
+                                                                typed[charIndex] === char
+                                                                ?
+                                                                "correct-char"
+                                                                :
+                                                                "wrong-char";
 
-        displayChar = typedChar;
 
-    }
+                                                            }
 
-    return(
 
-        <span
+                                                            if(
+                                                                charIndex === currentChar
+                                                            ){
 
-            key={i}
+                                                                className += " cursor";
 
-            className={className.trim()}
+                                                            }
 
-        >
 
-            {displayChar}
+                                                        }
 
-        </span>
 
-    );
 
-})
+                                                        return (
 
+                                                            <span
+
+                                                                key={charIndex}
+
+                                                                className={
+                                                                    className.trim()
+                                                                }
+
+                                                            >
+
+                                                                {char}
+
+                                                            </span>
+
+                                                        );
+
+
+                                                    }
+                                                )
+
+                                            }
+
+
+
+                                            {
+
+
+                                            isActive &&
+                                            typed.length > word.length &&
+
+                                            typed
+                                            .slice(word.length)
+                                            .split("")
+                                            .map((char,index)=>(
+
+
+                                                <span
+
+                                                    key={
+                                                        "extra-"+index
+                                                    }
+
+                                                    className="wrong-char"
+
+                                                >
+
+                                                    {char}
+
+                                                </span>
+
+
+                                            ))
+
+
+                                            }
+
+
+                                        </span>
+
+                                    );
+
+
+                                })
                             }
 
-                            {" "}
 
-                        </span>
+                        </div>
 
                     );
 
-                })
 
+                })
             }
+
 
         </div>
 
     );
 
+
 }
+
 
 export default TypingViewport;
