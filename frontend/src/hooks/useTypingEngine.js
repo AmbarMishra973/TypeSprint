@@ -61,18 +61,30 @@ const [isRunning,setIsRunning]=useState(false);
 const [finished,setFinished]=useState(false);
 
 
+const [hasRepeated,setHasRepeated] = useState(false);
+
+
+const [bestRepeatedWpm,setBestRepeatedWpm] = useState(0);
+
+
+const [ghostPosition,setGhostPosition] = useState(0);
+
+const [ghostWpm,setGhostWpm] = useState(0);
 
 const [correctWords,setCorrectWords]=useState(0);
 
+
 const [wrongWords,setWrongWords]=useState(0);
+
 
 const [wpmHistory,setWpmHistory] = useState([]);
 
 
-
 const [correctCharacters,setCorrectCharacters]=useState(0);
 
+
 const [incorrectCharacters,setIncorrectCharacters]=useState(0);
+
 
 
 
@@ -107,6 +119,7 @@ if(key==="Backspace"){
     return;
 
 }
+
 
 
 
@@ -150,6 +163,7 @@ if(key===" "){
 
 
 
+
 if(key.length===1){
 
 
@@ -175,6 +189,7 @@ if(key.length===1){
     setTyped(previous=>previous+key);
 
     setCurrentChar(previous=>previous+1);
+
 
 
 }
@@ -216,6 +231,8 @@ return Number(
 
 
 
+
+
 function calculateWPM(){
 
 
@@ -240,6 +257,7 @@ correctCharacters/5/minutes
 
 
 }
+
 
 
 
@@ -273,11 +291,17 @@ return Math.round(
 
 }
 
+
+
+
+
+
+
 function addWpmPoint(){
 
 
     const elapsedSeconds =
-    selectedTime - time;
+    selectedTime-time;
 
 
     if(elapsedSeconds <=0)
@@ -294,6 +318,7 @@ function addWpmPoint(){
     Math.round(
         correctCharacters / 5 / minutes
     );
+
 
 
     setWpmHistory(previous=>[
@@ -314,10 +339,11 @@ function addWpmPoint(){
 
 
 
-function restart(){
 
 
-setWords(generateWords());
+
+function resetTest(){
+
 
 setTyped("");
 
@@ -345,7 +371,64 @@ setIsRunning(false);
 setWpmHistory([]);
 
 
+setGhostPosition(0);
+
+
+
 }
+
+
+
+
+
+
+
+function repeatTest(){
+
+    setHasRepeated(true);
+
+    resetTest();
+
+}
+
+
+
+
+
+
+function updateBest(){
+
+    const current =
+    calculateWPM();
+
+
+
+    if(current > bestRepeatedWpm){
+
+        setBestRepeatedWpm(current);
+
+    }
+
+}
+
+
+
+
+
+
+
+function newTest(){
+
+
+    setWords(generateWords());
+
+    resetTest();
+
+
+}
+
+
+
 
 
 
@@ -387,7 +470,16 @@ finished,
 setFinished,
 
 
-restart,
+resetTest,
+
+repeatTest,
+
+newTest,
+
+
+bestRepeatedWpm,
+
+updateBest,
 
 
 calculateAccuracy,
@@ -401,9 +493,23 @@ correctCharacters,
 
 incorrectCharacters,
 
+
 wpmHistory,
 
-addWpmPoint
+addWpmPoint,
+
+
+hasRepeated,
+
+
+ghostPosition,
+
+setGhostPosition,
+
+ghostWpm,
+
+setGhostWpm
+
 
 };
 

@@ -130,3 +130,61 @@
 
 
 }
+
+.floating-ghost {
+
+
+position:absolute;
+
+
+width:3px;
+
+
+height:42px;
+
+
+background:#7c3aed;
+
+
+opacity:0.8;
+
+
+border-radius:3px;
+
+
+transition:
+transform 0.1s linear;
+
+
+pointer-events:none;
+
+
+box-shadow:
+0 0 8px #7c3aed;
+
+
+}
+
+.typing-viewport {
+
+    width:100%;
+
+    max-width:1000px;
+
+    height:180px;
+
+    margin:40px auto;
+
+    overflow:hidden;
+
+    user-select:none;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:flex-start;
+
+    position:relative;
+
+}

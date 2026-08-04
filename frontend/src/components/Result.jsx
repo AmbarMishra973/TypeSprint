@@ -12,9 +12,14 @@ function Result({
 
     history,
 
-    restart
+    bestWpm,
+
+    repeatTest,
+
+    newTest
 
 }) {
+
 
 
     const maxWpm = Math.max(
@@ -60,6 +65,8 @@ function Result({
 
 
 
+
+
     return (
 
         <div className="result-card">
@@ -68,6 +75,7 @@ function Result({
             <h2>
                 Test Complete 🎉
             </h2>
+
 
 
 
@@ -81,6 +89,17 @@ function Result({
                     <h3>WPM</h3>
 
                     <p>{wpm}</p>
+
+                </div>
+
+
+
+
+                <div>
+
+                    <h3>Best WPM 🏆</h3>
+
+                    <p>{bestWpm}</p>
 
                 </div>
 
@@ -138,6 +157,8 @@ function Result({
 
 
 
+
+
             <div className="graph-container">
 
 
@@ -167,12 +188,9 @@ function Result({
 
                     className="wpm-graph"
 
-
                     >
 
 
-
-                    {/* Y axis */}
 
                     <line
 
@@ -190,7 +208,7 @@ function Result({
 
 
 
-                    {/* X axis */}
+
 
                     <line
 
@@ -210,6 +228,8 @@ function Result({
 
 
 
+
+
                     <polyline
 
                     points={points}
@@ -222,58 +242,64 @@ function Result({
 
                     />
 
+
+
+
+
+
                     {
-history.map((point,index)=>{
+                    history.map((point,index)=>{
 
 
-const x =
-(index /
-Math.max(history.length-1,1))
-*
-width;
-
-
-
-const y =
-height -
-(
-point.wpm /
-maxWpm
-)
-*
-height;
+                    const x =
+                    (index /
+                    Math.max(history.length-1,1))
+                    *
+                    width;
 
 
 
-return (
-
-<circle
-
-key={index}
-
-cx={x}
-
-cy={y}
-
-r="5"
-
-fill="#39d353"
-
->
-
-<title>
-
-{point.wpm} WPM at {point.time}s
-
-</title>
-
-</circle>
-
-);
+                    const y =
+                    height -
+                    (
+                    point.wpm /
+                    maxWpm
+                    )
+                    *
+                    height;
 
 
-})
-}
+
+                    return (
+
+                    <circle
+
+                    key={index}
+
+                    cx={x}
+
+                    cy={y}
+
+                    r="5"
+
+                    fill="#39d353"
+
+                    >
+
+                    <title>
+
+                    {point.wpm} WPM at {point.time}s
+
+                    </title>
+
+
+                    </circle>
+
+                    );
+
+
+                    })
+                    }
 
 
 
@@ -294,7 +320,6 @@ fill="#39d353"
 
 
 
-
             </div>
 
 
@@ -303,17 +328,45 @@ fill="#39d353"
 
 
 
-            <button
 
-            onClick={restart}
 
-            className="restart-btn"
+            <div className="result-buttons">
 
-            >
 
-                Try Again
 
-            </button>
+                <button
+
+                onClick={repeatTest}
+
+                className="restart-btn"
+
+                >
+
+                    🔁 Repeat Words
+
+                </button>
+
+
+
+
+
+                <button
+
+                onClick={newTest}
+
+                className="restart-btn"
+
+                >
+
+                    🆕 New Test
+
+                </button>
+
+
+
+            </div>
+
+
 
 
 

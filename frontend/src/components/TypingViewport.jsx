@@ -1,4 +1,5 @@
 import "../styles/typingViewport.css";
+import { useEffect, useRef, useState } from "react";
 
 
 function TypingViewport({
@@ -9,7 +10,9 @@ function TypingViewport({
 
     currentIndex,
 
-    currentChar
+    currentChar,
+
+    ghostPosition
 
 }) {
 
@@ -17,6 +20,10 @@ function TypingViewport({
     const WORDS_PER_LINE = 7;
 
     const VISIBLE_LINES = 3;
+
+
+        const viewportRef = useRef(null);
+    const [ghostStyle,setGhostStyle] = useState({});
 
 
 
@@ -38,15 +45,115 @@ function TypingViewport({
 
 
 
+    // Convert character position into word + character
+
+    let counter = 0;
+
+    let ghostWordIndex = 0;
+
+    let ghostCharIndex = 0;
+
+
+
+    for(let i=0;i<words.length;i++){
+
+
+        const wordLength =
+        words[i].length + 1; // include space
+
+
+
+        if(
+            ghostPosition <
+            counter + wordLength
+        ){
+
+
+            ghostWordIndex = i;
+
+
+            ghostCharIndex =
+            ghostPosition - counter;
+
+
+            break;
+
+
+        }
+
+
+        counter += wordLength;
+
+
+    }
+
+
+
+
+
+    // Calculate floating ghost position
+
+    useEffect(()=>{
+
+
+    const element =
+    document.querySelector(
+        `[data-word="${ghostWordIndex}"][data-char="${ghostCharIndex}"]`
+    );
+
+
+    if(element && viewportRef.current){
+
+
+        const rect =
+        element.getBoundingClientRect();
+
+
+
+        const parent =
+        viewportRef.current.getBoundingClientRect();
+
+
+
+        setGhostStyle({
+
+            left:
+            rect.left - parent.left,
+
+
+            top:
+            rect.top - parent.top
+
+        });
+
+
+    }
+
+
+},[
+ghostWordIndex,
+ghostCharIndex,
+ghostPosition
+]);
+
+
+
+
+
+
     return (
 
-        <div className="typing-viewport">
+
+       <div
+    ref={viewportRef}
+    className="typing-viewport"
+>
 
 
             {
                 Array.from({
                     length: VISIBLE_LINES
-                }).map((_, lineIndex)=>{
+                }).map((_,lineIndex)=>{
 
 
                     const lineWords =
@@ -56,7 +163,9 @@ function TypingViewport({
                     );
 
 
+
                     return (
+
 
                         <div
 
@@ -65,6 +174,7 @@ function TypingViewport({
                             key={lineIndex}
 
                         >
+
 
 
                             {
@@ -85,7 +195,9 @@ function TypingViewport({
 
                                     return (
 
+
                                         <span
+
 
                                             className={
                                                 isActive
@@ -95,111 +207,137 @@ function TypingViewport({
                                                 "typing-word"
                                             }
 
+
                                             key={wordIndex}
+
+
 
                                         >
 
 
+
                                             {
-                                                word.split("").map(
-                                                    (char,charIndex)=>{
+                                                word
+                                                .split("")
+                                                .map(
+                                                (char,charIndex)=>{
 
 
-                                                        let className="";
+                                                    let className="";
 
 
-                                                        if(isActive){
+
+                                                    if(isActive){
 
 
-                                                            if(
-                                                                charIndex < typed.length
-                                                            ){
+                                                        if(
+                                                            charIndex < typed.length
+                                                        ){
 
 
-                                                                className =
-                                                                typed[charIndex] === char
-                                                                ?
-                                                                "correct-char"
-                                                                :
-                                                                "wrong-char";
-
-
-                                                            }
-
-
-                                                            if(
-                                                                charIndex === currentChar
-                                                            ){
-
-                                                                className += " cursor";
-
-                                                            }
+                                                            className =
+                                                            typed[charIndex] === char
+                                                            ?
+                                                            "correct-char"
+                                                            :
+                                                            "wrong-char";
 
 
                                                         }
 
 
 
-                                                        return (
 
-                                                            <span
+                                                        if(
+                                                            charIndex === currentChar
+                                                        ){
 
-                                                                key={charIndex}
+                                                            className += " cursor";
 
-                                                                className={
-                                                                    className.trim()
-                                                                }
-
-                                                            >
-
-                                                                {char}
-
-                                                            </span>
-
-                                                        );
+                                                        }
 
 
                                                     }
-                                                )
 
+
+
+
+                                                    return (
+
+
+                                                        <span
+
+
+                                                            key={charIndex}
+
+
+                                                            data-word={wordIndex}
+
+
+                                                            data-char={charIndex}
+
+
+                                                            className={
+                                                                className.trim()
+                                                            }
+
+
+                                                        >
+
+
+                                                            {char}
+
+
+                                                        </span>
+
+
+                                                    );
+
+
+                                                })
                                             }
+
 
 
 
                                             {
+                                                isActive &&
+                                                typed.length > word.length &&
 
 
-                                            isActive &&
-                                            typed.length > word.length &&
-
-                                            typed
-                                            .slice(word.length)
-                                            .split("")
-                                            .map((char,index)=>(
+                                                typed
+                                                .slice(word.length)
+                                                .split("")
+                                                .map((char,index)=>(
 
 
-                                                <span
-
-                                                    key={
-                                                        "extra-"+index
-                                                    }
-
-                                                    className="wrong-char"
-
-                                                >
-
-                                                    {char}
-
-                                                </span>
+                                                    <span
 
 
-                                            ))
+                                                        key={
+                                                            "extra-"+index
+                                                        }
 
 
+                                                        className="wrong-char"
+
+
+                                                    >
+
+                                                        {char}
+
+
+                                                    </span>
+
+
+                                                ))
                                             }
 
 
+
+
                                         </span>
+
 
                                     );
 
@@ -208,7 +346,9 @@ function TypingViewport({
                             }
 
 
+
                         </div>
+
 
                     );
 
@@ -217,7 +357,39 @@ function TypingViewport({
             }
 
 
+
+
+
+            {/* Floating Ghost Cursor */}
+
+
+            <div
+
+
+                className="floating-ghost"
+
+
+                style={{
+
+
+                    transform:
+                    `translate(
+                    ${ghostStyle.left || 0}px,
+                    ${ghostStyle.top || 0}px
+                    )`
+
+
+                }}
+
+
+
+            />
+
+
+
+
         </div>
+
 
     );
 
