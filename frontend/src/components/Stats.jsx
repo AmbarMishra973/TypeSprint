@@ -1,37 +1,57 @@
-function Stats({time, typedText, accuracy, wpm}) {
-
-    return (
-
-        <div className="stats">
-
-
-            <div>
-                <h3>Time</h3>
-                <p>{time}s</p>
-            </div>
+function Stats({
+    wpm,
+    accuracy,
+    typedText
+}){
 
 
-            <div>
-                <h3>WPM</h3>
-                <p>{wpm}</p>
-            </div>
+return (
+
+<div className="stats">
 
 
-            <div>
-                <h3>Accuracy</h3>
-                <p>{accuracy}%</p>
-            </div>
+<div>
+
+WPM:
+
+<strong>
+{wpm}
+</strong>
+
+</div>
 
 
-            <div>
-                <h3>Characters</h3>
-                <p>{typedText.length}</p>
-            </div>
+
+<div>
+
+Accuracy:
+
+<strong>
+{accuracy}%
+
+</strong>
+
+</div>
 
 
-        </div>
 
-    );
+<div>
+
+Characters:
+
+<strong>
+{typedText.length}
+
+</strong>
+
+</div>
+
+
+</div>
+
+
+);
+
 
 }
 

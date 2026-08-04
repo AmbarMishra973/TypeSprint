@@ -1,3 +1,16 @@
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    overflow:hidden;
+
+}
+
 .home {
     min-height: 100vh;
     background: #0f172a;
@@ -290,13 +303,33 @@ box-shadow:
 
 .typing-text{
 
+
 font-size:28px;
+
 
 line-height:1.8;
 
-color:#94a3b8;
+
+height:100%;
+
+
+overflow:hidden;
+
+
+display:flex;
+
+
+align-items:center;
+
+
+flex-wrap:wrap;
+
+
+align-content:center;
+
 
 user-select:none;
+
 
 }
 
@@ -355,3 +388,4 @@ opacity:0;
 pointer-events:none;
 
 }
+

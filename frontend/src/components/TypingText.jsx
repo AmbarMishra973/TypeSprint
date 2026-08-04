@@ -3,7 +3,9 @@ function TypingText({paragraph, typedText}) {
 
 return (
 
-<div className="typing-text">
+<div 
+className="typing-text"
+>
 
 
 {
