@@ -14,365 +14,497 @@ function Result({
 
     bestWpm,
 
+    testHistory,
+
     repeatTest,
 
-    newTest
+    newTest,
+
+    elapsedTime
 
 }) {
 
 
+const safeHistory =
+history?.length
+?
+history
+:
+[];
 
-    const maxWpm = Math.max(
-        ...history.map(point => point.wpm),
-        10
-    );
 
 
 
-    const width = 450;
+const maxWpm =
+Math.max(
 
-    const height = 180;
+    ...safeHistory.map(
+        item=>Number(item.wpm)
+    ),
 
+    50
 
+);
 
-    const points = history.map((point,index)=>{
 
 
-        const x =
-        (index /
-        Math.max(history.length-1,1))
-        *
-        width;
 
+const width = 500;
 
+const height = 200;
 
-        const y =
-        height -
-        (
-            point.wpm /
-            maxWpm
-        )
-        *
-        height;
 
 
 
-        return `${x},${y}`;
 
+const points =
 
-    }).join(" ");
+safeHistory.map((point,index)=>{
 
 
+const x =
 
+(
+    index /
+    Math.max(
+        safeHistory.length-1,
+        1
+    )
+)
 
+*
+width;
 
 
-    return (
 
-        <div className="result-card">
 
+const y =
 
-            <h2>
-                Test Complete 🎉
-            </h2>
+height -
 
+(
+    Number(point.wpm) /
+    maxWpm
+)
 
+*
+height;
 
 
 
-            <div className="result-stats">
+return `${x},${y}`;
 
 
+}).join(" ");
 
-                <div>
 
-                    <h3>WPM</h3>
 
-                    <p>{wpm}</p>
 
-                </div>
 
 
 
 
-                <div>
 
-                    <h3>Best WPM 🏆</h3>
+const totalTests =
+testHistory?.length || 0;
 
-                    <p>{bestWpm}</p>
 
-                </div>
 
 
 
+const averageWpm =
 
-                <div>
+totalTests
 
-                    <h3>Raw WPM</h3>
+?
 
-                    <p>{rawWpm}</p>
+Math.round(
 
-                </div>
+testHistory.reduce(
 
+(sum,test)=>
 
+sum + Number(test.wpm),
 
+0
 
-                <div>
+)
 
-                    <h3>Accuracy</h3>
+/
 
-                    <p>{accuracy}%</p>
+totalTests
 
-                </div>
+)
 
+:
 
+0;
 
 
-                <div>
 
-                    <h3>Characters</h3>
 
-                    <p>{characters}</p>
 
-                </div>
 
 
+return (
 
+<div className="result-card">
 
-                <div>
 
-                    <h3>Errors</h3>
 
-                    <p>{errors}</p>
+<h2>
+Test Complete 🎉
+</h2>
 
-                </div>
 
 
 
-            </div>
 
 
 
 
+<div className="result-stats">
 
 
 
 
 
-            <div className="graph-container">
+<div>
+<h3>WPM</h3>
+<p>{wpm}</p>
+</div>
 
 
-                <h3>
-                    WPM Progress
-                </h3>
 
 
 
-                <div className="axis-wrapper">
+<div>
+<h3>Raw WPM</h3>
+<p>{rawWpm}</p>
+</div>
 
 
-                    <div className="y-axis">
 
-                        WPM
 
-                    </div>
 
+<div>
+<h3>Accuracy</h3>
+<p>{accuracy}%</p>
+</div>
 
 
 
-                    <svg
 
-                    width={width}
 
-                    height={height}
+<div>
+<h3>Characters</h3>
+<p>{characters}</p>
+</div>
 
-                    className="wpm-graph"
 
-                    >
 
 
 
-                    <line
+<div>
+<h3>Errors</h3>
+<p>{errors}</p>
+</div>
 
-                    x1="0"
 
-                    y1="0"
 
-                    x2="0"
 
-                    y2={height}
 
-                    stroke="white"
+<div>
+<h3>Time Taken</h3>
+<p>{elapsedTime}s</p>
+</div>
 
-                    />
 
 
 
 
+<div>
+<h3>Personal Best 🏆</h3>
+<p>{bestWpm}</p>
+</div>
 
-                    <line
 
-                    x1="0"
 
-                    y1={height}
 
-                    x2={width}
 
-                    y2={height}
+<div>
+<h3>Average WPM</h3>
+<p>{averageWpm}</p>
+</div>
 
-                    stroke="white"
 
-                    />
 
 
 
+<div>
+<h3>Total Tests</h3>
+<p>{totalTests}</p>
+</div>
 
 
 
 
-                    <polyline
 
-                    points={points}
+</div>
 
-                    fill="none"
 
-                    stroke="#39d353"
 
-                    strokeWidth="3"
 
-                    />
 
 
 
 
 
+<div className="graph-container">
 
-                    {
-                    history.map((point,index)=>{
 
+<h3>
+WPM Progress
+</h3>
 
-                    const x =
-                    (index /
-                    Math.max(history.length-1,1))
-                    *
-                    width;
 
 
 
-                    const y =
-                    height -
-                    (
-                    point.wpm /
-                    maxWpm
-                    )
-                    *
-                    height;
 
+<svg
 
+width={width}
 
-                    return (
+height={height}
 
-                    <circle
+className="wpm-graph"
 
-                    key={index}
+>
 
-                    cx={x}
 
-                    cy={y}
 
-                    r="5"
+<line
 
-                    fill="#39d353"
+x1="0"
 
-                    >
+y1={height}
 
-                    <title>
+x2={width}
 
-                    {point.wpm} WPM at {point.time}s
+y2={height}
 
-                    </title>
+stroke="white"
 
+/>
 
-                    </circle>
 
-                    );
 
 
-                    })
-                    }
 
+<line
 
+x1="0"
 
-                    </svg>
+y1="0"
 
+x2="0"
 
+y2={height}
 
-                </div>
+stroke="white"
 
+/>
 
 
 
-                <div className="x-axis">
 
-                    Time (seconds)
 
-                </div>
 
 
 
-            </div>
+{
 
+safeHistory.length > 1 &&
 
 
+<polyline
 
+points={points}
 
+fill="none"
 
+stroke="#39d353"
 
+strokeWidth="4"
 
+/>
 
-            <div className="result-buttons">
 
+}
 
 
-                <button
 
-                onClick={repeatTest}
 
-                className="restart-btn"
 
-                >
 
-                    🔁 Repeat Words
 
-                </button>
 
 
+{
 
+safeHistory.map((point,index)=>{
 
 
-                <button
+const x =
 
-                onClick={newTest}
+(
+    index /
+    Math.max(
+        safeHistory.length-1,
+        1
+    )
+)
 
-                className="restart-btn"
+*
+width;
 
-                >
 
-                    🆕 New Test
 
-                </button>
 
 
+const y =
 
-            </div>
+height -
 
+(
+    Number(point.wpm) /
+    maxWpm
+)
 
+*
+height;
 
 
 
-        </div>
 
-    );
+
+return (
+
+<circle
+
+key={index}
+
+cx={x}
+
+cy={y}
+
+r="5"
+
+fill="#39d353"
+
+>
+
+<title>
+
+{point.wpm} WPM at {point.time}s
+
+</title>
+
+
+</circle>
+
+);
+
+
+})
+
+
+}
+
+
+
+
+
+
+</svg>
+
+
+
+
+
+
+
+<div className="x-axis">
+
+Time (seconds)
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="result-buttons">
+
+
+
+<button
+
+onClick={repeatTest}
+
+className="restart-btn"
+
+>
+
+🔁 Restart Test
+
+</button>
+
+
+
+
+
+
+
+<button
+
+onClick={newTest}
+
+className="restart-btn"
+
+>
+
+🆕 New Test
+
+</button>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
+
+);
 
 
 }

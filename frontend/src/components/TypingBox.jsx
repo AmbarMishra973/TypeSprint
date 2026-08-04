@@ -3,74 +3,105 @@ import useTypingEngine from "../hooks/useTypingEngine";
 import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
 import Result from "./Result";
+import ModeSelector from "./ModeSelector";
+import Dashboard from "./Dashboard";
 import "../styles/typingBox.css";
 
 
-function TypingBox() {
+function TypingBox(){
 
 
-    const {
+const {
 
-        words,
+    words,
 
-        typed,
+    typed,
 
-        currentIndex,
+    currentIndex,
 
-        currentChar,
+    currentChar,
 
-        handleKey,
-
-        time,
-
-        setTime,
-
-        selectedTime,
-
-        setSelectedTime,
-
-        isRunning,
-
-        setIsRunning,
-
-        finished,
-
-        setFinished,
-
-        repeatTest,
-
-        newTest,
-
-        bestRepeatedWpm,
-
-        updateBest,
-
-        calculateAccuracy,
-
-        calculateWPM,
-
-        calculateRawWPM,
-
-        correctCharacters,
-
-        incorrectCharacters,
-
-        wpmHistory,
-
-        addWpmPoint,
-
-        ghostPosition,
-setGhostPosition,
-ghostWpm,
-setGhostWpm
+    handleKey,
 
 
-    } = useTypingEngine();
+    time,
+
+    setTime,
+
+
+    selectedTime,
+
+    setSelectedTime,
+
+
+    testMode,
+
+    changeTestMode,
+
+
+    wordLimit,
+
+    changeWordLimit,
+
+
+    isRunning,
+
+    setIsRunning,
+
+
+    finished,
+
+
+    repeatTest,
+
+    newTest,
+
+
+    calculateAccuracy,
+
+    calculateWPM,
+
+    calculateRawWPM,
+
+
+    correctCharacters,
+
+    incorrectCharacters,
+
+
+    wpmHistory,
+
+    addWpmPoint,
+
+
+    ghostPosition,
+
+    setGhostPosition,
+
+
+    ghostWpm,
+
+    setGhostWpm,
+
+
+    getElapsedSeconds,
+
+
+    stats,
+
+    clearStatistics,
+
+
+    finishTest
+
+
+}=useTypingEngine();
 
 
 
 
-    const inputRef = useRef(null);
+
+const inputRef = useRef(null);
 
 const ghostStartTime = useRef(null);
 
@@ -78,130 +109,169 @@ const ghostStartTime = useRef(null);
 
 
 
-    useEffect(() => {
 
-
-    let timer;
-
-
-    if(isRunning && time>0){
-
-
-        timer=setInterval(()=>{
-
-
-            setTime(t=>t-1);
-
-
-            addWpmPoint();
-
-
-        },1000);
-
-
-    }
-
-
-
-    if(time===0){
-
-
-        setFinished(true);
-
-        setIsRunning(false);
-
-        updateBest();
-
-
-    }
-
-
-
-    return ()=>clearInterval(timer);
-
-
-
-},[isRunning,time]);
+// TIMER
 
 useEffect(()=>{
 
 
-    let animationFrame;
+let timer;
 
 
 
-    function moveGhost(){
+if(
+    isRunning &&
+    testMode==="time"
+){
 
 
-        if(!isRunning || ghostWpm <= 0){
+timer=setInterval(()=>{
 
-            return;
+
+    setTime(prev=>{
+
+
+        if(prev<=1){
+
+
+            addWpmPoint();
+
+            finishTest();
+
+
+            return 0;
 
         }
 
 
 
-        if(!ghostStartTime.current){
+        return prev-1;
 
-            ghostStartTime.current =
-            performance.now();
 
-        }
+    });
 
 
 
-        const elapsed =
-        (
-            performance.now()
-            -
-            ghostStartTime.current
-        )
-        /
-        1000;
+    if(time>1){
 
-
-
-        const charactersPerSecond =
-        (ghostWpm * 5) / 60;
-
-
-
-        const position =
-        Math.floor(
-            elapsed * charactersPerSecond
-        );
-
-
-
-        setGhostPosition(position);
-
-
-
-        animationFrame =
-        requestAnimationFrame(moveGhost);
-
+        addWpmPoint();
 
     }
 
 
 
-
-
-    if(isRunning){
-
-        animationFrame =
-        requestAnimationFrame(moveGhost);
-
-    }
+},1000);
 
 
 
+}
 
-    return ()=>{
 
-        cancelAnimationFrame(animationFrame);
 
-    }
+return ()=>{
+
+    clearInterval(timer);
+
+};
+
+
+},[
+    isRunning,
+    time,
+    testMode
+]);
+
+
+
+
+
+
+
+
+
+// GHOST
+
+useEffect(()=>{
+
+
+let frame;
+
+
+
+function animate(){
+
+
+if(
+    !isRunning ||
+    ghostWpm<=0
+)
+return;
+
+
+
+if(!ghostStartTime.current){
+
+
+ghostStartTime.current =
+performance.now();
+
+
+}
+
+
+
+const elapsed =
+
+(
+performance.now()
+-
+ghostStartTime.current
+)
+/
+1000;
+
+
+
+const speed =
+(ghostWpm*5)/60;
+
+
+
+setGhostPosition(
+
+Math.floor(
+elapsed*speed
+)
+
+);
+
+
+
+frame=requestAnimationFrame(
+animate
+);
+
+
+
+}
+
+
+
+if(isRunning){
+
+frame=requestAnimationFrame(
+animate
+);
+
+}
+
+
+
+return ()=>{
+
+cancelAnimationFrame(frame);
+
+};
 
 
 
@@ -211,34 +281,79 @@ ghostWpm
 ]);
 
 
+// WPM GRAPH TRACKER (BOTH MODES)
+
+useEffect(()=>{
+
+let graphTimer;
 
 
+if(isRunning){
 
+    graphTimer=setInterval(()=>{
 
+        addWpmPoint();
 
-    function keyHandler(e){
-
-
-        e.preventDefault();
-
-
-        if(!isRunning){
-
-    setGhostWpm(
-    bestRepeatedWpm || calculateWPM()
-);
-
-    ghostStartTime.current=null;
+    },1000);
 
 }
+
+
+return ()=>{
+
+    clearInterval(graphTimer);
+
+};
+
+
+},[
+isRunning
+]);
+
+
+
+
+
+
+function keyHandler(e){
+
+
+e.preventDefault();
+
+
+
+if(!isRunning){
+
+
+ghostStartTime.current=null;
+
+
+
+setGhostWpm(
+    stats.bestWpm || 0
+);
+
+
+
+}
+
 
 
 handleKey(e.key);
 
 
-    }
+
+}
 
 
+
+
+
+
+
+const elapsedTime = Math.floor(
+    getElapsedSeconds()
+);
 
 
 
@@ -254,52 +369,41 @@ return (
 
 
 
-<div className="time-selector">
 
 
-{
-
-[30,60,120].map(seconds=>(
+<ModeSelector
 
 
-<button
-
-key={seconds}
-
-className={
-selectedTime===seconds
-?
-"active-time"
-:
-""
-}
+testMode={testMode}
 
 
-onClick={()=>{
+setTestMode={changeTestMode}
 
 
-setSelectedTime(seconds);
 
-setTime(seconds);
+selectedTime={selectedTime}
+
+
+setSelectedTime={(value)=>{
+
+
+setSelectedTime(value);
+
+
+setTime(value);
 
 
 }}
 
->
 
 
-{seconds}s
+wordLimit={wordLimit}
 
 
-</button>
+setWordLimit={changeWordLimit}
 
 
-))
-
-}
-
-
-</div>
+/>
 
 
 
@@ -311,7 +415,34 @@ setTime(seconds);
 
 <div className="timer">
 
+
+{
+
+testMode==="time"
+
+
+?
+
+
+<>
+
 Time Left : {time}s
+
+</>
+
+
+:
+
+
+<>
+
+Time Taken : {elapsedTime}s
+
+</>
+
+
+}
+
 
 </div>
 
@@ -334,15 +465,22 @@ Time Left : {time}s
 
 <TypingViewport
 
+
 words={words}
+
 
 typed={typed}
 
+
 currentIndex={currentIndex}
+
 
 currentChar={currentChar}
 
+
 ghostPosition={ghostPosition}
+
+
 />
 
 
@@ -354,9 +492,6 @@ ghostPosition={ghostPosition}
 
 
 <Stats
-
-
-time={time}
 
 
 wpm={calculateWPM()}
@@ -375,6 +510,7 @@ errors={incorrectCharacters}
 
 
 />
+
 
 
 
@@ -398,12 +534,19 @@ className="hidden-input"
 onKeyDown={keyHandler}
 
 
-onBlur={()=>
-inputRef.current.focus()
-}
+
+onBlur={()=>{
+
+
+inputRef.current?.focus();
+
+
+}}
 
 
 />
+
+
 
 
 
@@ -427,29 +570,80 @@ inputRef.current.focus()
 finished &&
 
 
+<>
+
+
+
 <Result
+
 
 wpm={calculateWPM()}
 
+
 rawWpm={calculateRawWPM()}
+
 
 accuracy={calculateAccuracy()}
 
+
 characters={correctCharacters}
+
 
 errors={incorrectCharacters}
 
+
+
 history={wpmHistory}
 
-bestWpm={bestRepeatedWpm}
+
+bestWpm={stats.bestWpm}
+
+
+testHistory={stats.recentTests}
+
+
+
+elapsedTime={elapsedTime}
+
+
 
 repeatTest={repeatTest}
 
+
 newTest={newTest}
+
 
 />
 
+
+
+
+
+
+
+
+
+<Dashboard
+
+
+stats={stats}
+
+
+onReset={clearStatistics}
+
+
+/>
+
+
+
+</>
+
+
 }
+
+
+
+
 
 
 
@@ -460,6 +654,7 @@ newTest={newTest}
 
 
 }
+
 
 
 export default TypingBox;
