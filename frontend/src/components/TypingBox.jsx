@@ -4,6 +4,7 @@ import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
 import Result from "./Result";
 import ModeSelector from "./ModeSelector";
+import ThemeSelector from "./ThemeSelector";
 import Dashboard from "./Dashboard";
 import "../styles/typingBox.css";
 
@@ -129,6 +130,7 @@ function TypingBox() {
 
   return (
     <div className="typing-box">
+      <ThemeSelector />
       <ModeSelector
         testMode={testMode}
         setTestMode={changeTestMode}

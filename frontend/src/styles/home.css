@@ -1,3 +1,38 @@
+:root {
+  --bg-color: #0f172a;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --text-main: white;
+  --text-muted: #8b95a5;
+  --primary-accent: #38bdf8;
+  --error-color: #ef4444;
+  --correct-color: #22c55e;
+}
+
+[data-theme="cyberpunk"] {
+  --bg-color: #fdf6e3;
+  --card-bg: #f4e85c;
+  --text-main: #111111;
+  --text-muted: #555555;
+  --primary-accent: #ff003c;
+  --error-color: #ff003c;
+  --correct-color: #00f0ff;
+}
+
+[data-theme="dracula"] {
+  --bg-color: #282a36;
+  --card-bg: #44475a;
+  --text-main: #f8f8f2;
+  --text-muted: #6272a4;
+  --primary-accent: #ff79c6;
+  --error-color: #ff5555;
+  --correct-color: #50fa7b;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 * {
   box-sizing: border-box;
 }
@@ -10,11 +45,10 @@ body {
 
 .home {
   min-height: 100vh;
-  background: #0f172a;
-  color: white;
+  background: var(--bg-color); 
+  color: var(--text-main);    
   padding: 30px;
 }
-
 .navbar {
   display: flex;
   justify-content: center;
@@ -55,11 +89,7 @@ h1 {
 
 .typing-box {
   margin-top: 40px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  padding: 30px;
-
+  background: var(--card-bg); 
   border-radius: 20px;
 }
 
@@ -105,24 +135,20 @@ textarea {
   margin-bottom: 25px;
 }
 
-.correct {
-  color: #22c55e;
-}
-
-.wrong {
-  color: #ef4444;
-}
-
 .timer {
   font-size: 24px;
-
   margin-bottom: 20px;
-
-  color: #38bdf8;
-
+  color: var(--primary-accent); 
   font-weight: bold;
 }
 
+.correct {
+  color: var(--correct-color);
+}
+
+.wrong {
+  color: var(--error-color); 
+}
 .result-card {
   background: rgba(255, 255, 255, 0.1);
 
@@ -246,23 +272,19 @@ textarea {
 .typing-text span {
   transition: 0.1s;
 }
-
 .typing-text .correct {
-  color: #22c55e;
+  color: var(--correct-color);
 }
 
 .typing-text .wrong {
-  color: #ef4444;
+  color: var(--error-color);
 }
 
 .typing-text .current {
-  color: white;
-
-  border-bottom: 3px solid #38bdf8;
-
+  color: var(--text-main); 
+  border-bottom: 3px solid var(--primary-accent); 
   animation: blink 1s infinite;
 }
-
 @keyframes blink {
   50% {
     border-color: transparent;
@@ -287,4 +309,17 @@ body {
   overflow-x: hidden;
 
   overflow-y: auto;
+}
+
+h1, h2, h3, h4, p {
+  color: var(--text-main);
+}
+
+.stats div, 
+.stats div h3, 
+.stats div p,
+.result-stats div,
+.result-stats div h3,
+.result-stats div p {
+  color: var(--text-main) !important;
 }
