@@ -78,6 +78,7 @@ function useTypingEngine() {
   const [correctCharacters, setCorrectCharacters] = useState(0);
   const [incorrectCharacters, setIncorrectCharacters] = useState(0);
   const [isRepeat, setIsRepeat] = useState(false);
+  const [missedKeys, setMissedKeys] = useState({});
   const [wpmHistory, setWpmHistory] = useState([]);
   const [resultSaved, setResultSaved] = useState(false);
   const [ghostPosition, setGhostPosition] = useState(0);
@@ -143,10 +144,17 @@ function useTypingEngine() {
         setCorrectCharacters((prev) => prev + 1);
       } else {
         setIncorrectCharacters((prev) => prev + 1);
+        if (expected) {
+                    setMissedKeys(prev => ({
+                        ...prev,
+                        [expected]: (prev[expected] || 0) + 1
+                    }));
+                }
       }
 
       setTyped((prev) => prev + key);
       setCurrentChar((prev) => prev + 1);
+      
     }
   }
 
@@ -250,6 +258,7 @@ function useTypingEngine() {
     setResultSaved(false);
     setWpmHistory([]);
     setGhostPosition(0);
+    setMissedKeys({});
   }
 
   function changeTestMode(mode) {
@@ -332,7 +341,8 @@ function useTypingEngine() {
     saveCurrentTest,
     updateBest,
     bestRepeatedWpm,
-    isRepeat
+    isRepeat,
+    missedKeys
   };
 }
 

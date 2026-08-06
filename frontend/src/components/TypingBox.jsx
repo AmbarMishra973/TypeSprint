@@ -42,7 +42,8 @@ function TypingBox() {
     stats,
     clearStatistics,
     isRepeat,
-    finishTest
+    finishTest,
+    missedKeys={missedKeys}
   } = useTypingEngine();
 
   const inputRef = useRef(null);
@@ -191,6 +192,7 @@ function TypingBox() {
             elapsedTime={elapsedTime}
             repeatTest={repeatTest}
             newTest={newTest}
+            missedKeys={missedKeys}
           />
 
           <Dashboard stats={stats} onReset={clearStatistics} />

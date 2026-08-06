@@ -1,3 +1,4 @@
+import KeyboardHeatmap from "./KeyboardHeatmap";
 function Result({
   wpm,
 
@@ -19,7 +20,8 @@ function Result({
 
   newTest,
 
-  elapsedTime
+  elapsedTime,
+  missedKeys={}
 }) {
   const safeHistory = history?.length ? history : [];
 
@@ -179,7 +181,9 @@ function Result({
 
         <div className="x-axis">Time (seconds)</div>
       </div>
-
+{Object.keys(missedKeys).length > 0 && (
+        <KeyboardHeatmap missedKeys={missedKeys} />
+    )}
       <div className="result-buttons">
         <button
           onClick={repeatTest}

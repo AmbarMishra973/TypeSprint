@@ -1,0 +1,63 @@
+.heatmap-container {
+    margin-top: 40px;
+    background: #1c2128;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.heatmap-sub {
+    color: #8b95a5;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 8px;
+}
+
+/* Offset the rows slightly to look like a real keyboard */
+.keyboard-row:nth-child(2) { margin-left: 20px; }
+.keyboard-row:nth-child(3) { margin-left: 40px; }
+
+.key {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    position: relative;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.miss-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4d4f;
+    color: white;
+    font-size: 11px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
