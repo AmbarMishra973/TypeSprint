@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import useTypingEngine from "../hooks/useTypingEngine";
 import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
@@ -48,12 +48,16 @@ function TypingBox() {
     keystrokeLog,
     missedKeys={missedKeys},
     soundEnabled,
-    setSoundEnabled
+    setSoundEnabled,
+    
+    punctuationFreq,
+    numberFreq,
+    updateModifiers
   } = useTypingEngine();
 
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
-
+  const [showModifiers, setShowModifiers] = useState(false);
   // 1. Store the freshest functions in a ref to avoid stale closures
   const latestEngine = useRef({ addWpmPoint, finishTest });
 
@@ -137,7 +141,7 @@ function TypingBox() {
         <button 
           onClick={() => setSoundEnabled(!soundEnabled)}
           style={{ 
-            padding: '8px 15px', 
+            padding: '8px 12px',
             borderRadius: '8px',
             background: soundEnabled ? 'var(--primary-accent)' : 'var(--card-bg)',
             color: soundEnabled ? '#fff' : 'var(--text-main)',
@@ -145,30 +149,91 @@ function TypingBox() {
             cursor: 'pointer',
             fontWeight: 'bold',
             transition: '0.2s',
-            width: '140px'
+            width: '140px' 
           }}
         >
           {soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF'}
         </button>
       </div>
-      <ModeSelector
-        testMode={testMode}
-        setTestMode={changeTestMode}
-        selectedTime={selectedTime}
-        setSelectedTime={(value) => {
-          setSelectedTime(value);
-          setTime(value);
-        }}
-        wordLimit={wordLimit}
-        setWordLimit={changeWordLimit}
-      />
 
-      <div className="timer">
-        {testMode === "time" ? (
-          <>Time Left : {time}s</>
-        ) : (
-          <>Time Taken : {elapsedTime}s</>
+      <div 
+        style={{ position: 'fixed', top: '120px', right: '20px', zIndex: 9999 }}
+        onMouseEnter={() => setShowModifiers(true)}
+        onMouseLeave={() => setShowModifiers(false)}
+      >
+        <button 
+          style={{ 
+            padding: '8px 12px',
+            borderRadius: '8px',
+            background: (punctuationFreq > 0 || numberFreq > 0) ? 'var(--primary-accent)' : 'var(--card-bg)',
+            color: (punctuationFreq > 0 || numberFreq > 0) ? '#fff' : 'var(--text-main)',
+            border: '1px solid var(--text-muted)',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: '0.2s',
+            width: '140px' 
+          }}
+        >
+          ⚙️ Modifiers
+        </button >
+
+        {showModifiers && (
+          <div style={{
+            position: 'absolute', 
+            top: '100%', 
+            right: '0', 
+            paddingTop: '8px',
+            background: 'var(--card-bg)', 
+            border: '1px solid var(--text-muted)',
+            padding: '15px', 
+            borderRadius: '12px', 
+            marginTop: '8px', 
+            width: '220px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            color: 'var(--text-main)'
+          }}>
+            <div style={{ marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 'bold' }}>@ Punctuation</span>
+                <span>{punctuationFreq}%</span>
+              </div>
+              <input 
+                type="range" min="0" max="100" step="5"
+                value={punctuationFreq} 
+                onChange={(e) => updateModifiers(Number(e.target.value), numberFreq)}
+                style={{ width: '100%', cursor: 'pointer' }}
+              />
+            </div>
+            
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                <span style={{ fontWeight: 'bold' }}># Numbers</span>
+                <span>{numberFreq}%</span>
+              </div>
+              <input 
+                type="range" min="0" max="100" step="5"
+                value={numberFreq} 
+                onChange={(e) => updateModifiers(punctuationFreq, Number(e.target.value))}
+                style={{ width: '100%', cursor: 'pointer' }}
+              />
+            </div>
+          </div>
         )}
+      </div>
+
+      <div className="time-selector">
+        <button 
+          className={testMode === "time" ? "active-time" : ""} 
+          onClick={() => changeTestMode("time")}
+        >
+          Time
+        </button>
+        <button 
+          className={testMode === "words" ? "active-time" : ""} 
+          onClick={() => changeTestMode("words")}
+        >
+          Words
+        </button>
       </div>
 
       {!finished && (

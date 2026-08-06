@@ -38,10 +38,27 @@ const wordBank = [
   "challenge"
 ];
 
-function generateWords(amount = 300) {
+function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
   const result = [];
+  const punctuations = [",", ".", "?", "!", ";", ":", '"', '()'];
+
   for (let i = 0; i < amount; i++) {
-    result.push(wordBank[Math.floor(Math.random() * wordBank.length)]);
+    let word = wordBank[Math.floor(Math.random() * wordBank.length)];
+
+    
+    if (numFreq > 0 && Math.random() * 100 < numFreq) {
+      word = Math.floor(Math.random() * 1000).toString();
+    } else if (punctFreq > 0 && Math.random() * 100 < punctFreq) {
+      
+      if (Math.random() < 0.5) word = word.charAt(0).toUpperCase() + word.slice(1);
+      
+      
+      const punc = punctuations[Math.floor(Math.random() * punctuations.length)];
+      if (punc === '"') word = `"${word}"`;
+      else if (punc === '()') word = `(${word})`;
+      else word += punc;
+    }
+    result.push(word);
   }
   return result;
 }
@@ -91,6 +108,15 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [ghostPosition, setGhostPosition] = useState(0);
   const [ghostWpm, setGhostWpm] = useState(0);
   const [bestRepeatedWpm, setBestRepeatedWpm] = useState(0);
+  const [punctuationFreq, setPunctuationFreq] = useState(0);
+  const [numberFreq, setNumberFreq] = useState(0);
+
+  function updateModifiers(pFreq, nFreq) {
+    setPunctuationFreq(pFreq);
+    setNumberFreq(nFreq);
+    setWords(generateWords(testMode === "words" ? wordLimit : 300, pFreq, nFreq));
+    resetTest();
+  }
 
   function getElapsedSeconds() {
     if (finalElapsed > 0) return finalElapsed;
@@ -255,6 +281,23 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
       { time: Math.floor(elapsed), wpm: currentWpm }
     ]);
   }
+  function togglePunctuation() {
+    setUsePunctuation((prev) => {
+      const next = !prev;
+      setWords(generateWords(testMode === "words" ? wordLimit : 300, next, useNumbers));
+      resetTest();
+      return next;
+    });
+  }
+
+  function toggleNumbers() {
+    setUseNumbers((prev) => {
+      const next = !prev;
+      setWords(generateWords(testMode === "words" ? wordLimit : 300, usePunctuation, next));
+      resetTest();
+      return next;
+    });
+  }
 
   function saveCurrentTest(elapsed) {
     const currentWpm = calculateWPM();
@@ -336,26 +379,27 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
 
   function changeTestMode(mode) {
     setTestMode(mode);
-    setWords(mode === "words" ? generateWords(wordLimit) : generateWords(300));
+    setWords(generateWords(mode === "words" ? wordLimit : 300, usePunctuation, useNumbers));
     resetTest();
   }
 
   function changeWordLimit(value) {
     setWordLimit(value);
     if (testMode === "words") {
-      setWords(generateWords(value));
+      setWords(generateWords(value, usePunctuation, useNumbers));
       resetTest();
     }
   }
 
   function repeatTest() {
+
     resetTest();
     setIsRepeat(true);
   }
 
   function newTest() {
     setWords(
-      testMode === "words" ? generateWords(wordLimit) : generateWords(300)
+      generateWords(testMode === "words" ? wordLimit : 300, usePunctuation, useNumbers)
     );
     resetTest();
     setIsRepeat(false);
@@ -419,7 +463,11 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     wordTimes,
     keystrokeLog,
     soundEnabled,        
-    setSoundEnabled
+    setSoundEnabled,
+    
+    punctuationFreq,
+    numberFreq,
+    updateModifiers
   };
 }
 
