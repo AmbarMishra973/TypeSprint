@@ -49,24 +49,30 @@ function TypingBox() {
     missedKeys = { missedKeys },
     soundEnabled,
     setSoundEnabled,
-
+changeTimeLimit,
     punctuationFreq,
     numberFreq,
     updateModifiers,
     isQuoteMode,
     quoteAuthor,
-    fetchQuoteTest
+    fetchQuoteTest,
+    repeatBestWpm,
   } = useTypingEngine();
 
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
   const [showModifiers, setShowModifiers] = useState(false);
   // 1. Store the freshest functions in a ref to avoid stale closures
-  const latestEngine = useRef({ addWpmPoint, finishTest });
+  // 1. Store the freshest state in a ref to avoid stale closures
+  const latestEngine = useRef({ 
+    addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
+  });
 
   // 2. Keep the ref constantly updated on every render/keystroke
   useEffect(() => {
-    latestEngine.current = { addWpmPoint, finishTest };
+    latestEngine.current = { 
+      addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
+    };
   });
 
   // 3. MASTER TIMER & GRAPH TRACKER
@@ -108,10 +114,26 @@ function TypingBox() {
         ghostStartTime.current = performance.now();
       }
 
-      const elapsed = (performance.now() - ghostStartTime.current) / 1000;
-      const speed = (ghostWpm * 5) / 60;
+      const { 
+        words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
+      } = latestEngine.current;
 
-      setGhostPosition(Math.floor(elapsed * speed));
+      let expectedTrackLength = 0;
+      for (let i = 0; i < currentIndex; i++) {
+        expectedTrackLength += words[i]?.length || 0;
+      }
+      const userTrackPosition = expectedTrackLength + currentIndex + currentChar;
+
+      const userTypedEffort = correctCharacters + incorrectCharacters;
+
+      const skippedCharacters = userTrackPosition - userTypedEffort;
+
+      const elapsed = (performance.now() - ghostStartTime.current) / 1000;
+      const speed = (ghostWpm * 5) / 60; 
+
+      const finalPosition = Math.max(0, Math.floor((elapsed * speed) + skippedCharacters));
+      
+      setGhostPosition(finalPosition);
       frame = requestAnimationFrame(animate);
     }
 
@@ -123,18 +145,17 @@ function TypingBox() {
       cancelAnimationFrame(frame);
     };
   }, [isRunning, ghostWpm, isRepeat, setGhostPosition]);
-
-  function keyHandler(e) {
+function keyHandler(e) {
     e.preventDefault();
 
     if (!isRunning) {
       ghostStartTime.current = null;
-      setGhostWpm(stats.bestWpm || 0);
+      // Sets the ghost to the repeat best if repeating, otherwise uses your global best
+      setGhostWpm(isRepeat ? repeatBestWpm : (stats.bestWpm || 0));
     }
 
     handleKey(e.key);
   }
-
   const elapsedTime = Math.floor(getElapsedSeconds());
 
   return (
@@ -290,7 +311,7 @@ function TypingBox() {
             {[15, 30, 60, 120].map((t) => (
               <button
                 key={t}
-                onClick={() => setSelectedTime(t)}
+                onClick={() => changeTimeLimit(t)}
                 style={{
                   background: selectedTime === t ? 'var(--primary-accent)' : 'transparent',
                   color: selectedTime === t ? '#fff' : 'var(--text-muted)',
@@ -332,8 +353,22 @@ function TypingBox() {
       </div>
       </div>
       {!finished && (
-        <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--primary-accent)', marginBottom: '15px', textAlign: 'center' }}>
-          {testMode === "time" ? time : elapsedTime}s
+        <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+          
+          {isQuoteMode && quoteAuthor && (
+            <div style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '8px', fontStyle: 'italic' }}>
+              ~ {quoteAuthor}
+            </div>
+          )}
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--primary-accent)' }}>
+            {testMode === "time" ? time : elapsedTime}s
+          </div>
+
+          {isRepeat && repeatBestWpm > 0 && (
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: '500' }}>
+              👻 Racing Ghost: <span style={{ color: 'var(--primary-accent)', fontWeight: 'bold' }}>{repeatBestWpm} WPM</span>
+            </div>
+          )}
         </div>
       )}
 

@@ -111,6 +111,7 @@ function useTypingEngine() {
   const [numberFreq, setNumberFreq] = useState(0);
   const [isQuoteMode, setIsQuoteMode] = useState(false);
   const [quoteAuthor, setQuoteAuthor] = useState("");
+  const [repeatBestWpm, setRepeatBestWpm] = useState(0);
 
   // Local curated list of quotes (100% reliable, no internet required)
   const sampleQuotes = [
@@ -389,7 +390,7 @@ function useTypingEngine() {
     setFinalElapsed(elapsed);
 
     const finalWpm = Math.round(correctCharacters / 5 / (elapsed / 60));
-
+setRepeatBestWpm((prev) => Math.max(prev, finalWpm));
     setWpmHistory((prev) => [
       ...prev,
       { time: Math.floor(elapsed), wpm: finalWpm }
@@ -434,25 +435,30 @@ function useTypingEngine() {
     setWords(
       generateWords(
         mode === "words" ? wordLimit : 300,
-        punctuationFreq,  
-        numberFreq        
+        punctuationFreq,
+        numberFreq       
       )
     );
     resetTest();
   }
 
+  function changeTimeLimit(value) {
+    setSelectedTime(value);
+    setTime(value); 
+    setIsQuoteMode(false);
+    setQuoteAuthor("");
+    if (testMode === "time") {
+      setWords(generateWords(300, punctuationFreq, numberFreq));
+      resetTest();
+      setTime(value); 
+    }
+  }
   function changeWordLimit(value) {
     setWordLimit(value);
     setIsQuoteMode(false); 
     setQuoteAuthor("");
     if (testMode === "words") {
-      setWords(
-        generateWords(
-          value, 
-          punctuationFreq,
-          numberFreq        
-        )
-      );
+      setWords(generateWords(value, punctuationFreq, numberFreq));
       resetTest();
     }
   }
@@ -460,6 +466,7 @@ function useTypingEngine() {
   function repeatTest() {
     resetTest();
     setIsRepeat(true);
+    setGhostWpm(repeatBestWpm);
   }
 
   function newTest() {
@@ -473,6 +480,7 @@ function useTypingEngine() {
     );
     resetTest();
     setIsRepeat(false);
+    setRepeatBestWpm(0);
   }
 
   function updateBest() {
@@ -540,7 +548,9 @@ function useTypingEngine() {
     updateModifiers,
     isQuoteMode,
     quoteAuthor,
-    fetchQuoteTest
+    fetchQuoteTest,
+    changeTimeLimit,
+    repeatBestWpm,
   };
 }
 
