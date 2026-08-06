@@ -4,251 +4,141 @@ import Stats from "./Stats";
 import Result from "./Result";
 import generateWords from "../utils/generateWords";
 
-
 function TypingBox() {
+  const [paragraph, setParagraph] = useState(generateWords());
 
+  const [typedText, setTypedText] = useState("");
 
-    const [paragraph, setParagraph] = useState(generateWords());
+  const [selectedTime, setSelectedTime] = useState(30);
 
+  const [time, setTime] = useState(30);
 
-    const [typedText, setTypedText] = useState("");
+  const [isRunning, setIsRunning] = useState(false);
 
-    const [selectedTime, setSelectedTime] = useState(30);
+  const [finished, setFinished] = useState(false);
 
-const [time, setTime] = useState(30);
+  const correctCharacters = typedText
+    .split("")
+    .filter((char, index) => char === paragraph[index]).length;
 
-    const [isRunning, setIsRunning] = useState(false);
+  const accuracy =
+    typedText.length === 0
+      ? 100
+      : ((correctCharacters / typedText.length) * 100).toFixed(1);
 
-    const [finished, setFinished] = useState(false);
+  const minutes = (30 - time) / 60;
 
-    const correctCharacters = typedText
-.split("")
-.filter((char,index)=>char === paragraph[index])
-.length;
+  const wpm = minutes === 0 ? 0 : Math.round(correctCharacters / 5 / minutes);
 
+  useEffect(() => {
+    let timer;
 
-const accuracy = typedText.length === 0 
-? 100
-: ((correctCharacters / typedText.length) * 100).toFixed(1);
+    if (isRunning && time > 0) {
+      timer = setInterval(() => {
+        setTime((previous) => previous - 1);
+      }, 1000);
+    }
 
+    if (time === 0) {
+      setFinished(true);
 
-const minutes = (30-time)/60;
+      setIsRunning(false);
+    }
 
+    return () => clearInterval(timer);
+  }, [isRunning, time]);
 
-const wpm = minutes === 0
-? 0
-: Math.round((correctCharacters/5)/minutes);
+  function handleTyping(event) {
+    if (finished) {
+      return;
+    }
 
+    if (!isRunning) {
+      setIsRunning(true);
+    }
 
+    setTypedText(event.target.value);
 
-    useEffect(() => {
+    if (typedText.length > paragraph.length - 300) {
+      setParagraph((previous) => previous + " " + generateWords(100));
+    }
+  }
 
+  return (
+    <div className="typing-box">
+      {!finished && (
+        <>
+          <div className="time-selector">
+            {[30, 60, 120].map((seconds) => (
+              <button
+                key={seconds}
 
-        let timer;
+                className={selectedTime === seconds ? "active-time" : ""}
 
+                onClick={() => {
+                  setSelectedTime(seconds);
 
-        if(isRunning && time > 0){
+                  setTime(seconds);
+                }}
+              >
+                {seconds}s
+              </button>
+            ))}
+          </div>
 
-            timer = setInterval(() => {
+          <div className="timer">Time Left: {time}s</div>
 
-                setTime(previous => previous - 1);
+          <TypingText
+            paragraph={paragraph}
 
-            },1000);
+            typedText={typedText}
+          />
 
-        }
+          <textarea
+            className="hidden-input"
 
+            value={typedText}
 
-        if(time === 0){
+            onChange={handleTyping}
 
-            setFinished(true);
+            autoFocus
+          />
+
+          <Stats
+            time={time}
+
+            typedText={typedText}
+
+            accuracy={accuracy}
+
+            wpm={wpm}
+          />
+        </>
+      )}
+
+      {finished && (
+        <Result
+          wpm={wpm}
+
+          accuracy={accuracy}
+
+          characters={typedText.length}
+
+          restart={() => {
+            setTypedText("");
+
+            setTime(selectedTime);
+
+            setFinished(false);
 
             setIsRunning(false);
 
-        }
-
-
-        return () => clearInterval(timer);
-
-
-    },[isRunning,time]);
-
-
-
-
-
-    function handleTyping(event){
-
-
-        if(finished){
-            return;
-        }
-
-
-        if(!isRunning){
-
-            setIsRunning(true);
-
-        }
-
-
-        setTypedText(event.target.value);
-
-        if(typedText.length > paragraph.length - 300){
-
-    setParagraph(previous => previous + " " + generateWords(100));
-
+            setParagraph(generateWords());
+          }}
+        />
+      )}
+    </div>
+  );
 }
-
-
-    }
-
-
-
-
-
-    return (
-
-<div className="typing-box">
-
-
-{
-!finished && (
-
-<>
-
-
-<div className="time-selector">
-
-{
-[30,60,120].map((seconds)=>(
-
-
-<button
-
-key={seconds}
-
-className={
-selectedTime === seconds
-?
-"active-time"
-:
-""
-}
-
-
-onClick={()=>{
-
-setSelectedTime(seconds);
-
-setTime(seconds);
-
-}}
-
-
->
-
-{seconds}s
-
-</button>
-
-
-))
-
-}
-
-</div>
-
-
-
-<div className="timer">
-
-Time Left: {time}s
-
-</div>
-
-
-    <TypingText
-
-paragraph={paragraph}
-
-typedText={typedText}
-
-/>
-
-
-
-   <textarea
-
-className="hidden-input"
-
-value={typedText}
-
-onChange={handleTyping}
-
-autoFocus
-
-/>
-
-
-
-    <Stats
-
-        time={time}
-
-        typedText={typedText}
-
-        accuracy={accuracy}
-
-        wpm={wpm}
-
-    />
-
-</>
-
-)
-
-
-
-}
-
-
-{
-finished && (
-
-<Result
-
-    wpm={wpm}
-
-    accuracy={accuracy}
-
-    characters={typedText.length}
-
-    restart={()=>{
-
-        setTypedText("");
-
-        setTime(selectedTime);
-
-        setFinished(false);
-
-        setIsRunning(false);
-
-        setParagraph(generateWords());
-
-    }}
-
-/>
-
-)
-
-}
-
-
-</div>
-
-    );
-
-}
-
 
 export default TypingBox;

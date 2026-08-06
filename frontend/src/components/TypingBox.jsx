@@ -154,7 +154,7 @@ function TypingBox() {
             currentIndex={currentIndex}
             currentChar={currentChar}
             ghostPosition={ghostPosition}
-            isRepeat={isRepeat} 
+            isRepeat={isRepeat}
           />
 
           <Stats

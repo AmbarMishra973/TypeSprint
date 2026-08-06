@@ -34,14 +34,15 @@ function TypingViewport({
       const newLines = [];
       let currentLine = [];
       let currentWidth = 0;
-      
+
       const GAP = 12;
 
       wordRefs.current.forEach((element, index) => {
         if (!element) return;
 
         const wordWidth = element.getBoundingClientRect().width;
-        const widthToAdd = currentLine.length === 0 ? wordWidth : wordWidth + GAP;
+        const widthToAdd =
+          currentLine.length === 0 ? wordWidth : wordWidth + GAP;
 
         if (currentWidth + widthToAdd > maxWidth + 1) {
           newLines.push(currentLine);
@@ -76,7 +77,9 @@ function TypingViewport({
   }, [words]);
 
   // 2. FIND CURRENT LINE
-  const currentLineIndex = lines.findIndex((line) => line.includes(currentIndex));
+  const currentLineIndex = lines.findIndex((line) =>
+    line.includes(currentIndex)
+  );
   const startLine = currentLineIndex === -1 ? 0 : currentLineIndex;
   const visibleLines = lines.slice(startLine, startLine + VISIBLE_LINES);
 
@@ -87,7 +90,7 @@ function TypingViewport({
 
   for (let i = 0; i < words.length; i++) {
     // SAFETY: Skip iteration if word is undefined during state transition
-    if (!words[i]) continue; 
+    if (!words[i]) continue;
 
     const length = words[i].length + 1;
 
@@ -102,7 +105,7 @@ function TypingViewport({
   // 4. GHOST LOCATION
   useEffect(() => {
     // Optimization: Don't run DOM queries if the ghost isn't active
-    if (!isRepeat) return; 
+    if (!isRepeat) return;
 
     const element = document.querySelector(
       `.typing-char[data-word="${ghostWord}"][data-char="${ghostChar}"]`
@@ -121,10 +124,9 @@ function TypingViewport({
 
   return (
     <div className="typing-viewport" ref={containerRef}>
-      
       {/* Hidden measuring layer */}
       <div className="measure-box" ref={measureRef}>
-        {words.map((word, index) => (
+        {words.map((word, index) =>
           // SAFETY: Check if word exists before rendering
           word ? (
             <span
@@ -135,7 +137,7 @@ function TypingViewport({
               {word}
             </span>
           ) : null
-        ))}
+        )}
       </div>
 
       {/* Visible Typing Area */}
@@ -143,9 +145,9 @@ function TypingViewport({
         <div className="typing-line" key={lineIndex}>
           {line.map((wordIndex) => {
             const word = words[wordIndex];
-            
+
             // CRITICAL SAFETY CHECK: Prevents the '.split is not a function' crash
-            if (!word) return null; 
+            if (!word) return null;
 
             const active = wordIndex === currentIndex;
 
@@ -159,7 +161,8 @@ function TypingViewport({
 
                   if (active) {
                     if (index < typed.length) {
-                      className = typed[index] === char ? "correct-char" : "wrong-char";
+                      className =
+                        typed[index] === char ? "correct-char" : "wrong-char";
                     }
 
                     if (index === currentChar) {
