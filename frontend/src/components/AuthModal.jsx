@@ -1,36 +1,48 @@
 import { useState } from "react";
+import { loginUser, signupUser } from "../services/api"; // 👈 Import your new API service
 
 function AuthModal({ onClose, onLoginSuccess }) {
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // 👈 Added password field if your backend requires it
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!username.trim()) return;
+    setErrorMsg("");
 
-    // Create session user object
-    const userData = {
-      username: username.trim(),
-      email: email.trim() || `${username.toLowerCase()}@typingmaster.com`,
-      joined: Date.now()
-    };
-
-    // Save to localStorage
-    localStorage.setItem("typingUser", JSON.stringify(userData));
-    
-    // Pass user back to Home.jsx and close modal
-    onLoginSuccess(userData);
-    onClose();
+    if (isSignup) {
+      // 🚀 Call Spring Boot Signup Endpoint
+      signupUser({ name:username, email, password }).then((res) => {
+        if (res.success) {
+          onLoginSuccess(res.data);
+          onClose();
+        } else {
+          setErrorMsg(res.error || "Signup failed");
+        }
+      });
+    } else {
+      // 🚀 Call Spring Boot Login Endpoint
+      loginUser({ name:username, password }).then((res) => {
+        if (res.success) {
+          onLoginSuccess(res.data);
+          onClose();
+        } else {
+          setErrorMsg(res.error || "Invalid username or password");
+        }
+      });
+    }
   };
 
   return (
     <div style={overlayStyle}>
       <div style={modalStyle}>
         <h2>{isSignup ? "Create Account 🚀" : "Welcome Back 👋"}</h2>
-        <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "5px" }}>
-          {isSignup ? "Sign up to track your typing evolution" : "Log in to access your profile and stats"}
-        </p>
+        
+        {errorMsg && (
+          <p style={{ color: "#ef4444", fontSize: "12px", marginTop: "10px" }}>{errorMsg}</p>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px", marginTop: "20px" }}>
           {isSignup && (
@@ -51,6 +63,15 @@ function AuthModal({ onClose, onLoginSuccess }) {
             required 
             style={inputStyle} 
           />
+          {/* Ensure you have a password field input if your backend expects it */}
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            style={inputStyle} 
+          />
           <button 
             type="submit" 
             className="restart-btn" 
@@ -59,6 +80,7 @@ function AuthModal({ onClose, onLoginSuccess }) {
             {isSignup ? "Sign Up" : "Login"}
           </button>
         </form>
+
         <p 
           style={{ marginTop: "15px", fontSize: "13px", cursor: "pointer", color: "var(--primary-accent)", textAlign: "center" }} 
           onClick={() => setIsSignup(!isSignup)}
@@ -76,6 +98,8 @@ function AuthModal({ onClose, onLoginSuccess }) {
     </div>
   );
 }
+
+// Keep your styling constants (overlayStyle, modalStyle, inputStyle) the same...
 
 const overlayStyle = { 
   position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UserService userService;
@@ -19,22 +18,25 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
-
         User savedUser = userService.signup(user);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
+    // 🚀 Changed from ResponseEntity<String> to ResponseEntity<?>
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
-
+    public ResponseEntity<?> login(@RequestBody User user) {
+        if (user.getName() == null || user.getName().trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name cannot be empty");
+        }
+        
         User loggedUser = userService.login(
-                user.getEmail(),
+                user.getName(),
                 user.getPassword()
         );
 
         if (loggedUser != null) {
-            return ResponseEntity.ok("Login successful");
+            // 🚀 Return the actual user object here!
+            return ResponseEntity.ok(loggedUser);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

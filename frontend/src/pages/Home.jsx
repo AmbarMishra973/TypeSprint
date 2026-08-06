@@ -16,6 +16,8 @@ function Home() {
   });
 const handleLoginSuccess = (userData) => {
     setUser(userData);
+    localStorage.setItem("typingUser", JSON.stringify(userData)); // 👈 Persist session
+  
   };
   const [activeModal, setActiveModal] = useState(null);
   const openModal = (modalName) => setActiveModal(modalName);
@@ -40,7 +42,7 @@ const handleLoginSuccess = (userData) => {
             <TypingBox engine={typingEngine} />
           </>
         ) : (
-          <Dashboard />
+          <Dashboard user={user} />
         )}
       </main>
 

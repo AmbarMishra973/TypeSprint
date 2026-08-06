@@ -1,19 +1,29 @@
 import { useState, useEffect } from "react";
 import KeyboardHeatmap from "./KeyboardHeatmap";
 
-function Dashboard() {
+function Dashboard({ user }) {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [stats, setStats] = useState(null);
 
-  // Fetch stats directly from local storage on mount
+  // 1. Helper function to get the correct storage key based on who is logged in
+  const getStorageKey = () => {
+    return user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
+  };
+
+  // 2. Fetch stats directly from local storage on mount OR when user switches
   useEffect(() => {
-    const savedData = localStorage.getItem("typingStats"); 
+    const storageKey = getStorageKey();
+    const savedData = localStorage.getItem(storageKey); 
+    
     if (savedData) {
       setStats(JSON.parse(savedData));
     } else {
       setStats({}); 
     }
-  }, []);
+    
+    // Hide the reset confirmation if someone switches accounts
+    setShowConfirmReset(false);
+  }, [user]); // 👈 Re-runs automatically if 'user' changes (login/logout)
 
   if (!stats) return <div style={{ textAlign: "center", padding: "50px" }}>Loading Dashboard...</div>;
 
@@ -46,9 +56,11 @@ function Dashboard() {
     });
   };
 
+  // 3. Update the reset button to only delete the current user's data
   const handleResetClick = () => {
     if (showConfirmReset) {
-      localStorage.removeItem("typingStats");
+      const storageKey = getStorageKey();
+      localStorage.removeItem(storageKey); // 👈 Safely removes ONLY this user's stats
       setStats({}); 
       setShowConfirmReset(false);
     } else {
@@ -66,7 +78,8 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header" style={{ marginBottom: "20px" }}>
-        <h2>📊 User Profile & Career Analytics</h2>
+        {/* 4. Make the Header personalized! */}
+        <h2>📊 {user ? `${user.name}'s Analytics` : "Guest Analytics"}</h2>
         <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
           Your long-term performance overview across all typing sessions.
         </p>

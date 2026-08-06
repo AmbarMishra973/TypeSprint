@@ -62,7 +62,7 @@ function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
   return result;
 }
 
-function useTypingEngine() {
+function useTypingEngine(user) {
   const defaultStats = {
     totalTests: 0,
     bestWpm: 0,
@@ -75,14 +75,31 @@ function useTypingEngine() {
     globalMissedKeys: {}
   };
 
+  const storageKey = user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
+
+  // Helper to load stats dynamically
+  const loadStats = (key) => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : null;
+  };
+
   const [stats, setStats] = useState({
     ...defaultStats,
-    ...(loadStats() || {})
+    ...(loadStats(storageKey) || {})
   });
 
+  // 3. ✨ NEW: When a user logs in or out, switch their stats instantly!
   useEffect(() => {
-    localStorage.setItem("typingStats", JSON.stringify(stats));
-  }, [stats]);
+    setStats({
+      ...defaultStats,
+      ...(loadStats(storageKey) || {})
+    });
+  }, [storageKey]); // Runs every time the user changes
+
+  // 4. Save to their specific unique key
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(stats));
+  }, [stats, storageKey]);
 
   const [testMode, setTestMode] = useState("time");
   const [wordLimit, setWordLimit] = useState(25);

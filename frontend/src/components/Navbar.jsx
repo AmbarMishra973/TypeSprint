@@ -53,11 +53,14 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
                   📊 Dashboard
                 </button>
                 <button 
-                  onClick={() => { openModal("profile"); setDropdownOpen(false); }} 
-                  style={menuItemStyle}
-                >
-                  👤 Profile
-                </button>
+  onClick={() => { 
+    setDropdownOpen(false); 
+    openModal("profile"); 
+  }} 
+  style={menuItemStyle}
+>
+  👤 Profile
+</button>
                 <button 
                   onClick={() => { openModal("settings"); setDropdownOpen(false); }} 
                   style={menuItemStyle}
