@@ -40,22 +40,21 @@ const wordBank = [
 
 function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
   const result = [];
-  const punctuations = [",", ".", "?", "!", ";", ":", '"', '()'];
+  const punctuations = [",", ".", "?", "!", ";", ":", '"', "()"];
 
   for (let i = 0; i < amount; i++) {
     let word = wordBank[Math.floor(Math.random() * wordBank.length)];
 
-    
     if (numFreq > 0 && Math.random() * 100 < numFreq) {
       word = Math.floor(Math.random() * 1000).toString();
     } else if (punctFreq > 0 && Math.random() * 100 < punctFreq) {
-      
-      if (Math.random() < 0.5) word = word.charAt(0).toUpperCase() + word.slice(1);
-      
-      
-      const punc = punctuations[Math.floor(Math.random() * punctuations.length)];
+      if (Math.random() < 0.5)
+        word = word.charAt(0).toUpperCase() + word.slice(1);
+
+      const punc =
+        punctuations[Math.floor(Math.random() * punctuations.length)];
       if (punc === '"') word = `"${word}"`;
-      else if (punc === '()') word = `(${word})`;
+      else if (punc === "()") word = `(${word})`;
       else word += punc;
     }
     result.push(word);
@@ -83,7 +82,7 @@ function useTypingEngine() {
   const [testMode, setTestMode] = useState("time");
   const [wordLimit, setWordLimit] = useState(25);
   const [words, setWords] = useState(generateWords(300));
-  const [soundEnabled, setSoundEnabled] = useState(false); 
+  const [soundEnabled, setSoundEnabled] = useState(false);
   const [typed, setTyped] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
@@ -101,8 +100,8 @@ function useTypingEngine() {
   const [isRepeat, setIsRepeat] = useState(false);
   const [missedKeys, setMissedKeys] = useState({});
   const [wordTimes, setWordTimes] = useState([]);
-const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
-const [keystrokeLog, setKeystrokeLog] = useState([]);
+  const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
+  const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [wpmHistory, setWpmHistory] = useState([]);
   const [resultSaved, setResultSaved] = useState(false);
   const [ghostPosition, setGhostPosition] = useState(0);
@@ -110,11 +109,45 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [bestRepeatedWpm, setBestRepeatedWpm] = useState(0);
   const [punctuationFreq, setPunctuationFreq] = useState(0);
   const [numberFreq, setNumberFreq] = useState(0);
+  const [isQuoteMode, setIsQuoteMode] = useState(false);
+  const [quoteAuthor, setQuoteAuthor] = useState("");
+
+  // Local curated list of quotes (100% reliable, no internet required)
+  const sampleQuotes = [
+    { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+    { content: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+    { content: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
+    { content: "Success is not final; failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
+    { content: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+    { content: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson" },
+    { content: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
+    { content: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde" }
+  ];
+
+  function fetchQuoteTest() {
+    setIsQuoteMode(true);
+    
+    // Pick a random quote from our local array
+    const randomQuote = sampleQuotes[Math.floor(Math.random() * sampleQuotes.length)];
+    
+    // Split the sentence into words just like your normal word bank
+    const quoteWords = randomQuote.content.split(" ");
+    if (quoteWords.length > 0) {
+      quoteWords[0] = `"${quoteWords[0]}`;
+      quoteWords[quoteWords.length - 1] = `${quoteWords[quoteWords.length - 1]}"`;
+    }
+    setQuoteAuthor(randomQuote.author);
+    
+    setWords(quoteWords);
+    resetTest();
+  }
 
   function updateModifiers(pFreq, nFreq) {
     setPunctuationFreq(pFreq);
     setNumberFreq(nFreq);
-    setWords(generateWords(testMode === "words" ? wordLimit : 300, pFreq, nFreq));
+    setWords(
+      generateWords(testMode === "words" ? wordLimit : 300, pFreq, nFreq)
+    );
     resetTest();
   }
 
@@ -128,7 +161,7 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     if (!soundEnabled) return;
 
     // Browsers sometimes suspend audio until the user interacts; this wakes it up
-    if (audioCtx.state === 'suspended') {
+    if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
 
@@ -141,20 +174,32 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
 
       if (isError) {
         // 🔴 ERROR SOUND: A quick, deeper warning "buzz"
-        osc.type = 'sawtooth';
+        osc.type = "sawtooth";
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+        osc.frequency.exponentialRampToValueAtTime(
+          50,
+          audioCtx.currentTime + 0.1
+        );
         gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.1
+        );
         osc.start();
         osc.stop(audioCtx.currentTime + 0.1);
       } else {
         // 🟢 NORMAL SOUND: A very short, crisp, pleasant "click"
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
+        osc.frequency.exponentialRampToValueAtTime(
+          100,
+          audioCtx.currentTime + 0.02
+        );
         gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.02
+        );
         osc.start();
         osc.stop(audioCtx.currentTime + 0.02);
       }
@@ -166,7 +211,6 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
   function handleKey(key) {
     if (finished) return;
 
-
     let currentStartTime = startTime;
 
     if (!isRunning) {
@@ -176,12 +220,11 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     }
 
     if (!startTimeRef.current) {
-        startTimeRef.current = Date.now();
-        setStartTime(startTimeRef.current);
+      startTimeRef.current = Date.now();
+      setStartTime(startTimeRef.current);
     }
     const timeOffset = Date.now() - currentStartTime;
-        setKeystrokeLog(prev => [...prev, { key, timeOffset }]);
-
+    setKeystrokeLog((prev) => [...prev, { key, timeOffset }]);
 
     if (key === "Backspace") {
       playKeySound(false);
@@ -211,11 +254,11 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
         setWrongWords((prev) => prev + 1);
       }
       const now = Date.now();
-            if (currentWordStartTime) {
-                const timeTaken = (now - currentWordStartTime) / 1000;
-                setWordTimes(prev => [...prev, { word: expected, time: timeTaken }]);
-            }
-            setCurrentWordStartTime(now);
+      if (currentWordStartTime) {
+        const timeTaken = (now - currentWordStartTime) / 1000;
+        setWordTimes((prev) => [...prev, { word: expected, time: timeTaken }]);
+      }
+      setCurrentWordStartTime(now);
 
       setTyped("");
       setCurrentChar(0);
@@ -240,16 +283,15 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
       } else {
         setIncorrectCharacters((prev) => prev + 1);
         if (expected) {
-                    setMissedKeys(prev => ({
-                        ...prev,
-                        [expected]: (prev[expected] || 0) + 1
-                    }));
-                }
+          setMissedKeys((prev) => ({
+            ...prev,
+            [expected]: (prev[expected] || 0) + 1
+          }));
+        }
       }
 
       setTyped((prev) => prev + key);
       setCurrentChar((prev) => prev + 1);
-      
     }
   }
 
@@ -284,7 +326,9 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
   function togglePunctuation() {
     setUsePunctuation((prev) => {
       const next = !prev;
-      setWords(generateWords(testMode === "words" ? wordLimit : 300, next, useNumbers));
+      setWords(
+        generateWords(testMode === "words" ? wordLimit : 300, next, useNumbers)
+      );
       resetTest();
       return next;
     });
@@ -293,7 +337,13 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
   function toggleNumbers() {
     setUseNumbers((prev) => {
       const next = !prev;
-      setWords(generateWords(testMode === "words" ? wordLimit : 300, usePunctuation, next));
+      setWords(
+        generateWords(
+          testMode === "words" ? wordLimit : 300,
+          usePunctuation,
+          next
+        )
+      );
       resetTest();
       return next;
     });
@@ -372,34 +422,54 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     setWpmHistory([]);
     setGhostPosition(0);
     setMissedKeys({});
-    setWordTimes([]); 
-        setCurrentWordStartTime(null);
-        setKeystrokeLog([]);
+    setWordTimes([]);
+    setCurrentWordStartTime(null);
+    setKeystrokeLog([]);
   }
 
   function changeTestMode(mode) {
+    setIsQuoteMode(false); 
+    setQuoteAuthor("");    
     setTestMode(mode);
-    setWords(generateWords(mode === "words" ? wordLimit : 300, usePunctuation, useNumbers));
+    setWords(
+      generateWords(
+        mode === "words" ? wordLimit : 300,
+        punctuationFreq,  
+        numberFreq        
+      )
+    );
     resetTest();
   }
 
   function changeWordLimit(value) {
     setWordLimit(value);
+    setIsQuoteMode(false); 
+    setQuoteAuthor("");
     if (testMode === "words") {
-      setWords(generateWords(value, usePunctuation, useNumbers));
+      setWords(
+        generateWords(
+          value, 
+          punctuationFreq,
+          numberFreq        
+        )
+      );
       resetTest();
     }
   }
 
   function repeatTest() {
-
     resetTest();
     setIsRepeat(true);
   }
 
   function newTest() {
     setWords(
-      generateWords(testMode === "words" ? wordLimit : 300, usePunctuation, useNumbers)
+      generateWords(
+        testMode === "words" ? wordLimit : 300,
+        
+        punctuationFreq, 
+          numberFreq
+      )
     );
     resetTest();
     setIsRepeat(false);
@@ -462,12 +532,15 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     missedKeys,
     wordTimes,
     keystrokeLog,
-    soundEnabled,        
+    soundEnabled,
     setSoundEnabled,
-    
+
     punctuationFreq,
     numberFreq,
-    updateModifiers
+    updateModifiers,
+    isQuoteMode,
+    quoteAuthor,
+    fetchQuoteTest
   };
 }
 
