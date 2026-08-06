@@ -1,4 +1,6 @@
+import { useState } from "react";
 import KeyboardHeatmap from "./KeyboardHeatmap";
+import TestReplay from "./TestReplay";
 function Result({
   wpm,
 
@@ -22,8 +24,12 @@ function Result({
 
   elapsedTime,
   missedKeys={},
-  wordTimes = []
+  wordTimes = [],
+  keystrokeLog = [], 
+  words = []
 }) {
+
+  const [showReplay, setShowReplay] = useState(false);
   const safeHistory = history?.length ? history : [];
 
   const maxWpm = Math.max(
@@ -201,6 +207,24 @@ function Result({
             ))}
           </div>
         </div>
+      )}
+
+      <div className="result-buttons" style={{ marginTop: '30px' }}>
+        <button
+          onClick={() => setShowReplay(true)}
+          className="restart-btn"
+          style={{ background: '#7c3aed' }}
+        >
+          🎥 Watch Replay
+        </button>
+      </div>
+
+      {showReplay && (
+        <TestReplay 
+          words={words} 
+          keystrokeLog={keystrokeLog} 
+          onClose={() => setShowReplay(false)} 
+        />
       )}
       <div className="result-buttons">
         <button

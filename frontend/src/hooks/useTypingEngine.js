@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
 
 const wordBank = [
@@ -70,6 +70,7 @@ function useTypingEngine() {
   const [time, setTime] = useState(30);
   const [selectedTime, setSelectedTime] = useState(30);
   const [startTime, setStartTime] = useState(null);
+  const startTimeRef = useRef(null);
   const [finalElapsed, setFinalElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -81,6 +82,7 @@ function useTypingEngine() {
   const [missedKeys, setMissedKeys] = useState({});
   const [wordTimes, setWordTimes] = useState([]);
 const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
+const [keystrokeLog, setKeystrokeLog] = useState([]);
   const [wpmHistory, setWpmHistory] = useState([]);
   const [resultSaved, setResultSaved] = useState(false);
   const [ghostPosition, setGhostPosition] = useState(0);
@@ -89,19 +91,28 @@ const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
 
   function getElapsedSeconds() {
     if (finalElapsed > 0) return finalElapsed;
-    if (!startTime) return 0;
-    return (Date.now() - startTime) / 1000;
+    if (!startTimeRef.current) return 0; // <--- CHANGE THIS LINE
+    return (Date.now() - startTimeRef.current) / 1000;
   }
 
   function handleKey(key) {
     if (finished) return;
 
+    let currentStartTime = startTime;
+
     if (!isRunning) {
       setIsRunning(true);
       setStartTime(Date.now());
-      setStartTime(now);
-      setCurrentWordStartTime(now);
+      setStartTime(currentStartTime);
     }
+
+    if (!startTimeRef.current) {
+        startTimeRef.current = Date.now();
+        setStartTime(startTimeRef.current);
+    }
+    const timeOffset = Date.now() - currentStartTime;
+        setKeystrokeLog(prev => [...prev, { key, timeOffset }]);
+
 
     if (key === "Backspace") {
       if (typed.length === 0) return;
@@ -262,6 +273,7 @@ const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
     setIncorrectCharacters(0);
     setTime(selectedTime);
     setStartTime(null);
+    startTimeRef.current = null;
     setFinalElapsed(0);
     setIsRunning(false);
     setFinished(false);
@@ -271,6 +283,7 @@ const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
     setMissedKeys({});
     setWordTimes([]); 
         setCurrentWordStartTime(null);
+        setKeystrokeLog([]);
   }
 
   function changeTestMode(mode) {
@@ -355,7 +368,8 @@ const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
     bestRepeatedWpm,
     isRepeat,
     missedKeys,
-    wordTimes
+    wordTimes,
+    keystrokeLog
   };
 }
 

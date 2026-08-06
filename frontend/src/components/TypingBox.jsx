@@ -44,6 +44,7 @@ function TypingBox() {
     isRepeat,
     finishTest,
     wordTimes,
+    keystrokeLog,
     missedKeys={missedKeys}
   } = useTypingEngine();
 
@@ -195,6 +196,8 @@ function TypingBox() {
             newTest={newTest}
             missedKeys={missedKeys}
             wordTimes={wordTimes}
+            keystrokeLog={keystrokeLog} 
+            words={words}
           />
 
           <Dashboard stats={stats} onReset={clearStatistics} />
