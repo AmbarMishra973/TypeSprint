@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +26,18 @@ public class User {
 
     public User() {
 
+    }
+    // Add this to your User.java fields
+    @Column(columnDefinition = "TEXT")
+    private String profilePicture;
+
+    // Add the Getter and Setter at the bottom of your file
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
 

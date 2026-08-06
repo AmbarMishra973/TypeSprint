@@ -42,4 +42,16 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Invalid credentials");
     }
+    @PutMapping("/update-picture")
+    public ResponseEntity<?> updateProfilePicture(@RequestBody User userRequest) {
+        // Find the user in the database by their name or ID
+        User existingUser = userService.login(userRequest.getName(), userRequest.getPassword());
+        
+        if (existingUser != null) {
+            existingUser.setProfilePicture(userRequest.getProfilePicture());
+            userService.signup(existingUser); // Re-save the user with the new picture
+            return ResponseEntity.ok(existingUser);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+    }
 }
