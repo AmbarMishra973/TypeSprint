@@ -1,68 +1,40 @@
 import { useState } from "react";
 import KeyboardHeatmap from "./KeyboardHeatmap";
 import TestReplay from "./TestReplay";
+
 function Result({
   wpm,
-
   rawWpm,
-
   accuracy,
-
   characters,
-
   errors,
-
   history,
-
-  bestWpm,
-
-  testHistory,
-
   repeatTest,
-
   newTest,
-
   elapsedTime,
-  missedKeys={},
+  missedKeys = {},
   wordTimes = [],
   keystrokeLog = [], 
   words = []
 }) {
-
   const [showReplay, setShowReplay] = useState(false);
   const safeHistory = history?.length ? history : [];
 
   const maxWpm = Math.max(
     ...safeHistory.map((item) => Number(item.wpm)),
-
     50
   );
 
   const width = 500;
-
   const height = 200;
 
   const points = safeHistory
     .map((point, index) => {
       const x = (index / Math.max(safeHistory.length - 1, 1)) * width;
-
       const y = height - (Number(point.wpm) / maxWpm) * height;
-
       return `${x},${y}`;
     })
     .join(" ");
-
-  const totalTests = testHistory?.length || 0;
-
-  const averageWpm = totalTests
-    ? Math.round(
-        testHistory.reduce(
-          (sum, test) => sum + Number(test.wpm),
-
-          0
-        ) / totalTests
-      )
-    : 0;
 
   const slowestWords = [...wordTimes]
     .sort((a, b) => b.time - a.time)
@@ -72,6 +44,7 @@ function Result({
     <div className="result-card">
       <h2>Test Complete 🎉</h2>
 
+      {/* 🚀 ONLY SINGLE-RUN METRICS DISPLAYED HERE */}
       <div className="result-stats">
         <div>
           <h3>WPM</h3>
@@ -102,84 +75,34 @@ function Result({
           <h3>Time Taken</h3>
           <p>{elapsedTime}s</p>
         </div>
-
-        <div>
-          <h3>Personal Best 🏆</h3>
-          <p>{bestWpm}</p>
-        </div>
-
-        <div>
-          <h3>Average WPM</h3>
-          <p>{averageWpm}</p>
-        </div>
-
-        <div>
-          <h3>Total Tests</h3>
-          <p>{totalTests}</p>
-        </div>
       </div>
 
       <div className="graph-container">
-        <h3>WPM Progress</h3>
+        <h3>WPM Progress (This Test)</h3>
 
-        <svg
-          width={width}
-
-          height={height}
-
-          className="wpm-graph"
-        >
-          <line
-            x1="0"
-
-            y1={height}
-
-            x2={width}
-
-            y2={height}
-
-            stroke="white"
-          />
-
-          <line
-            x1="0"
-
-            y1="0"
-
-            x2="0"
-
-            y2={height}
-
-            stroke="white"
-          />
+        <svg width={width} height={height} className="wpm-graph">
+          <line x1="0" y1={height} x2={width} y2={height} stroke="white" />
+          <line x1="0" y1="0" x2="0" y2={height} stroke="white" />
 
           {safeHistory.length > 1 && (
             <polyline
               points={points}
-
               fill="none"
-
               stroke="#39d353"
-
               strokeWidth="4"
             />
           )}
 
           {safeHistory.map((point, index) => {
             const x = (index / Math.max(safeHistory.length - 1, 1)) * width;
-
             const y = height - (Number(point.wpm) / maxWpm) * height;
 
             return (
               <circle
                 key={index}
-
                 cx={x}
-
                 cy={y}
-
                 r="5"
-
                 fill="#39d353"
               >
                 <title>
@@ -192,10 +115,12 @@ function Result({
 
         <div className="x-axis">Time (seconds)</div>
       </div>
-{Object.keys(missedKeys).length > 0 && (
+
+      {Object.keys(missedKeys).length > 0 && (
         <KeyboardHeatmap missedKeys={missedKeys} />
-    )}
-    {slowestWords.length > 0 && (
+      )}
+
+      {slowestWords.length > 0 && (
         <div className="slowest-words-container">
           <h3>Slowest Words 🐢</h3>
           <div className="slow-words-list">
@@ -226,10 +151,10 @@ function Result({
           onClose={() => setShowReplay(false)} 
         />
       )}
+
       <div className="result-buttons">
         <button
           onClick={repeatTest}
-
           className="restart-btn"
         >
           🔁 Restart Test
@@ -237,7 +162,6 @@ function Result({
 
         <button
           onClick={newTest}
-
           className="restart-btn"
         >
           🆕 New Test

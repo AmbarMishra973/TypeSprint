@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import useTypingEngine from "../hooks/useTypingEngine";
+
 import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
 import Result from "./Result";
 import ModeSelector from "./ModeSelector";
 import ThemeSelector from "./ThemeSelector";
-import Dashboard from "./Dashboard";
 import "../styles/typingBox.css";
 
-function TypingBox() {
+function TypingBox({ engine }) {
   const {
     words,
     typed,
@@ -57,7 +56,7 @@ changeTimeLimit,
     quoteAuthor,
     fetchQuoteTest,
     repeatBestWpm,
-  } = useTypingEngine();
+  } = engine;
 
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
@@ -422,8 +421,6 @@ function keyHandler(e) {
             keystrokeLog={keystrokeLog}
             words={words}
           />
-
-          <Dashboard stats={stats} onReset={clearStatistics} />
         </>
       )}
     </div>
