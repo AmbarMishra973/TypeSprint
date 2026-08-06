@@ -98,7 +98,7 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
 }
 
 const menuItemStyle = {
-  background: 'none', border: 'none', padding: '12px 16px', textAlign: 'left', 
+  background: '#1e293b', border: 'none', padding: '12px 16px', textAlign: 'left', 
   color: 'var(--text-main)', cursor: 'pointer', width: '100%', fontSize: '14px', 
   borderBottom: '1px solid rgba(255,255,255,0.05)'
 };

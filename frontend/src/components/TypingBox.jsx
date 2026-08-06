@@ -395,9 +395,6 @@ function keyHandler(e) {
             autoFocus
             className="hidden-input"
             onKeyDown={keyHandler}
-            onBlur={() => {
-              inputRef.current?.focus();
-            }}
           />
         </>
       )}
