@@ -21,7 +21,8 @@ function Result({
   newTest,
 
   elapsedTime,
-  missedKeys={}
+  missedKeys={},
+  wordTimes = []
 }) {
   const safeHistory = history?.length ? history : [];
 
@@ -56,6 +57,10 @@ function Result({
         ) / totalTests
       )
     : 0;
+
+  const slowestWords = [...wordTimes]
+    .sort((a, b) => b.time - a.time)
+    .slice(0, 3);
 
   return (
     <div className="result-card">
@@ -184,6 +189,19 @@ function Result({
 {Object.keys(missedKeys).length > 0 && (
         <KeyboardHeatmap missedKeys={missedKeys} />
     )}
+    {slowestWords.length > 0 && (
+        <div className="slowest-words-container">
+          <h3>Slowest Words 🐢</h3>
+          <div className="slow-words-list">
+            {slowestWords.map((item, index) => (
+              <div key={index} className="slow-word-card">
+                <span className="slow-word-text">{item.word}</span>
+                <span className="slow-word-time">{item.time.toFixed(2)}s</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="result-buttons">
         <button
           onClick={repeatTest}

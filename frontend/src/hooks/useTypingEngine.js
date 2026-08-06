@@ -79,6 +79,8 @@ function useTypingEngine() {
   const [incorrectCharacters, setIncorrectCharacters] = useState(0);
   const [isRepeat, setIsRepeat] = useState(false);
   const [missedKeys, setMissedKeys] = useState({});
+  const [wordTimes, setWordTimes] = useState([]);
+const [currentWordStartTime, setCurrentWordStartTime] = useState(null);
   const [wpmHistory, setWpmHistory] = useState([]);
   const [resultSaved, setResultSaved] = useState(false);
   const [ghostPosition, setGhostPosition] = useState(0);
@@ -97,6 +99,8 @@ function useTypingEngine() {
     if (!isRunning) {
       setIsRunning(true);
       setStartTime(Date.now());
+      setStartTime(now);
+      setCurrentWordStartTime(now);
     }
 
     if (key === "Backspace") {
@@ -124,6 +128,12 @@ function useTypingEngine() {
       } else {
         setWrongWords((prev) => prev + 1);
       }
+      const now = Date.now();
+            if (currentWordStartTime) {
+                const timeTaken = (now - currentWordStartTime) / 1000;
+                setWordTimes(prev => [...prev, { word: expected, time: timeTaken }]);
+            }
+            setCurrentWordStartTime(now);
 
       setTyped("");
       setCurrentChar(0);
@@ -259,6 +269,8 @@ function useTypingEngine() {
     setWpmHistory([]);
     setGhostPosition(0);
     setMissedKeys({});
+    setWordTimes([]); 
+        setCurrentWordStartTime(null);
   }
 
   function changeTestMode(mode) {
@@ -342,7 +354,8 @@ function useTypingEngine() {
     updateBest,
     bestRepeatedWpm,
     isRepeat,
-    missedKeys
+    missedKeys,
+    wordTimes
   };
 }
 

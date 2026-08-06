@@ -268,3 +268,45 @@
 .typing-word {
   display: inline-block;
 }
+.slowest-words-container {
+    margin-top: 30px;
+    background: #1c2128;
+    padding: 20px 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.slowest-words-container h3 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.slow-words-list {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.slow-word-card {
+    background: #2d333b;
+    border: 1px solid #444c56;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.slow-word-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4d4f;
+    margin-bottom: 5px;
+}
+
+.slow-word-time {
+    font-size: 14px;
+    color: #8b95a5;
+}
