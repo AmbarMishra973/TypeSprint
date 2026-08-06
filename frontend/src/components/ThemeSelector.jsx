@@ -31,7 +31,8 @@ function ThemeSelector() {
           border: '1px solid var(--text-muted, #8b95a5)',
           cursor: 'pointer',
           fontWeight: 'bold',
-          outline: 'none'
+          outline: 'none',
+          width: '140px'
         }}
       >
         <option value="dark" style={{ background: '#1c2128', color: '#c9d1d9' }}>🌙 Dark Mode</option>

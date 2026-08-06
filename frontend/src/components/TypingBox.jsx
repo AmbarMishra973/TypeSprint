@@ -46,7 +46,9 @@ function TypingBox() {
     finishTest,
     wordTimes,
     keystrokeLog,
-    missedKeys={missedKeys}
+    missedKeys={missedKeys},
+    soundEnabled,
+    setSoundEnabled
   } = useTypingEngine();
 
   const inputRef = useRef(null);
@@ -131,6 +133,24 @@ function TypingBox() {
   return (
     <div className="typing-box">
       <ThemeSelector />
+      <div style={{ position: 'fixed', top: '70px', right: '20px', zIndex: 9999 }}>
+        <button 
+          onClick={() => setSoundEnabled(!soundEnabled)}
+          style={{ 
+            padding: '8px 15px', 
+            borderRadius: '8px',
+            background: soundEnabled ? 'var(--primary-accent)' : 'var(--card-bg)',
+            color: soundEnabled ? '#fff' : 'var(--text-main)',
+            border: '1px solid var(--text-muted)',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: '0.2s',
+            width: '140px'
+          }}
+        >
+          {soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF'}
+        </button>
+      </div>
       <ModeSelector
         testMode={testMode}
         setTestMode={changeTestMode}

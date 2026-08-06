@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
 
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 const wordBank = [
   "the",
   "quick",
@@ -64,6 +66,7 @@ function useTypingEngine() {
   const [testMode, setTestMode] = useState("time");
   const [wordLimit, setWordLimit] = useState(25);
   const [words, setWords] = useState(generateWords(300));
+  const [soundEnabled, setSoundEnabled] = useState(false); 
   const [typed, setTyped] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
@@ -95,8 +98,48 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     return (Date.now() - startTimeRef.current) / 1000;
   }
 
+  function playKeySound(isError = false) {
+    if (!soundEnabled) return;
+
+    // Browsers sometimes suspend audio until the user interacts; this wakes it up
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    try {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (isError) {
+        // 🔴 ERROR SOUND: A quick, deeper warning "buzz"
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else {
+        // 🟢 NORMAL SOUND: A very short, crisp, pleasant "click"
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.02);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.02);
+      }
+    } catch (e) {
+      console.log("Audio error", e);
+    }
+  }
+
   function handleKey(key) {
     if (finished) return;
+
 
     let currentStartTime = startTime;
 
@@ -115,6 +158,7 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
 
 
     if (key === "Backspace") {
+      playKeySound(false);
       if (typed.length === 0) return;
 
       const charBeingDeleted = typed[typed.length - 1];
@@ -132,6 +176,7 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     }
 
     if (key === " ") {
+      playKeySound(false);
       const expected = words[currentIndex];
 
       if (typed === expected) {
@@ -160,6 +205,9 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
 
     if (key.length === 1) {
       const expected = words[currentIndex]?.[currentChar];
+
+      const isError = key !== expected;
+      playKeySound(isError);
 
       if (key === expected) {
         setCorrectCharacters((prev) => prev + 1);
@@ -369,7 +417,9 @@ const [keystrokeLog, setKeystrokeLog] = useState([]);
     isRepeat,
     missedKeys,
     wordTimes,
-    keystrokeLog
+    keystrokeLog,
+    soundEnabled,        
+    setSoundEnabled
   };
 }
 
