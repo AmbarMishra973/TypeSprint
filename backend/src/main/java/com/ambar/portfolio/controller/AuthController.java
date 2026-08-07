@@ -18,6 +18,16 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
+
+        if (userService.existsByName(user.getName())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Username already exists! Please choose another.");
+        }
+
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Email is already registered! Please log in.");
+        }
         User savedUser = userService.signup(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }

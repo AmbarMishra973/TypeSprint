@@ -26,4 +26,12 @@ public class UserService {
 
         return null;
     }
+
+    public boolean existsByName(String name) {
+        return userRepository.findFirstByName(name) != null;
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
 }

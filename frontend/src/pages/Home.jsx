@@ -23,6 +23,7 @@ function Home() {
     
     setUser(userData);
     localStorage.setItem("typingUser", JSON.stringify(userData)); 
+    console.log("Logged in user data received:", userData);
   };
 
   const [activeModal, setActiveModal] = useState(null);
