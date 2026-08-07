@@ -43,19 +43,20 @@ public class TestScoreService {
     }
 
     // 🚀 Routes the request to the correct query based on the test mode
-    public List<TestScore> getLeaderboard(String mode, Integer timeLimit, Integer wordLimit, boolean punctuation, boolean numbers) {
+    // 🚀 Routes the request to the correct query including timestamp filtering
+    public List<TestScore> getLeaderboard(String mode, Integer timeLimit, Integer wordLimit, boolean punctuation, boolean numbers, Long timestamp) {
         if ("time".equalsIgnoreCase(mode)) {
-            return testScoreRepository.findTop5ByModeAndTimeLimitAndPunctuationAndNumbersOrderByWpmDesc(
-                    mode, timeLimit, punctuation, numbers);
+            return testScoreRepository.findTop50ByModeAndTimeLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+                    mode, timeLimit, punctuation, numbers, timestamp);
                     
         } else if ("words".equalsIgnoreCase(mode)) {
-            return testScoreRepository.findTop5ByModeAndWordLimitAndPunctuationAndNumbersOrderByWpmDesc(
-                    mode, wordLimit, punctuation, numbers);
+            return testScoreRepository.findTop50ByModeAndWordLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+                    mode, wordLimit, punctuation, numbers, timestamp);
                     
         } else {
             // Quote mode doesn't use time or word limits
-            return testScoreRepository.findTop5ByModeAndPunctuationAndNumbersOrderByWpmDesc(
-                    mode, punctuation, numbers);
+            return testScoreRepository.findTop50ByModeAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+                    mode, punctuation, numbers, timestamp);
         }
     }
 }

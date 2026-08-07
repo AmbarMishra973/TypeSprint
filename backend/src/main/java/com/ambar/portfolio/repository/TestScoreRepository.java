@@ -8,14 +8,16 @@ import java.util.List;
 
 @Repository
 public interface TestScoreRepository extends JpaRepository<TestScore, Long> {
-    
-    // 🚀 Grabs the Top 5 Time Mode scores (e.g., 30s, punctuation ON)
-    List<TestScore> findTop50ByModeAndTimeLimitAndWordLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
-            String mode, 
-            Integer timeLimit, 
-            Integer wordLimit, 
-            Boolean punctuation, 
-            Boolean numbers, 
-            Long timestamp
-    );
+
+    // 1. For "time" mode (needs timeLimit)
+    List<TestScore> findTop50ByModeAndTimeLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+            String mode, Integer timeLimit, Boolean punctuation, Boolean numbers, Long timestamp);
+
+    // 2. For "words" mode (needs wordLimit)
+    List<TestScore> findTop50ByModeAndWordLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+            String mode, Integer wordLimit, Boolean punctuation, Boolean numbers, Long timestamp);
+
+    // 3. For "quote" mode (no limits)
+    List<TestScore> findTop50ByModeAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+            String mode, Boolean punctuation, Boolean numbers, Long timestamp);
 }
