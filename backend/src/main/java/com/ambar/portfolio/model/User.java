@@ -28,7 +28,8 @@ public class User {
 
     }
     // Add this to your User.java fields
-    @Column(columnDefinition = "TEXT")
+    @Lob 
+    @Column(columnDefinition = "LONGTEXT")
     private String profilePicture;
 
     // Add the Getter and Setter at the bottom of your file
@@ -40,7 +41,8 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    @Column(columnDefinition = "TEXT")
+    @Lob 
+    @Column(columnDefinition = "LONGTEXT")
     private String typingStats;
 
 

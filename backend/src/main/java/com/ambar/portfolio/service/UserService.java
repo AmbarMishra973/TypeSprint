@@ -18,7 +18,7 @@ public class UserService {
     }
 
     public User login(String name, String password){ // 👈 Changed parameter from email to name
-        User user = userRepository.findByName(name); // 👈 Changed to findByName
+        User user = userRepository.findFirstByName(name); // 👈 Changed to findByName
 
         if(user != null && user.getPassword().equals(password)){
             return user;

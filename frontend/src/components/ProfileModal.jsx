@@ -83,7 +83,7 @@ function ProfileModal({ user, stats, onClose }) {
     setIsUploading(true);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const finalSize = 400; 
+    const finalSize = 150; 
     canvas.width = finalSize;
     canvas.height = finalSize;
 
@@ -100,7 +100,7 @@ function ProfileModal({ user, stats, onClose }) {
       );
       
       // 🚀 FIX: Compress the image slightly to ensure it passes Tomcat limits
-      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.7);
 
       try {
         const response = await fetch("https://ambarmishradb.onrender.com/api/auth/update-picture", {
