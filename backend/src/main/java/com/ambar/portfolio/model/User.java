@@ -5,8 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ElementCollection;
 
 @Entity
 @Table(name = "users")
@@ -97,5 +102,16 @@ public class User {
     public void setTypingStats(String typingStats) {
         this.typingStats = typingStats;
     }
+
+    @ElementCollection
+private List<String> friends = new ArrayList<>();
+
+public List<String> getFriends() {
+    return friends;
+}
+
+public void setFriends(List<String> friends) {
+    this.friends = friends;
+}
 
 }

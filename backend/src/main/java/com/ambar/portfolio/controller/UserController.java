@@ -2,6 +2,9 @@ package com.ambar.portfolio.controller;
 
 import com.ambar.portfolio.model.User;
 import com.ambar.portfolio.service.UserService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,4 +49,21 @@ public class UserController {
         }
         return ResponseEntity.ok(updatedUser);
     }
+    @GetMapping("/search")
+public ResponseEntity<?> searchUsers(@RequestParam String query) {
+    List<User> users = userService.searchUsers(query);
+    // Remove sensitive data (like passwords) before sending to frontend!
+    users.forEach(u -> u.setPassword(null)); 
+    return ResponseEntity.ok(users);
+}
+
+// ➕ Endpoint to add a friend
+@PostMapping("/{username}/add-friend/{friendName}")
+public ResponseEntity<?> addFriend(@PathVariable String username, @PathVariable String friendName) {
+    User updatedUser = userService.addFriend(username, friendName);
+    if (updatedUser == null) {
+        return ResponseEntity.status(404).body("User or friend not found");
+    }
+    return ResponseEntity.ok(updatedUser);
+}
 }

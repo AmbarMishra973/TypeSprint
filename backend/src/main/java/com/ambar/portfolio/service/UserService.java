@@ -2,6 +2,9 @@ package com.ambar.portfolio.service;
 
 import com.ambar.portfolio.model.User;
 import com.ambar.portfolio.repository.UserRepository;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,5 +44,21 @@ public class UserService {
         return userRepository.save(user);
     }
     return null;
+}
+public List<User> searchUsers(String query) {
+    return userRepository.findByNameContainingIgnoreCase(query);
+}
+
+// ➕ Add a friend
+public User addFriend(String username, String friendName) {
+    User user = userRepository.findFirstByName(username);
+    User friend = userRepository.findFirstByName(friendName);
+
+    // Make sure both users exist and they aren't already friends
+    if (user != null && friend != null && !user.getFriends().contains(friendName)) {
+        user.getFriends().add(friendName);
+        return userRepository.save(user);
+    }
+    return user; // Return unchanged user if they are already friends
 }
 }
