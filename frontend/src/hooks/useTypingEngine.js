@@ -403,8 +403,8 @@ function useTypingEngine(user) {
           wpm: newBestWpm,       // Or whatever variable holds the current test's WPM
           accuracy: newHighestAcc, // The current test's accuracy
           mode: testMode,           // e.g., "time", "words", "quote"
-          timeLimit: mode === "time" ? duration : null,
-          wordLimit: mode === "words" ? wordCount : null,
+          timeLimit: testMode === "time" ? duration : null,
+          wordLimit: testMode === "words" ? wordCount : null,
           punctuation: includePunctuation, // Replace with your actual state variable name
           numbers: includeNumbers,         // Replace with your actual state variable name
           timestamp: Date.now()
