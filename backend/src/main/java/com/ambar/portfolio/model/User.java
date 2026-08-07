@@ -104,22 +104,33 @@ public class User {
     }
 
     @ElementCollection
-private List<String> friends = new ArrayList<>();
-public List<String> getFriends() {
-    return friends;
-}
-
-public void setFriends(List<String> friends) {
-    this.friends = friends;
-}
-@ElementCollection
-    private List<String> friendRequests = new ArrayList<>(); // Inbox: People who want to be your friend
+    private List<String> friends = new ArrayList<>();
 
     @ElementCollection
-    private List<String> sentRequests = new ArrayList<>(); // Outbox: People you have invited
+    private List<String> friendRequests = new ArrayList<>(); 
 
+    @ElementCollection
+    private List<String> sentRequests = new ArrayList<>(); 
 
-public List<String> getSentRequests() {
+    // --- GETTERS AND SETTERS ---
+
+    public List<String> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
+    }
+
+    public List<String> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public void setFriendRequests(List<String> friendRequests) {
+        this.friendRequests = friendRequests;
+    }
+
+    public List<String> getSentRequests() {
         return sentRequests;
     }
 
