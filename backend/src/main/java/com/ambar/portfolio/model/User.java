@@ -29,7 +29,7 @@ public class User {
 
     }
     // Add this to your User.java fields
-    @Lob 
+    
     @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
@@ -42,7 +42,7 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    @Lob 
+    
     @Column(columnDefinition = "TEXT")
     private String typingStats;
 

@@ -32,6 +32,6 @@ public class UserService {
     }
 
     public boolean existsByEmail(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userRepository.findFirstByEmail(email) != null;
     }
 }
