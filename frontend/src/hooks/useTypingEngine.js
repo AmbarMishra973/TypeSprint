@@ -398,20 +398,20 @@ function useTypingEngine(user) {
       
       if (user && user.name && user.password) {
         syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
-      const leaderboardPayload = {
+        
+        const leaderboardPayload = {
           username: user.name,
-          wpm: newBestWpm,       // Or whatever variable holds the current test's WPM
-          accuracy: newHighestAcc, // The current test's accuracy
-          mode: testMode,           // e.g., "time", "words", "quote"
-          timeLimit: testMode === "time" ? duration : null,
-          wordLimit: testMode === "words" ? wordCount : null,
-          punctuation: includePunctuation, // Replace with your actual state variable name
-          numbers: includeNumbers,         // Replace with your actual state variable name
+          wpm: finalWpm,           // Submits the current test's WPM
+          accuracy: finalAccuracy, // Submits the current test's accuracy
+          mode: isQuoteMode ? "quote" : testMode, // Correctly checks if it's a quote
+          timeLimit: testMode === "time" ? selectedTime : null, // Replaced 'duration' with 'selectedTime'
+          wordLimit: testMode === "words" ? wordLimit : null,   // Replaced 'wordCount' with 'wordLimit'
+          punctuation: punctuationFreq > 0, // Replaced 'includePunctuation'
+          numbers: numberFreq > 0,          // Replaced 'includeNumbers'
           timestamp: Date.now()
         };
 
         saveTestScore(leaderboardPayload);
-      
       }
 
       return updatedStatsObj;
