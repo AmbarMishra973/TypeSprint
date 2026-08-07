@@ -9,7 +9,7 @@ import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
 import Leaderboard from "../components/Leaderboard";
 import AchievementsGrid from "../components/AchievementsGrid";
-
+import Friends from "../components/Friends";
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   
@@ -107,6 +107,9 @@ function Home() {
       <AchievementsGrid unlockedIds={typingEngine?.stats?.unlockedAchievements || []} />
     </div>
   )}
+  {activeView === "friends" && (
+  <Friends user={user} setUser={setUser} />
+)}
     </div>
   );
 }

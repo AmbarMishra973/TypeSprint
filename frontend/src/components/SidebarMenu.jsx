@@ -5,6 +5,7 @@ export default function SidebarMenu({ isOpen, onClose, activeView, setActiveView
     { id: "typing", label: "⌨️ Practice" },
     { id: "leaderboard", label: "🏆 Leaderboard", color: "#fbbf24" },
     { id: "achievements", label: "🎖️ Achievements", color: "#38bdf8" },
+    { id: "friends", label: "👥 Friends", color: "#10b981" },
   ];
 
   return (
