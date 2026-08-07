@@ -7,7 +7,7 @@ import useTypingEngine from "../hooks/useTypingEngine";
 import AuthModal from "../components/AuthModal";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
-
+import Leaderboard from "../components/Leaderboard"; // (Adjust path if needed)
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   
@@ -42,6 +42,7 @@ function Home() {
 
   return (
     <div className="home">
+     
       <Navbar 
         activeView={activeView} 
         setActiveView={setActiveView} 
@@ -83,6 +84,7 @@ function Home() {
           onClose={closeModal} 
         />
       )}
+      {activeView === "leaderboard" && <Leaderboard />}
     </div>
   );
 }

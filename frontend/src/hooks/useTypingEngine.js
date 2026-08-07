@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
-import { syncUserStats } from "../services/api";
+import { syncUserStats, saveTestScore } from "../services/api";
+
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const wordBank = [
@@ -397,6 +398,20 @@ function useTypingEngine(user) {
       
       if (user && user.name && user.password) {
         syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
+      const leaderboardPayload = {
+          username: user.name,
+          wpm: newBestWpm,       // Or whatever variable holds the current test's WPM
+          accuracy: newHighestAcc, // The current test's accuracy
+          mode: testMode,           // e.g., "time", "words", "quote"
+          timeLimit: mode === "time" ? duration : null,
+          wordLimit: mode === "words" ? wordCount : null,
+          punctuation: includePunctuation, // Replace with your actual state variable name
+          numbers: includeNumbers,         // Replace with your actual state variable name
+          timestamp: Date.now()
+        };
+
+        saveTestScore(leaderboardPayload);
+      
       }
 
       return updatedStatsObj;

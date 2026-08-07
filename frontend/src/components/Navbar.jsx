@@ -37,11 +37,20 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
             border: '1px solid var(--text-muted)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
             width: '180px', zIndex: 100, display: 'flex', flexDirection: 'column', overflow: 'hidden'
           }}>
+            
             <button 
               onClick={() => { setActiveView("typing"); setDropdownOpen(false); }} 
               style={menuItemStyle}
             >
               ⌨️ Practice
+            </button>
+
+            {/* 🏆 LEADERBOARD PLACED HERE SO EVERYONE CAN SEE IT */}
+            <button 
+              onClick={() => { setActiveView("leaderboard"); setDropdownOpen(false); }} 
+              style={{ ...menuItemStyle, color: '#fbbf24', fontWeight: 'bold' }}
+            >
+              🏆 Leaderboard
             </button>
 
             {user ? (
@@ -53,14 +62,11 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
                   📊 Dashboard
                 </button>
                 <button 
-  onClick={() => { 
-    setDropdownOpen(false); 
-    openModal("profile"); 
-  }} 
-  style={menuItemStyle}
->
-  👤 Profile
-</button>
+                  onClick={() => { setDropdownOpen(false); openModal("profile"); }} 
+                  style={menuItemStyle}
+                >
+                  👤 Profile
+                </button>
                 <button 
                   onClick={() => { openModal("settings"); setDropdownOpen(false); }} 
                   style={menuItemStyle}
