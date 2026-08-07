@@ -38,6 +38,7 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
   }, [user]);
 
   // 🔍 Handle Search
+  // 🎮 Accept/Decline Challenge API Call
   const handleChallengeResponse = async (challengeId, status) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
@@ -53,6 +54,17 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
         }
       }
     } catch (err) { console.error("Failed to update challenge status:", err); }
+  };
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setLoading(true);
+    setSearchAttempted(true);
+    try {
+      const res = await fetch(`https://ambarmishradb.onrender.com/api/users/search?query=${searchQuery}`);
+      if (res.ok) setSearchResults((await res.json()).filter(u => u.name !== user.name));
+    } catch (err) { console.error("Search failed:", err); }
+    setLoading(false);
   };
 
   // 📨 Send Request
@@ -102,18 +114,7 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
     } catch (err) { console.error("Failed to send challenge:", err); }
   };
 
-  // 🎮 Accept/Decline Challenge API Call
-  const handleChallengeResponse = async (challengeId, status) => {
-    try {
-      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
-      if (res.ok) {
-        setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
-        if (status === "ACCEPTED") {
-          alert("Challenge Accepted! (Game transition system coming in next step!)");
-        }
-      }
-    } catch (err) { console.error("Failed to update challenge status:", err); }
-  };
+
 
   if (!user) return <div style={styles.container}><h2>Please log in to manage friends!</h2></div>;
 
