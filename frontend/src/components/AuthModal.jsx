@@ -12,6 +12,9 @@ function AuthModal({ onClose, onLoginSuccess }) {
     e.preventDefault();
     setErrorMsg("");
 
+
+        // ...
+
     if (isSignup) {
       // 🚀 Call Spring Boot Signup Endpoint
       signupUser({ name:username, email, password }).then((res) => {

@@ -37,33 +37,51 @@ export const saveTestScore = async (payload) => {
 };
 
 // 🔐 Authentication Functions (Fixes the missing export error)
-export const loginUser = async (username, password) => {
+// 🔐 LOGIN FUNCTION
+export const loginUser = async (userData) => {
   try {
-    const response = await fetch(`${API_URL}/users/login`, {
+    const response = await fetch("https://ambarmishradb.onrender.com/api/users/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: username, password }),
+      headers: {
+        "Content-Type": "application/json", // 🚀 THIS IS CRITICAL for Spring Boot
+      },
+      body: JSON.stringify(userData), // userData already contains { name, password }
     });
-    if (!response.ok) throw new Error("Login failed");
-    return await response.json();
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { success: false, error: errorText || "Login failed" };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
   } catch (error) {
-    console.error("Login Error:", error);
-    throw error;
+    console.error("Login API Error:", error);
+    return { success: false, error: "Network error" };
   }
 };
 
-export const signupUser = async (username, password) => {
+// 📝 SIGNUP FUNCTION
+export const signupUser = async (userData) => {
   try {
-    const response = await fetch(`${API_URL}/users/signup`, {
+    const response = await fetch("https://ambarmishradb.onrender.com/api/users/signup", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: username, password }),
+      headers: {
+        "Content-Type": "application/json", // 🚀 THIS IS CRITICAL
+      },
+      body: JSON.stringify(userData),
     });
-    if (!response.ok) throw new Error("Signup failed");
-    return await response.json();
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { success: false, error: errorText || "Signup failed" };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
   } catch (error) {
-    console.error("Signup Error:", error);
-    throw error;
+    console.error("Signup API Error:", error);
+    return { success: false, error: "Network error" };
   }
 };
 
