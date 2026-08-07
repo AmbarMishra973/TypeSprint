@@ -8,11 +8,12 @@ import java.util.List;
 
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
-    // Find all pending challenges for a specific user (Their Challenge Inbox)
+    // Find pending challenges for the inbox
     List<Challenge> findByReceiverNameAndStatus(String receiverName, String status);
+    
+    // Find challenges sent by a user with a specific status (e.g. ACCEPTED)
+    List<Challenge> findBySenderNameAndStatus(String senderName, String status);
     
     // Find all active or past matches for a user
     List<Challenge> findBySenderNameOrReceiverName(String senderName, String receiverName);
-    List<Challenge> findBySenderNameAndStatus(String senderName, String status);
-    List<Challenge> findByReceiverNameAndStatus(String receiverName, String status);
 }
