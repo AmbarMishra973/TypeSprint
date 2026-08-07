@@ -8,7 +8,7 @@ import AuthModal from "../components/AuthModal";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
 import Leaderboard from "../components/Leaderboard";
-import AchievementsGrid from "..components/AchievementsGrid";
+import AchievementsGrid from "../components/AchievementsGrid";
 
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
