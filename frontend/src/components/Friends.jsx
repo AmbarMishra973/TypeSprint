@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function Friends({ user, setUser }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchAttempted, setSearchAttempted] = useState(false);
+
+  // Challenge Inbox State
+  const [pendingChallenges, setPendingChallenges] = useState([]);
 
   // Modal States
   const [friendToRemove, setFriendToRemove] = useState(null);
@@ -16,19 +19,34 @@ export default function Friends({ user, setUser }) {
     localStorage.setItem("typingUser", JSON.stringify(updatedUser));
   };
 
+  // 🔄 Fetch Pending Challenges (Polls every 5 seconds)
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchChallenges = async () => {
+      try {
+        const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${user.name}/pending`);
+        if (res.ok) {
+          const data = await res.json();
+          setPendingChallenges(data);
+        }
+      } catch (err) { console.error("Failed to fetch challenges:", err); }
+    };
+
+    fetchChallenges(); // Fetch immediately on load
+    const interval = setInterval(fetchChallenges, 5000); // Check every 5 seconds
+    return () => clearInterval(interval);
+  }, [user]);
+
   // 🔍 Handle Search
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-
     setLoading(true);
     setSearchAttempted(true);
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/search?query=${searchQuery}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSearchResults(data.filter(u => u.name !== user.name));
-      }
+      if (res.ok) setSearchResults((await res.json()).filter(u => u.name !== user.name));
     } catch (err) { console.error("Search failed:", err); }
     setLoading(false);
   };
@@ -41,7 +59,7 @@ export default function Friends({ user, setUser }) {
     } catch (err) { console.error("Failed to send request:", err); }
   };
 
-  // ✅ Accept / ❌ Reject
+  // ✅ Accept / ❌ Reject Friend Requests
   const acceptRequest = async (reqName) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/accept-friend/${reqName}`, { method: "POST" });
@@ -56,28 +74,44 @@ export default function Friends({ user, setUser }) {
     } catch (err) { console.error("Failed to reject:", err); }
   };
 
-  // 🗑️ Confirm Remove Friend API Call
+  // 🗑️ Remove Friend
   const confirmRemoveFriend = async () => {
     if (!friendToRemove) return;
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/remove-friend/${friendToRemove}`, { method: "POST" });
       if (res.ok) {
         updateUserState(await res.json());
-        setFriendToRemove(null); // Close the modal
+        setFriendToRemove(null);
       }
     } catch (err) { console.error("Failed to remove friend:", err); }
   };
 
-  // ⚔️ Send Challenge API Call (Prep for Backend)
-  const sendChallenge = () => {
-    console.log(`Sending a ${challengeTime}s challenge to ${challengeTarget}`);
-    alert(`Challenge sent to ${challengeTarget} for ${challengeTime} seconds! (Backend linking next)`);
-    setChallengeTarget(null); // Close the modal
+  // ⚔️ Send Challenge API Call
+  const sendChallenge = async () => {
+    if (!challengeTarget) return;
+    try {
+      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${challengeTarget}&duration=${challengeTime}`, { method: "POST" });
+      if (res.ok) {
+        alert(`Challenge sent to ${challengeTarget}! Waiting for them to accept.`);
+        setChallengeTarget(null);
+      }
+    } catch (err) { console.error("Failed to send challenge:", err); }
   };
 
-  if (!user) {
-    return <div style={styles.container}><h2>Please log in to manage friends!</h2></div>;
-  }
+  // 🎮 Accept/Decline Challenge API Call
+  const handleChallengeResponse = async (challengeId, status) => {
+    try {
+      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
+      if (res.ok) {
+        setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
+        if (status === "ACCEPTED") {
+          alert("Challenge Accepted! (Game transition system coming in next step!)");
+        }
+      }
+    } catch (err) { console.error("Failed to update challenge status:", err); }
+  };
+
+  if (!user) return <div style={styles.container}><h2>Please log in to manage friends!</h2></div>;
 
   const myFriends = user.friends || [];
   const friendRequests = user.friendRequests || [];
@@ -87,14 +121,12 @@ export default function Friends({ user, setUser }) {
     <div style={styles.container}>
       <h1 style={styles.title}>👥 Friends & Compete</h1>
 
-      {/* --- CUSTOM MODALS --- */}
-      
-      {/* 1. Remove Friend Modal */}
+      {/* --- MODALS --- */}
       {friendToRemove && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <h3>Remove Friend</h3>
-            <p>Are you sure you want to remove <strong style={{color: '#ef4444'}}>{friendToRemove}</strong> from your friends list?</p>
+            <p>Remove <strong style={{color: '#ef4444'}}>{friendToRemove}</strong> from friends?</p>
             <div style={styles.modalActions}>
               <button onClick={() => setFriendToRemove(null)} style={styles.cancelBtn}>Cancel</button>
               <button onClick={confirmRemoveFriend} style={styles.confirmRemoveBtn}>Yes, Remove</button>
@@ -103,29 +135,22 @@ export default function Friends({ user, setUser }) {
         </div>
       )}
 
-      {/* 2. Challenge Setup Modal */}
       {challengeTarget && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <h3 style={{ color: '#fbbf24' }}>⚔️ Challenge {challengeTarget}</h3>
             <p>Select match duration:</p>
-            
             <div style={styles.challengeOptions}>
               {[15, 30, 60].map(time => (
                 <button 
                   key={time} 
                   onClick={() => setChallengeTime(time)}
-                  style={{
-                    ...styles.timeBtn,
-                    background: challengeTime === time ? '#38bdf8' : '#334155',
-                    color: challengeTime === time ? '#000' : '#fff'
-                  }}
+                  style={{...styles.timeBtn, background: challengeTime === time ? '#38bdf8' : '#334155', color: challengeTime === time ? '#000' : '#fff'}}
                 >
                   {time}s
                 </button>
               ))}
             </div>
-
             <div style={styles.modalActions}>
               <button onClick={() => setChallengeTarget(null)} style={styles.cancelBtn}>Cancel</button>
               <button onClick={sendChallenge} style={styles.sendChallengeBtn}>Send Challenge</button>
@@ -134,11 +159,33 @@ export default function Friends({ user, setUser }) {
         </div>
       )}
 
-      {/* --- MAIN PAGE CONTENT --- */}
+      {/* --- MAIN CONTENT --- */}
       <div style={styles.grid}>
         
-        {/* LEFT COLUMN: Inbox & Friends */}
+        {/* LEFT COLUMN: Inboxes & Friends */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          
+          {/* CHALLENGE INBOX */}
+          {pendingChallenges.length > 0 && (
+            <div style={{...styles.card, border: "2px solid #fbbf24"}}>
+              <h2 style={{ color: "#fbbf24" }}>⚔️ Match Challenges ({pendingChallenges.length})</h2>
+              <div style={styles.list}>
+                {pendingChallenges.map((challenge) => (
+                  <div key={challenge.id} style={styles.friendRow}>
+                    <span style={styles.friendName}>
+                      {challenge.senderName} <span style={styles.mutedText}>({challenge.duration}s match)</span>
+                    </span>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} style={styles.acceptBtn}>✅ Play</button>
+                      <button onClick={() => handleChallengeResponse(challenge.id, "DECLINED")} style={styles.rejectBtn}>❌</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* FRIEND REQUEST INBOX */}
           {friendRequests.length > 0 && (
             <div style={{...styles.card, border: "2px solid #38bdf8"}}>
               <h2 style={{ color: "#38bdf8" }}>📬 Friend Requests ({friendRequests.length})</h2>
@@ -156,6 +203,7 @@ export default function Friends({ user, setUser }) {
             </div>
           )}
 
+          {/* MY FRIENDS LIST */}
           <div style={styles.card}>
             <h2>My Friends ({myFriends.length})</h2>
             {myFriends.length === 0 ? (
@@ -219,13 +267,11 @@ const styles = {
   friendRow: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.05)", padding: "12px", borderRadius: "8px" },
   friendName: { fontWeight: "bold", fontSize: "1.1rem" },
   addBtn: { background: "#10b981", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" },
-  acceptBtn: { background: "#10b981", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem" },
-  rejectBtn: { background: "#ef4444", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem" },
+  acceptBtn: { background: "#10b981", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
+  rejectBtn: { background: "#ef4444", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
   challengeBtn: { background: "#fbbf24", color: "#000", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
   removeBtn: { background: "transparent", color: "#ef4444", border: "1px solid #ef4444", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem" },
   mutedText: { color: "#94a3b8", fontSize: "0.9rem" },
-  
-  // Custom Modal Styles
   modalOverlay: { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, backdropFilter: "blur(4px)" },
   modalContent: { background: "#1e293b", padding: "30px", borderRadius: "12px", width: "90%", maxWidth: "400px", textAlign: "center", border: "1px solid #475569", boxShadow: "0 10px 25px rgba(0,0,0,0.5)" },
   modalActions: { display: "flex", justifyContent: "center", gap: "15px", marginTop: "25px" },
