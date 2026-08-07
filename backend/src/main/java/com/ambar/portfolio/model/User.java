@@ -30,7 +30,7 @@ public class User {
     }
     // Add this to your User.java fields
     @Lob 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
     // Add the Getter and Setter at the bottom of your file
@@ -43,7 +43,7 @@ public class User {
     }
 
     @Lob 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String typingStats;
 
 
