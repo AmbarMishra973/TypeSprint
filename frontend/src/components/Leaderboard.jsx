@@ -11,7 +11,6 @@ export default function Leaderboard() {
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch leaderboard whenever filters change
   useEffect(() => {
     async function fetchScores() {
       setLoading(true);
@@ -29,33 +28,81 @@ export default function Leaderboard() {
   }, [mode, timeLimit, wordLimit, punctuation, numbers]);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 text-neutral-200">
-      <h2 className="text-3xl font-bold mb-6 text-center">🏆 Global Leaderboard</h2>
+    <div style={styles.container}>
+      {/* 🚀 Built-in CSS for smooth hover animations */}
+      <style>{`
+        .lb-btn {
+          padding: 8px 20px;
+          border-radius: 8px;
+          border: 2px solid transparent;
+          background: rgba(0, 0, 0, 0.05);
+          color: var(--text-main, #333);
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 1rem;
+          transition: all 0.2s ease;
+        }
+        .lb-btn:hover {
+          transform: translateY(-2px);
+          background: rgba(0, 0, 0, 0.1);
+        }
+        .lb-btn.active {
+          background: #fbbf24;
+          color: #1a1a1a;
+          box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
+        }
+        .lb-sub-btn {
+          padding: 6px 14px;
+          border-radius: 6px;
+          border: 2px solid rgba(0, 0, 0, 0.1);
+          background: transparent;
+          color: var(--text-muted, #666);
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+        .lb-sub-btn:hover {
+          border-color: rgba(0, 0, 0, 0.3);
+          color: var(--text-main, #333);
+        }
+        .lb-sub-btn.active {
+          border-color: #fbbf24;
+          color: #d97706;
+          background: rgba(251, 191, 36, 0.1);
+        }
+        .lb-card {
+          transition: transform 0.2s ease;
+        }
+        .lb-card:hover {
+          transform: scale(1.02);
+          background: rgba(0, 0, 0, 0.03);
+        }
+      `}</style>
 
-      {/* Mode Filters */}
-      <div className="flex justify-center gap-2 mb-4 bg-neutral-900 p-2 rounded-xl border border-neutral-800">
+      <h2 style={styles.header}>🏆 Global Leaderboard</h2>
+
+      {/* Main Mode Filters */}
+      <div style={styles.filterRow}>
         {["time", "words", "quote"].map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`px-4 py-2 rounded-lg font-medium capitalize transition-all ${
-              mode === m ? "bg-amber-500 text-neutral-950 shadow-md" : "hover:text-amber-400"
-            }`}
+            className={`lb-btn ${mode === m ? "active" : ""}`}
+            style={{ textTransform: 'capitalize' }}
           >
             {m}
           </button>
         ))}
       </div>
 
-      {/* Sub-Filters (Time Limits / Word Limits) */}
-      <div className="flex flex-wrap justify-center gap-3 mb-6 text-sm">
+      {/* Sub-Filters (Time Limits / Word Limits) & Modifiers */}
+      <div style={{ ...styles.filterRow, marginBottom: '40px' }}>
         {mode === "time" && [15, 30, 60, 120].map((t) => (
           <button
             key={t}
             onClick={() => setTimeLimit(t)}
-            className={`px-3 py-1 rounded-md border ${
-              timeLimit === t ? "border-amber-500 text-amber-500 bg-amber-500/10" : "border-neutral-800 text-neutral-400"
-            }`}
+            className={`lb-sub-btn ${timeLimit === t ? "active" : ""}`}
           >
             {t}s
           </button>
@@ -65,70 +112,68 @@ export default function Leaderboard() {
           <button
             key={w}
             onClick={() => setWordLimit(w)}
-            className={`px-3 py-1 rounded-md border ${
-              wordLimit === w ? "border-amber-500 text-amber-500 bg-amber-500/10" : "border-neutral-800 text-neutral-400"
-            }`}
+            className={`lb-sub-btn ${wordLimit === w ? "active" : ""}`}
           >
             {w} words
           </button>
         ))}
 
-        {/* Modifiers */}
+        <div style={{ borderLeft: '2px solid rgba(0,0,0,0.1)', height: '24px', margin: '0 10px' }}></div>
+
         <button
           onClick={() => setPunctuation(!punctuation)}
-          className={`px-3 py-1 rounded-md border ${
-            punctuation ? "border-amber-500 text-amber-500 bg-amber-500/10" : "border-neutral-800 text-neutral-400"
-          }`}
+          className={`lb-sub-btn ${punctuation ? "active" : ""}`}
         >
-          punctuation
+          @ punctuation
         </button>
         <button
           onClick={() => setNumbers(!numbers)}
-          className={`px-3 py-1 rounded-md border ${
-            numbers ? "border-amber-500 text-amber-500 bg-amber-500/10" : "border-neutral-800 text-neutral-400"
-          }`}
+          className={`lb-sub-btn ${numbers ? "active" : ""}`}
         >
-          numbers
+          # numbers
         </button>
       </div>
 
       {/* Rankings List */}
-      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-xl">
+      <div style={styles.listContainer}>
         {loading ? (
-          <div className="text-center py-12 text-neutral-500">Loading rankings...</div>
-        ​) : leaders.length === 0 ? (
-          <div className="text-center py-12 text-neutral-500">No scores recorded for this category yet. Be the first!</div>
+          <div style={styles.emptyState}>Loading rankings... ⏳</div>
+        ) : leaders.length === 0 ? (
+          <div style={styles.emptyState}>
+            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>👻</span>
+            No scores recorded for this exact mode yet.<br/>
+            <strong>Be the first to claim the #1 spot!</strong>
+          </div>
         ) : (
           leaders.map((score, index) => (
-            <div
-              key={score.id}
-              className="flex items-center justify-between px-6 py-4 border-b border-neutral-800/60 last:border-none hover:bg-neutral-800/40 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <span className={`font-bold text-lg w-6 text-center ${
-                  index === 0 ? "text-yellow-400" : index === 1 ? "text-zinc-300" : index === 2 ? "text-amber-600" : "text-neutral-500"
-                }`}>
+            <div key={score.id} className="lb-card" style={styles.leaderCard}>
+              
+              {/* Left Side: Rank & User Info */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <span style={{ 
+                  ...styles.rankBadge, 
+                  color: index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : index === 2 ? '#b45309' : '#666'
+                }}>
                   #{index + 1}
                 </span>
 
-                {/* User Profile Picture or Default Avatar */}
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-800 flex items-center justify-center border border-neutral-700">
-                  {score.user?.profilePicture ? (
-                    <img src={score.user.profilePicture} alt="avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-sm font-bold text-neutral-400">{score.user?.name?.charAt(0).toUpperCase()}</span>
-                  )}
+                <div style={styles.avatar}>
+                  {score.user?.name?.charAt(0).toUpperCase() || "?"}
                 </div>
 
-                <span className="font-semibold text-neutral-200">{score.user?.name}</span>
+                <span style={styles.username}>{score.user?.name || "Anonymous"}</span>
               </div>
 
-              <div className="flex items-center gap-6">
-                <div className="text-right">
-                  <div className="text-xl font-extrabold text-amber-400">{score.wpm} <span className="text-xs font-normal text-neutral-400">WPM</span></div>
-                  <div className="text-xs text-neutral-500">{score.accuracy}% accuracy</div>
+              {/* Right Side: Stats */}
+              <div style={styles.statsContainer}>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={styles.wpmText}>
+                    {score.wpm} <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 'normal' }}>WPM</span>
+                  </div>
+                  <div style={styles.accuracyText}>{score.accuracy}% accuracy</div>
                 </div>
               </div>
+
             </div>
           ))
         )}
@@ -136,3 +181,85 @@ export default function Leaderboard() {
     </div>
   );
 }
+
+// Inline Styles Object for the Layout
+const styles = {
+  container: {
+    maxWidth: '750px',
+    margin: '0 auto',
+    padding: '40px 20px',
+    color: 'var(--text-main, #333)',
+  },
+  header: {
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: '30px',
+  },
+  filterRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '12px',
+    marginBottom: '20px',
+  },
+  listContainer: {
+    background: 'rgba(0,0,0,0.02)',
+    border: '1px solid rgba(0,0,0,0.08)',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.02)',
+  },
+  emptyState: {
+    padding: '60px 20px',
+    textAlign: 'center',
+    color: '#666',
+    fontSize: '1.1rem',
+  },
+  leaderCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '20px 24px',
+    borderBottom: '1px solid rgba(0,0,0,0.05)',
+    cursor: 'default',
+  },
+  rankBadge: {
+    fontSize: '1.5rem',
+    fontWeight: '900',
+    width: '40px',
+  },
+  avatar: {
+    width: '45px',
+    height: '45px',
+    borderRadius: '50%',
+    background: '#e2e8f0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    fontSize: '1.2rem',
+    color: '#475569',
+    border: '2px solid rgba(0,0,0,0.1)',
+  },
+  username: {
+    fontSize: '1.2rem',
+    fontWeight: '600',
+  },
+  statsContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  wpmText: {
+    fontSize: '1.8rem',
+    fontWeight: '900',
+    color: '#fbbf24', // Amber/Yellow color for speed
+    lineHeight: '1',
+  },
+  accuracyText: {
+    fontSize: '0.85rem',
+    color: '#888',
+    marginTop: '4px',
+  },
+};
