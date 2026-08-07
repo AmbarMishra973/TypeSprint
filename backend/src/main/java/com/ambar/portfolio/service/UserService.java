@@ -50,15 +50,69 @@ public List<User> searchUsers(String query) {
 }
 
 // ➕ Add a friend
-public User addFriend(String username, String friendName) {
-    User user = userRepository.findFirstByName(username);
-    User friend = userRepository.findFirstByName(friendName);
+// 📨 1. Send a Request
+    public User sendFriendRequest(String senderName, String receiverName) {
+        User sender = userRepository.findFirstByName(senderName);
+        User receiver = userRepository.findFirstByName(receiverName);
 
-    // Make sure both users exist and they aren't already friends
-    if (user != null && friend != null && !user.getFriends().contains(friendName)) {
-        user.getFriends().add(friendName);
-        return userRepository.save(user);
+        if (sender != null && receiver != null) {
+            if (!receiver.getFriendRequests().contains(senderName)) {
+                receiver.getFriendRequests().add(senderName);
+            }
+            if (!sender.getSentRequests().contains(receiverName)) {
+                sender.getSentRequests().add(receiverName);
+            }
+            userRepository.save(receiver);
+            return userRepository.save(sender);
+        }
+        return sender;
     }
-    return user; // Return unchanged user if they are already friends
-}
+
+    // ✅ 2. Accept a Request
+    public User acceptFriendRequest(String username, String requesterName) {
+        User user = userRepository.findFirstByName(username);
+        User requester = userRepository.findFirstByName(requesterName);
+
+        if (user != null && requester != null) {
+            // Remove from queues
+            user.getFriendRequests().remove(requesterName);
+            requester.getSentRequests().remove(username);
+
+            // Add to both friends lists mutually
+            if (!user.getFriends().contains(requesterName)) user.getFriends().add(requesterName);
+            if (!requester.getFriends().contains(username)) requester.getFriends().add(username);
+
+            userRepository.save(requester);
+            return userRepository.save(user);
+        }
+        return user;
+    }
+
+    // ❌ 3. Reject a Request
+    public User rejectFriendRequest(String username, String requesterName) {
+        User user = userRepository.findFirstByName(username);
+        User requester = userRepository.findFirstByName(requesterName);
+
+        if (user != null && requester != null) {
+            user.getFriendRequests().remove(requesterName);
+            requester.getSentRequests().remove(username);
+            userRepository.save(requester);
+            return userRepository.save(user);
+        }
+        return user;
+    }
+
+    // 🗑️ 4. Remove a Friend
+    public User removeFriend(String username, String friendName) {
+        User user = userRepository.findFirstByName(username);
+        User friend = userRepository.findFirstByName(friendName);
+
+        if (user != null && friend != null) {
+            user.getFriends().remove(friendName);
+            friend.getFriends().remove(username);
+            userRepository.save(friend);
+            return userRepository.save(user);
+        }
+        return user;
+    }
 }

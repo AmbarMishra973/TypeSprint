@@ -58,12 +58,23 @@ public ResponseEntity<?> searchUsers(@RequestParam String query) {
 }
 
 // ➕ Endpoint to add a friend
-@PostMapping("/{username}/add-friend/{friendName}")
-public ResponseEntity<?> addFriend(@PathVariable String username, @PathVariable String friendName) {
-    User updatedUser = userService.addFriend(username, friendName);
-    if (updatedUser == null) {
-        return ResponseEntity.status(404).body("User or friend not found");
+@PostMapping("/{username}/request-friend/{receiverName}")
+    public ResponseEntity<?> sendRequest(@PathVariable String username, @PathVariable String receiverName) {
+        return ResponseEntity.ok(userService.sendFriendRequest(username, receiverName));
     }
-    return ResponseEntity.ok(updatedUser);
-}
+
+    @PostMapping("/{username}/accept-friend/{requesterName}")
+    public ResponseEntity<?> acceptRequest(@PathVariable String username, @PathVariable String requesterName) {
+        return ResponseEntity.ok(userService.acceptFriendRequest(username, requesterName));
+    }
+
+    @PostMapping("/{username}/reject-friend/{requesterName}")
+    public ResponseEntity<?> rejectRequest(@PathVariable String username, @PathVariable String requesterName) {
+        return ResponseEntity.ok(userService.rejectFriendRequest(username, requesterName));
+    }
+
+    @PostMapping("/{username}/remove-friend/{friendName}")
+    public ResponseEntity<?> removeFriend(@PathVariable String username, @PathVariable String friendName) {
+        return ResponseEntity.ok(userService.removeFriend(username, friendName));
+    }
 }

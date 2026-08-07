@@ -105,6 +105,11 @@ public class User {
 
     @ElementCollection
 private List<String> friends = new ArrayList<>();
+@ElementCollection
+    private List<String> friendRequests = new ArrayList<>(); // Inbox: People who want to be your friend
+
+    @ElementCollection
+    private List<String> sentRequests = new ArrayList<>(); // Outbox: People you have invited
 
 public List<String> getFriends() {
     return friends;
@@ -113,5 +118,11 @@ public List<String> getFriends() {
 public void setFriends(List<String> friends) {
     this.friends = friends;
 }
+public List<String> getSentRequests() {
+        return sentRequests;
+    }
 
+    public void setSentRequests(List<String> sentRequests) {
+        this.sentRequests = sentRequests;
+    }
 }
