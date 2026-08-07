@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getLeaderboard } from "../services/api";
 
-export default function Leaderboard() {
+export default function Leaderboard({ user }) {
+  const [scope, setScope] = useState("global"); // "global" or "friends"
+  const [timeRange, setTimeRange] = useState("all"); // "all", "month", "week"
+  
   const [mode, setMode] = useState("time");
   const [timeLimit, setTimeLimit] = useState(30);
   const [wordLimit, setWordLimit] = useState(25);
@@ -20,16 +23,17 @@ export default function Leaderboard() {
         wordLimit: mode === "words" ? wordLimit : null,
         punctuation,
         numbers,
+        scope,      // 🚀 NEW: Send scope to API
+        timeRange,  // 🚀 NEW: Send time range to API
       });
       setLeaders(data || []);
       setLoading(false);
     }
     fetchScores();
-  }, [mode, timeLimit, wordLimit, punctuation, numbers]);
+  }, [mode, timeLimit, wordLimit, punctuation, numbers, scope, timeRange]);
 
   return (
     <div style={styles.container}>
-      {/* 🚀 Built-in CSS for smooth hover animations */}
       <style>{`
         .lb-btn {
           padding: 8px 20px;
@@ -75,63 +79,58 @@ export default function Leaderboard() {
           transition: transform 0.2s ease;
         }
         .lb-card:hover {
-          transform: scale(1.02);
-          background: rgba(0, 0, 0, 0.03);
+          transform: scale(1.01);
         }
       `}</style>
 
-      <h2 style={styles.header}>🏆 Global Leaderboard</h2>
+      {/* 🚀 SCOPE TOGGLE (Global vs Friends) */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '30px' }}>
+        <button 
+          onClick={() => setScope("global")} 
+          className={`lb-btn ${scope === "global" ? "active" : ""}`}
+          style={{ fontSize: '1.2rem', padding: '10px 30px' }}
+        >
+          🌍 Global
+        </button>
+        <button 
+          onClick={() => setScope("friends")} 
+          className={`lb-btn ${scope === "friends" ? "active" : ""}`}
+          style={{ fontSize: '1.2rem', padding: '10px 30px' }}
+        >
+          👥 Friends
+        </button>
+      </div>
 
       {/* Main Mode Filters */}
       <div style={styles.filterRow}>
         {["time", "words", "quote"].map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`lb-btn ${mode === m ? "active" : ""}`}
-            style={{ textTransform: 'capitalize' }}
-          >
+          <button key={m} onClick={() => setMode(m)} className={`lb-btn ${mode === m ? "active" : ""}`} style={{ textTransform: 'capitalize' }}>
             {m}
           </button>
         ))}
       </div>
 
-      {/* Sub-Filters (Time Limits / Word Limits) & Modifiers */}
-      <div style={{ ...styles.filterRow, marginBottom: '40px' }}>
+      {/* Sub-Filters & Modifiers */}
+      <div style={{ ...styles.filterRow, marginBottom: '20px' }}>
         {mode === "time" && [15, 30, 60, 120].map((t) => (
-          <button
-            key={t}
-            onClick={() => setTimeLimit(t)}
-            className={`lb-sub-btn ${timeLimit === t ? "active" : ""}`}
-          >
-            {t}s
-          </button>
+          <button key={t} onClick={() => setTimeLimit(t)} className={`lb-sub-btn ${timeLimit === t ? "active" : ""}`}>{t}s</button>
         ))}
 
         {mode === "words" && [10, 25, 50, 100].map((w) => (
-          <button
-            key={w}
-            onClick={() => setWordLimit(w)}
-            className={`lb-sub-btn ${wordLimit === w ? "active" : ""}`}
-          >
-            {w} words
-          </button>
+          <button key={w} onClick={() => setWordLimit(w)} className={`lb-sub-btn ${wordLimit === w ? "active" : ""}`}>{w} words</button>
         ))}
 
         <div style={{ borderLeft: '2px solid rgba(0,0,0,0.1)', height: '24px', margin: '0 10px' }}></div>
 
-        <button
-          onClick={() => setPunctuation(!punctuation)}
-          className={`lb-sub-btn ${punctuation ? "active" : ""}`}
-        >
-          @ punctuation
-        </button>
-        <button
-          onClick={() => setNumbers(!numbers)}
-          className={`lb-sub-btn ${numbers ? "active" : ""}`}
-        >
-          # numbers
-        </button>
+        <button onClick={() => setPunctuation(!punctuation)} className={`lb-sub-btn ${punctuation ? "active" : ""}`}>@ punctuation</button>
+        <button onClick={() => setNumbers(!numbers)} className={`lb-sub-btn ${numbers ? "active" : ""}`}># numbers</button>
+      </div>
+
+      {/* 🚀 TIME RANGE FILTERS */}
+      <div style={{ ...styles.filterRow, marginBottom: '30px' }}>
+        <button onClick={() => setTimeRange("all")} className={`lb-sub-btn ${timeRange === "all" ? "active" : ""}`}>All-Time</button>
+        <button onClick={() => setTimeRange("month")} className={`lb-sub-btn ${timeRange === "month" ? "active" : ""}`}>Past 30 Days</button>
+        <button onClick={() => setTimeRange("week")} className={`lb-sub-btn ${timeRange === "week" ? "active" : ""}`}>Past 7 Days</button>
       </div>
 
       {/* Rankings List */}
@@ -141,125 +140,71 @@ export default function Leaderboard() {
         ) : leaders.length === 0 ? (
           <div style={styles.emptyState}>
             <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>👻</span>
-            No scores recorded for this exact mode yet.<br/>
-            <strong>Be the first to claim the #1 spot!</strong>
+            No scores recorded for this exact mode/time yet.<br/>
+            <strong>Be the first!</strong>
           </div>
         ) : (
-          leaders.map((score, index) => (
-            <div key={score.id} className="lb-card" style={styles.leaderCard}>
-              
-              {/* Left Side: Rank & User Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <span style={{ 
-                  ...styles.rankBadge, 
-                  color: index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : index === 2 ? '#b45309' : '#666'
-                }}>
-                  #{index + 1}
-                </span>
+          leaders.map((score, index) => {
+            // 🚀 CHECK IF THIS ROW BELONGS TO THE LOGGED-IN USER
+            const isMe = user && score.user?.name === user.name;
 
-                <div style={styles.avatar}>
-                  {score.user?.name?.charAt(0).toUpperCase() || "?"}
-                </div>
-
-                <span style={styles.username}>{score.user?.name || "Anonymous"}</span>
-              </div>
-
-              {/* Right Side: Stats */}
-              <div style={styles.statsContainer}>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={styles.wpmText}>
-                    {score.wpm} <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 'normal' }}>WPM</span>
+            return (
+              <div 
+                key={score.id} 
+                className="lb-card" 
+                style={{
+                  ...styles.leaderCard,
+                  ...(isMe ? styles.highlightedCard : {}) // Apply glowing border if it's the user
+                }}
+              >
+                {/* Left Side: Rank & User Info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <span style={{ 
+                    ...styles.rankBadge, 
+                    color: index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : index === 2 ? '#b45309' : '#666'
+                  }}>
+                    #{index + 1}
+                  </span>
+                  <div style={{...styles.avatar, ...(isMe ? {background: '#fef3c7', borderColor: '#fbbf24'} : {})}}>
+                    {score.user?.name?.charAt(0).toUpperCase() || "?"}
                   </div>
-                  <div style={styles.accuracyText}>{score.accuracy}% accuracy</div>
+                  <span style={{...styles.username, ...(isMe ? {color: '#d97706'} : {})}}>
+                    {score.user?.name || "Anonymous"} {isMe && "(You)"}
+                  </span>
+                </div>
+
+                {/* Right Side: Stats */}
+                <div style={styles.statsContainer}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={styles.wpmText}>
+                      {score.wpm} <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 'normal' }}>WPM</span>
+                    </div>
+                    <div style={styles.accuracyText}>{score.accuracy}% accuracy</div>
+                  </div>
                 </div>
               </div>
-
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
   );
 }
 
-// Inline Styles Object for the Layout
 const styles = {
-  container: {
-    maxWidth: '750px',
-    margin: '0 auto',
-    padding: '40px 20px',
-    color: 'var(--text-main, #333)',
+  container: { maxWidth: '750px', margin: '0 auto', padding: '40px 20px', color: 'var(--text-main, #333)' },
+  filterRow: { display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '12px' },
+  listContainer: { background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px', overflow: 'hidden' },
+  emptyState: { padding: '60px 20px', textAlign: 'center', color: '#666', fontSize: '1.1rem' },
+  leaderCard: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' },
+  highlightedCard: { 
+    background: 'rgba(251, 191, 36, 0.1)', // Light amber background
+    borderLeft: '5px solid #fbbf24',       // Thick amber accent line on the left
   },
-  header: {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: '30px',
-  },
-  filterRow: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '12px',
-    marginBottom: '20px',
-  },
-  listContainer: {
-    background: 'rgba(0,0,0,0.02)',
-    border: '1px solid rgba(0,0,0,0.08)',
-    borderRadius: '16px',
-    overflow: 'hidden',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.02)',
-  },
-  emptyState: {
-    padding: '60px 20px',
-    textAlign: 'center',
-    color: '#666',
-    fontSize: '1.1rem',
-  },
-  leaderCard: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '20px 24px',
-    borderBottom: '1px solid rgba(0,0,0,0.05)',
-    cursor: 'default',
-  },
-  rankBadge: {
-    fontSize: '1.5rem',
-    fontWeight: '900',
-    width: '40px',
-  },
-  avatar: {
-    width: '45px',
-    height: '45px',
-    borderRadius: '50%',
-    background: '#e2e8f0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '1.2rem',
-    color: '#475569',
-    border: '2px solid rgba(0,0,0,0.1)',
-  },
-  username: {
-    fontSize: '1.2rem',
-    fontWeight: '600',
-  },
-  statsContainer: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  wpmText: {
-    fontSize: '1.8rem',
-    fontWeight: '900',
-    color: '#fbbf24', // Amber/Yellow color for speed
-    lineHeight: '1',
-  },
-  accuracyText: {
-    fontSize: '0.85rem',
-    color: '#888',
-    marginTop: '4px',
-  },
+  rankBadge: { fontSize: '1.5rem', fontWeight: '900', width: '40px' },
+  avatar: { width: '45px', height: '45px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: '#475569', border: '2px solid rgba(0,0,0,0.1)' },
+  username: { fontSize: '1.2rem', fontWeight: '600' },
+  statsContainer: { display: 'flex', alignItems: 'center' },
+  wpmText: { fontSize: '1.8rem', fontWeight: '900', color: '#fbbf24', lineHeight: '1' },
+  accuracyText: { fontSize: '0.85rem', color: '#888', marginTop: '4px' },
 };

@@ -72,8 +72,8 @@ function Home() {
 
         {/* Strictly render ONLY the Leaderboard when activeView is "leaderboard" */}
         {activeView === "leaderboard" && (
-          <Leaderboard />
-        )}
+  <Leaderboard user={user} />
+)}
 
       </main>
 
