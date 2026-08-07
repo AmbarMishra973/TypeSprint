@@ -95,7 +95,10 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
                   ⚙️ Settings
                 </button>
                 <button 
-  onClick={() => setActiveView("achievements")}
+  onClick={() => {
+    console.log("Switching to achievements..."); // 🚀 CHECK CONSOLE
+    setActiveView("achievements");
+  }}
   className={activeView === "achievements" ? "active" : ""}
 >
   🏆 Achievements
