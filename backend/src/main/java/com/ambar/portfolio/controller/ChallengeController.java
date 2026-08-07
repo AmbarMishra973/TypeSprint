@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/challenges")
@@ -16,38 +19,28 @@ public class ChallengeController {
     @Autowired
     private ChallengeService challengeService;
 
+    // In-memory live positions: Map<ChallengeId, Map<Username, CharacterIndex>>
+    private final Map<Long, Map<String, Integer>> livePositions = new ConcurrentHashMap<>();
+
     // ⚔️ Send a Challenge
     @PostMapping("/send")
-    public ResponseEntity<?> sendChallenge(@RequestParam String sender, @RequestParam String receiver, @RequestParam int duration, @RequestParam(required = false) String wordsText) {
-        Challenge challenge = new Challenge(sender, receiver, duration);
-        if (wordsText != null) challenge.setWordsText(wordsText);
-        Challenge saved = challengeRepository.save(challenge);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<?> sendChallenge(
+            @RequestParam String sender, 
+            @RequestParam String receiver, 
+            @RequestParam int duration,
+            @RequestParam(required = false) String wordsText) {
+        
+        Challenge challenge = challengeService.createChallenge(sender, receiver, duration);
+        if (wordsText != null && !wordsText.isEmpty()) {
+            challenge.setWordsText(wordsText);
+        }
+        return ResponseEntity.ok(challenge);
     }
 
     // 📬 Get Challenge Inbox
     @GetMapping("/{username}/pending")
     public ResponseEntity<List<Challenge>> getPendingChallenges(@PathVariable String username) {
         return ResponseEntity.ok(challengeService.getPendingChallenges(username));
-    }
-
-    // ✅/❌ Update Status (Accept/Decline)
-    @PutMapping("/{challengeId}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long challengeId, @RequestParam String status) {
-        Challenge updatedChallenge = challengeService.updateChallengeStatus(challengeId, status);
-        if (updatedChallenge == null) {
-            return ResponseEntity.status(404).body("Challenge not found");
-        }
-        return ResponseEntity.ok(updatedChallenge);
-    }
-    // 🏁 Submit Score Endpoint
-    @PostMapping("/{challengeId}/submit")
-    public ResponseEntity<?> submitScore(@PathVariable Long challengeId, @RequestParam String username, @RequestParam int wpm) {
-        Challenge updatedChallenge = challengeService.submitChallengeScore(challengeId, username, wpm);
-        if (updatedChallenge == null) {
-            return ResponseEntity.status(404).body("Challenge not found");
-        }
-        return ResponseEntity.ok(updatedChallenge);
     }
 
     // 🔍 Check for Active Match
@@ -60,17 +53,43 @@ public class ChallengeController {
         return ResponseEntity.noContent().build();
     }
 
-    // In-memory live positions: Map<ChallengeId, Map<Username, CharacterIndex>>
-    private final java.util.Map<Long, java.util.Map<String, Integer>> livePositions = new java.util.concurrent.ConcurrentHashMap<>();
+    // ✅/❌ Update Status (Accept/Decline)
+    @PutMapping("/{challengeId}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long challengeId, @RequestParam String status) {
+        Challenge updatedChallenge = challengeService.updateChallengeStatus(challengeId, status);
+        if (updatedChallenge == null) {
+            return ResponseEntity.status(404).body("Challenge not found");
+        }
+        return ResponseEntity.ok(updatedChallenge);
+    }
 
+    // 🏁 Submit Score Endpoint
+    @PostMapping("/{challengeId}/submit")
+    public ResponseEntity<?> submitScore(
+            @PathVariable Long challengeId, 
+            @RequestParam String username, 
+            @RequestParam int wpm) {
+        
+        Challenge updatedChallenge = challengeService.submitChallengeScore(challengeId, username, wpm);
+        if (updatedChallenge == null) {
+            return ResponseEntity.status(404).body("Challenge not found");
+        }
+        return ResponseEntity.ok(updatedChallenge);
+    }
+
+    // 📊 Live Position Tracking for Opponent Ghost Cursor
     @PostMapping("/{challengeId}/progress")
-    public ResponseEntity<?> updateProgress(@PathVariable Long challengeId, @RequestParam String username, @RequestParam int position) {
-        livePositions.computeIfAbsent(challengeId, k => new java.util.concurrent.ConcurrentHashMap<>()).put(username, position);
+    public ResponseEntity<?> updateProgress(
+            @PathVariable Long challengeId, 
+            @RequestParam String username, 
+            @RequestParam int position) {
+        
+        livePositions.computeIfAbsent(challengeId, k -> new ConcurrentHashMap<>()).put(username, position);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{challengeId}/progress")
-    public ResponseEntity<?> getProgress(@PathVariable Long challengeId) {
-        return ResponseEntity.ok(livePositions.getOrDefault(challengeId, java.util.Collections.emptyMap()));
+    public ResponseEntity<Map<String, Integer>> getProgress(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(livePositions.getOrDefault(challengeId, Collections.emptyMap()));
     }
 }
