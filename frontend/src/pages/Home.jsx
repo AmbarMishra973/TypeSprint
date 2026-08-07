@@ -98,7 +98,7 @@ function Home() {
           onClose={closeModal} 
         />
       )}
-      {activeModal === "achievements" && (
+      {activeView === "achievements" && (
           <div style={{ animation: "fadeIn 0.3s ease" }}>
             <h1 style={{ textAlign: "center", marginBottom: "10px" }}>Your Trophy Room</h1>
             <p style={{ textAlign: "center", color: "#666", marginBottom: "40px" }}>
