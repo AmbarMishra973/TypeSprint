@@ -31,11 +31,14 @@ export default function Friends({ user, setUser }) {
   };
 
   // 📨 Send Friend Request
+  // 📨 Send Friend Request
   const sendRequest = async (friendName) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/request-friend/${friendName}`, { method: "POST" });
       if (res.ok) updateUserState(await res.json());
-    } catch (err) console.error("Failed to send request:", err);
+    } catch (err) { 
+      console.error("Failed to send request:", err); 
+    }
   };
 
   // ✅ Accept Friend Request
@@ -43,7 +46,9 @@ export default function Friends({ user, setUser }) {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/accept-friend/${requesterName}`, { method: "POST" });
       if (res.ok) updateUserState(await res.json());
-    } catch (err) console.error("Failed to accept request:", err);
+    } catch (err) { 
+      console.error("Failed to accept request:", err); 
+    }
   };
 
   // ❌ Reject Friend Request
@@ -51,7 +56,9 @@ export default function Friends({ user, setUser }) {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/reject-friend/${requesterName}`, { method: "POST" });
       if (res.ok) updateUserState(await res.json());
-    } catch (err) console.error("Failed to reject request:", err);
+    } catch (err) { 
+      console.error("Failed to reject request:", err); 
+    }
   };
 
   // 🗑️ Remove Friend
@@ -60,7 +67,9 @@ export default function Friends({ user, setUser }) {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/users/${user.name}/remove-friend/${friendName}`, { method: "POST" });
       if (res.ok) updateUserState(await res.json());
-    } catch (err) console.error("Failed to remove friend:", err);
+    } catch (err) { 
+      console.error("Failed to remove friend:", err); 
+    }
   };
 
   // ⚔️ Challenge & Profile Placeholders (Stage B)
