@@ -158,7 +158,7 @@ function keyHandler(e) {
   const elapsedTime = Math.floor(getElapsedSeconds());
 
   return (
-    <div className="typing-box">
+    <div className="typing-box" onClick={() => inputRef.current?.focus()}>
       <ThemeSelector />
       <div
         style={{ position: "fixed", top: "70px", right: "20px", zIndex: 9999 }}
