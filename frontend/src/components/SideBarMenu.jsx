@@ -9,10 +9,8 @@ export default function SidebarMenu({ isOpen, onClose, activeView, setActiveView
 
   return (
     <>
-      {/* Dark Backdrop Overlay */}
       {isOpen && <div style={styles.overlay} onClick={onClose} />}
       
-      {/* Slide-out Drawer Panel */}
       <div style={{ ...styles.drawer, right: isOpen ? "0" : "-35%" }}>
         <div style={styles.header}>
           <h2 style={styles.drawerTitle}>Menu</h2>
@@ -20,7 +18,6 @@ export default function SidebarMenu({ isOpen, onClose, activeView, setActiveView
         </div>
 
         <div style={styles.menuList}>
-          {/* Core Navigation Views */}
           {menuItems.map((item) => (
             <button
               key={item.id}
@@ -40,46 +37,27 @@ export default function SidebarMenu({ isOpen, onClose, activeView, setActiveView
 
           <hr style={styles.divider} />
 
-          {/* User-specific views & modals */}
           {user ? (
             <>
-              <button 
-                onClick={() => { setActiveView("dashboard"); onClose(); }} 
-                style={styles.navBtn}
-              >
+              <button onClick={() => { setActiveView("dashboard"); onClose(); }} style={styles.navBtn}>
                 📊 Dashboard
               </button>
-              <button 
-                onClick={() => { onClose(); openModal("profile"); }} 
-                style={styles.navBtn}
-              >
+              <button onClick={() => { onClose(); openModal("profile"); }} style={styles.navBtn}>
                 👤 Profile
               </button>
-              <button 
-                onClick={() => { onClose(); openModal("settings"); }} 
-                style={styles.navBtn}
-              >
+              <button onClick={() => { onClose(); openModal("settings"); }} style={styles.navBtn}>
                 ⚙️ Settings
               </button>
-              <button 
-                onClick={onLogout} 
-                style={{ ...styles.navBtn, color: '#ef4444' }}
-              >
+              <button onClick={onLogout} style={{ ...styles.navBtn, color: '#ef4444' }}>
                 🚪 Logout
               </button>
             </>
           ) : (
             <>
-              <button 
-                onClick={() => { onClose(); openModal("auth"); }} 
-                style={styles.navBtn}
-              >
+              <button onClick={() => { onClose(); openModal("auth"); }} style={styles.navBtn}>
                 🔑 Login / Signup
               </button>
-              <button 
-                onClick={() => { onClose(); openModal("settings"); }} 
-                style={styles.navBtn}
-              >
+              <button onClick={() => { onClose(); openModal("settings"); }} style={styles.navBtn}>
                 ⚙️ Settings
               </button>
             </>
