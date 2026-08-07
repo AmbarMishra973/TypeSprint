@@ -32,14 +32,35 @@ public class TestScoreController {
 
     // 🚀 GET: Fetches the top 5 scores dynamically based on filters
     @GetMapping("/leaderboard")
-    public ResponseEntity<List<TestScore>> getLeaderboard(
+    public ResponseEntity<?> getLeaderboard(
             @RequestParam String mode,
             @RequestParam(required = false) Integer timeLimit,
             @RequestParam(required = false) Integer wordLimit,
-            @RequestParam boolean punctuation,
-            @RequestParam boolean numbers) {
-            
-        List<TestScore> topScores = testScoreService.getLeaderboard(mode, timeLimit, wordLimit, punctuation, numbers);
-        return ResponseEntity.ok(topScores);
+            @RequestParam Boolean punctuation,
+            @RequestParam Boolean numbers,
+            @RequestParam(defaultValue = "global") String scope,
+            @RequestParam(defaultValue = "all") String timeRange) {
+
+        // 1. If the user clicks "Friends", return an empty list for now (Feature coming soon!)
+        if ("friends".equalsIgnoreCase(scope)) {
+            return ResponseEntity.ok(List.of()); // Returns an empty array to React
+        }
+
+        // 2. Calculate the time cutoff in milliseconds
+        long now = System.currentTimeMillis();
+        long sinceTimestamp = 0L; // Default for "all" (All-time)
+
+        if ("week".equalsIgnoreCase(timeRange)) {
+            sinceTimestamp = now - (7L * 24 * 60 * 60 * 1000); // 7 days ago
+        } else if ("month".equalsIgnoreCase(timeRange)) {
+            sinceTimestamp = now - (30L * 24 * 60 * 60 * 1000); // 30 days ago
+        }
+
+        // 3. Fetch from the database
+        List<TestScore> leaders = testScoreRepository.findTop50ByModeAndTimeLimitAndWordLimitAndPunctuationAndNumbersAndTimestampGreaterThanEqualOrderByWpmDesc(
+                mode, timeLimit, wordLimit, punctuation, numbers, sinceTimestamp
+        );
+
+        return ResponseEntity.ok(leaders);
     }
 }
