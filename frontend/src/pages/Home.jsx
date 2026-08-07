@@ -10,6 +10,7 @@ import SettingsModal from "../components/SettingsModal";
 import Leaderboard from "../components/Leaderboard";
 import AchievementsGrid from "../components/AchievementsGrid";
 import Friends from "../components/Friends";
+
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   const [activeChallenge, setActiveChallenge] = useState(null);
@@ -33,10 +34,9 @@ function Home() {
   const openModal = (modalName) => setActiveModal(modalName);
   const closeModal = () => setActiveModal(null);
 
-  // 🚀 FIX 1: Pass the user into the typing engine so stats save to the right account
+  // 🚀 The engine is named typingEngine here!
   const typingEngine = useTypingEngine(user);
 
-  // 🚀 FIX 2: Wake up the Render backend as soon as the website loads
   useEffect(() => {
     fetch("https://ambarmishradb.onrender.com/")
       .then(() => console.log("Backend server is awake!"))
@@ -60,11 +60,11 @@ function Home() {
           <>
             <h1>Improve your typing speed every day</h1>
             <TypingBox 
-  engine={engine} 
-  user={user} 
-  activeChallenge={activeChallenge} 
-  setActiveChallenge={setActiveChallenge} 
-/>
+              engine={typingEngine} // 🚀 FIXED: Passed typingEngine instead of engine
+              user={user} 
+              activeChallenge={activeChallenge} 
+              setActiveChallenge={setActiveChallenge} 
+            />
           </>
         )}
 
@@ -79,8 +79,29 @@ function Home() {
 
         {/* Strictly render ONLY the Leaderboard when activeView is "leaderboard" */}
         {activeView === "leaderboard" && (
-  <Leaderboard user={user} />
-)}
+          <Leaderboard user={user} />
+        )}
+
+        {/* 🚀 FIXED: Kept only ONE Friends block and passed all the correct props */}
+        {activeView === "friends" && (
+          <Friends 
+            user={user} 
+            setUser={setUser} 
+            setActiveView={setActiveView} 
+            setActiveChallenge={setActiveChallenge} 
+          />
+        )}
+
+        {/* Achievements View */}
+        {activeView === "achievements" && (
+          <div style={{ animation: "fadeIn 0.3s ease", paddingBottom: "40px" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "10px", fontSize: "2.5rem" }}>Your Trophy Room</h1>
+            <p style={{ textAlign: "center", color: "var(--text-muted, #666)", marginBottom: "40px" }}>
+              Complete challenges to unlock badges and level up your typing status.
+            </p>
+            <AchievementsGrid unlockedIds={typingEngine?.stats?.unlockedAchievements || []} />
+          </div>
+        )}
 
       </main>
 
@@ -104,35 +125,7 @@ function Home() {
           onClose={closeModal} 
         />
       )}
-      {activeView === "achievements" && (
-    <div style={{ animation: "fadeIn 0.3s ease", paddingBottom: "40px" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "10px", fontSize: "2.5rem" }}>Your Trophy Room</h1>
-      <p style={{ textAlign: "center", color: "var(--text-muted, #666)", marginBottom: "40px" }}>
-        Complete challenges to unlock badges and level up your typing status.
-      </p>
-      <AchievementsGrid unlockedIds={typingEngine?.stats?.unlockedAchievements || []} />
-    </div>
-  )}
-  {activeView === "friends" && (
-  <Friends user={user} setUser={setUser} />
-)}
 
-{activeView === "friends" && (
-  <Friends 
-    user={user} 
-    setUser={setUser} 
-    setActiveView={setActiveView} 
-    setActiveChallenge={setActiveChallenge} 
-  />
-)}
-
-{activeView === "typing" && (
-  <TypingTest 
-    user={user} 
-    activeChallenge={activeChallenge} 
-    setActiveChallenge={setActiveChallenge} 
-  />
-)}
     </div>
   );
 }
