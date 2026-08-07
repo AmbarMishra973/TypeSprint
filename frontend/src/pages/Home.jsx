@@ -12,6 +12,7 @@ import AchievementsGrid from "../components/AchievementsGrid";
 import Friends from "../components/Friends";
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
+  const [activeChallenge, setActiveChallenge] = useState(null);
   
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("typingUser");
@@ -58,7 +59,12 @@ function Home() {
         {activeView === "typing" && (
           <>
             <h1>Improve your typing speed every day</h1>
-            <TypingBox engine={typingEngine} />
+            <TypingBox 
+  engine={engine} 
+  user={user} 
+  activeChallenge={activeChallenge} 
+  setActiveChallenge={setActiveChallenge} 
+/>
           </>
         )}
 
@@ -109,6 +115,23 @@ function Home() {
   )}
   {activeView === "friends" && (
   <Friends user={user} setUser={setUser} />
+)}
+
+{activeView === "friends" && (
+  <Friends 
+    user={user} 
+    setUser={setUser} 
+    setActiveView={setActiveView} 
+    setActiveChallenge={setActiveChallenge} 
+  />
+)}
+
+{activeView === "typing" && (
+  <TypingTest 
+    user={user} 
+    activeChallenge={activeChallenge} 
+    setActiveChallenge={setActiveChallenge} 
+  />
 )}
     </div>
   );

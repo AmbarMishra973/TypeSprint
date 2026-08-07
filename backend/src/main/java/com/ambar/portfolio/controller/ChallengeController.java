@@ -38,4 +38,13 @@ public class ChallengeController {
         }
         return ResponseEntity.ok(updatedChallenge);
     }
+    // 🏁 Submit Score Endpoint
+    @PostMapping("/{challengeId}/submit")
+    public ResponseEntity<?> submitScore(@PathVariable Long challengeId, @RequestParam String username, @RequestParam int wpm) {
+        Challenge updatedChallenge = challengeService.submitChallengeScore(challengeId, username, wpm);
+        if (updatedChallenge == null) {
+            return ResponseEntity.status(404).body("Challenge not found");
+        }
+        return ResponseEntity.ok(updatedChallenge);
+    }
 }

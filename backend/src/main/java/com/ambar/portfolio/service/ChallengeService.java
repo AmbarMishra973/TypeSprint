@@ -33,4 +33,30 @@ public class ChallengeService {
         }
         return null;
     }
+    // 🏁 Submit Score & Determine Winner
+    public Challenge submitChallengeScore(Long challengeId, String username, int wpm) {
+        Challenge challenge = challengeRepository.findById(challengeId).orElse(null);
+        if (challenge != null) {
+            // Save the score for the correct player
+            if (challenge.getSenderName().equals(username)) {
+                challenge.setSenderWpm(wpm);
+            } else if (challenge.getReceiverName().equals(username)) {
+                challenge.setReceiverWpm(wpm);
+            }
+
+            // If both players have now submitted their scores, finish the match!
+            if (challenge.getSenderWpm() > 0 && challenge.getReceiverWpm() > 0) {
+                challenge.setStatus("COMPLETED");
+                if (challenge.getSenderWpm() > challenge.getReceiverWpm()) {
+                    challenge.setWinnerName(challenge.getSenderName());
+                } else if (challenge.getReceiverWpm() > challenge.getSenderWpm()) {
+                    challenge.setWinnerName(challenge.getReceiverName());
+                } else {
+                    challenge.setWinnerName("TIE");
+                }
+            }
+            return challengeRepository.save(challenge);
+        }
+        return null;
+    }
 }

@@ -7,7 +7,8 @@ import ModeSelector from "./ModeSelector";
 import ThemeSelector from "./ThemeSelector";
 import "../styles/typingBox.css";
 
-function TypingBox({ engine }) {
+// 🚀 ADDED NEW PROPS: user, activeChallenge, setActiveChallenge
+function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   const {
     words,
     typed,
@@ -48,7 +49,7 @@ function TypingBox({ engine }) {
     missedKeys = { missedKeys },
     soundEnabled,
     setSoundEnabled,
-changeTimeLimit,
+    changeTimeLimit,
     punctuationFreq,
     numberFreq,
     updateModifiers,
@@ -61,13 +62,11 @@ changeTimeLimit,
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
   const [showModifiers, setShowModifiers] = useState(false);
-  // 1. Store the freshest functions in a ref to avoid stale closures
-  // 1. Store the freshest state in a ref to avoid stale closures
+  
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
   });
 
-  // 2. Keep the ref constantly updated on every render/keystroke
   useEffect(() => {
     latestEngine.current = { 
       addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
@@ -80,14 +79,12 @@ changeTimeLimit,
 
     if (isRunning) {
       timer = setInterval(() => {
-        // Add a graph point every second (works for BOTH modes perfectly)
         latestEngine.current.addWpmPoint();
 
-        // Handle the countdown clock ONLY if in time mode
         if (testMode === "time") {
           setTime((prev) => {
             if (prev <= 1) {
-              clearInterval(timer); // Stop immediately
+              clearInterval(timer); 
               latestEngine.current.finishTest();
               return 0;
             }
@@ -96,11 +93,35 @@ changeTimeLimit,
         }
       }, 1000);
     }
-
-    return () => {
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, [isRunning, testMode, setTime]);
+
+  // 🚀 CHALLENGE MODE PART 1: LOCK THE TIMER
+  useEffect(() => {
+    if (activeChallenge) {
+      changeTestMode("time"); // Force it into time mode
+      changeTimeLimit(activeChallenge.duration); // Set to 15, 30, or 60
+      setTime(activeChallenge.duration); // Update the visual clock
+    }
+  }, [activeChallenge]);
+
+  // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE WHEN FINISHED
+  useEffect(() => {
+    // When the test finishes, and we have an active challenge...
+    if (finished && activeChallenge && user) {
+      const finalWpm = calculateWPM();
+      
+      fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/submit?username=${user.name}&wpm=${finalWpm}`, {
+        method: "POST"
+      }).then(res => {
+        if (res.ok) {
+          alert(`Challenge Complete! You scored ${finalWpm} WPM. Waiting for opponent...`);
+          setActiveChallenge(null); // Clear challenge so they can practice normally again
+        }
+      }).catch(err => console.error("Error submitting challenge:", err));
+    }
+  }, [finished, activeChallenge, user, calculateWPM, setActiveChallenge]);
+
 
   // GHOST ANIMATION
   useEffect(() => {
@@ -113,18 +134,14 @@ changeTimeLimit,
         ghostStartTime.current = performance.now();
       }
 
-      const { 
-        words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
-      } = latestEngine.current;
+      const { words, currentIndex, currentChar, correctCharacters, incorrectCharacters } = latestEngine.current;
 
       let expectedTrackLength = 0;
       for (let i = 0; i < currentIndex; i++) {
         expectedTrackLength += words[i]?.length || 0;
       }
       const userTrackPosition = expectedTrackLength + currentIndex + currentChar;
-
       const userTypedEffort = correctCharacters + incorrectCharacters;
-
       const skippedCharacters = userTrackPosition - userTypedEffort;
 
       const elapsed = (performance.now() - ghostStartTime.current) / 1000;
@@ -140,229 +157,106 @@ changeTimeLimit,
       frame = requestAnimationFrame(animate);
     }
 
-    return () => {
-      cancelAnimationFrame(frame);
-    };
+    return () => cancelAnimationFrame(frame);
   }, [isRunning, ghostWpm, isRepeat, setGhostPosition]);
-function keyHandler(e) {
-    e.preventDefault();
 
+  function keyHandler(e) {
+    e.preventDefault();
     if (!isRunning) {
       ghostStartTime.current = null;
-      // Sets the ghost to the repeat best if repeating, otherwise uses your global best
       setGhostWpm(isRepeat ? repeatBestWpm : (stats.bestWpm || 0));
     }
-
     handleKey(e.key);
   }
+  
   const elapsedTime = Math.floor(getElapsedSeconds());
 
   return (
     <div className="typing-box" onClick={() => inputRef.current?.focus()}>
       <ThemeSelector />
-      <div
-        style={{ position: "fixed", top: "70px", right: "20px", zIndex: 9999 }}
-      >
+      
+      {/* Sound Settings Button */}
+      <div style={{ position: "fixed", top: "70px", right: "20px", zIndex: 9999 }}>
         <button
           onClick={() => setSoundEnabled(!soundEnabled)}
-          style={{
-            padding: "8px 12px",
-            borderRadius: "8px",
-            background: soundEnabled
-              ? "var(--primary-accent)"
-              : "var(--card-bg)",
-            color: soundEnabled ? "#fff" : "var(--text-main)",
-            border: "1px solid var(--text-muted)",
-            cursor: "pointer",
-            fontWeight: "bold",
-            transition: "0.2s",
-            width: "140px"
-          }}
+          style={{ padding: "8px 12px", borderRadius: "8px", background: soundEnabled ? "var(--primary-accent)" : "var(--card-bg)", color: soundEnabled ? "#fff" : "var(--text-main)", border: "1px solid var(--text-muted)", cursor: "pointer", fontWeight: "bold", transition: "0.2s", width: "140px" }}
         >
           {soundEnabled ? "🔊 Sound ON" : "🔇 Sound OFF"}
         </button>
       </div>
 
-      <div
-        style={{ position: "fixed", top: "120px", right: "20px", zIndex: 9999 }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* Modifiers Button */}
+      <div style={{ position: "fixed", top: "120px", right: "20px", zIndex: 9999 }} onClick={(e) => e.stopPropagation()}>
         <button
-        onClick={() => setShowModifiers(!showModifiers)}
-          style={{
-            padding: "8px 12px",
-            borderRadius: "8px",
-            background:
-              punctuationFreq > 0 || numberFreq > 0
-                ? "var(--primary-accent)"
-                : "var(--card-bg)",
-            color:
-              punctuationFreq > 0 || numberFreq > 0
-                ? "#fff"
-                : "var(--text-main)",
-            border: "1px solid var(--text-muted)",
-            cursor: "pointer",
-            fontWeight: "bold",
-            transition: "0.2s",
-            width: "140px"
-          }}
+          onClick={() => setShowModifiers(!showModifiers)}
+          style={{ padding: "8px 12px", borderRadius: "8px", background: punctuationFreq > 0 || numberFreq > 0 ? "var(--primary-accent)" : "var(--card-bg)", color: punctuationFreq > 0 || numberFreq > 0 ? "#fff" : "var(--text-main)", border: "1px solid var(--text-muted)", cursor: "pointer", fontWeight: "bold", transition: "0.2s", width: "140px" }}
         >
           ⚙️ Modifiers
         </button>
 
         {showModifiers && (
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              right: "0",
-              paddingTop: "8px",
-              background: "var(--card-bg)",
-              border: "1px solid var(--text-muted)",
-              padding: "15px",
-              borderRadius: "12px",
-              marginTop: "8px",
-              width: "220px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-              color: "var(--text-main)"
-            }}
-          >
+          <div style={{ position: "absolute", top: "100%", right: "0", paddingTop: "8px", background: "var(--card-bg)", border: "1px solid var(--text-muted)", padding: "15px", borderRadius: "12px", marginTop: "8px", width: "220px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)", color: "var(--text-main)" }}>
             <div style={{ marginBottom: "15px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "5px"
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
                 <span style={{ fontWeight: "bold" }}>@ Punctuation</span>
                 <span>{punctuationFreq}%</span>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={punctuationFreq}
-                onChange={(e) =>
-                  updateModifiers(Number(e.target.value), numberFreq)
-                }
-                style={{ width: "100%", cursor: "pointer" }}
-              />
+              <input type="range" min="0" max="100" step="5" value={punctuationFreq} onChange={(e) => updateModifiers(Number(e.target.value), numberFreq)} style={{ width: "100%", cursor: "pointer" }} />
             </div>
 
             <div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "5px"
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
                 <span style={{ fontWeight: "bold" }}># Numbers</span>
                 <span>{numberFreq}%</span>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={numberFreq}
-                onChange={(e) =>
-                  updateModifiers(punctuationFreq, Number(e.target.value))
-                }
-                style={{ width: "100%", cursor: "pointer" }}
-              />
+              <input type="range" min="0" max="100" step="5" value={numberFreq} onChange={(e) => updateModifiers(punctuationFreq, Number(e.target.value))} style={{ width: "100%", cursor: "pointer" }} />
             </div>
           </div>
         )}
       </div>
 
-      <div className="time-selector">
-        {/* 4. CLEAN MODE SELECTOR & SUB-MENUS (Centered) */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-        
-        {/* Main Mode Buttons */}
-        <div className="time-selector" style={{ display: 'flex', gap: '10px' }}>
-          <button 
-            className={testMode === "time" && !isQuoteMode ? "active-time" : ""} 
-            onClick={() => changeTestMode("time")}
-          >
-            Time
-          </button>
-          <button 
-            className={testMode === "words" && !isQuoteMode ? "active-time" : ""} 
-            onClick={() => changeTestMode("words")}
-          >
-            Words
-          </button>
-          <button 
-            className={isQuoteMode ? "active-time" : ""} 
-            onClick={fetchQuoteTest}
-          >
-            💬 Quotes
-          </button>
+      {/* 🚀 CHALLENGE MODE: Hide regular settings so user can't cheat */}
+      {activeChallenge ? (
+        <div style={{ textAlign: "center", color: "#fbbf24", marginBottom: "20px", fontWeight: "bold", fontSize: "1.2rem", padding: "10px", border: "2px dashed #fbbf24", borderRadius: "8px" }}>
+          ⚔️ CHALLENGE MODE ACTIVE: {activeChallenge.duration}s
         </div>
+      ) : (
+        <div className="time-selector">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+            
+            <div className="time-selector" style={{ display: 'flex', gap: '10px' }}>
+              <button className={testMode === "time" && !isQuoteMode ? "active-time" : ""} onClick={() => changeTestMode("time")}>Time</button>
+              <button className={testMode === "words" && !isQuoteMode ? "active-time" : ""} onClick={() => changeTestMode("words")}>Words</button>
+              <button className={isQuoteMode ? "active-time" : ""} onClick={fetchQuoteTest}>💬 Quotes</button>
+            </div>
 
-        {/* Sub-menu: Appears ONLY when Time mode is active and not in quotes */}
-        {testMode === "time" && !isQuoteMode && (
-          <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
-            {[15, 30, 60, 120].map((t) => (
-              <button
-                key={t}
-                onClick={() => changeTimeLimit(t)}
-                style={{
-                  background: selectedTime === t ? 'var(--primary-accent)' : 'transparent',
-                  color: selectedTime === t ? '#fff' : 'var(--text-muted)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontWeight: 'bold'
-                }}
-              >
-                {t}s
-              </button>
-            ))}
-          </div>
-        )}
+            {testMode === "time" && !isQuoteMode && (
+              <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
+                {[15, 30, 60, 120].map((t) => (
+                  <button key={t} onClick={() => changeTimeLimit(t)} style={{ background: selectedTime === t ? 'var(--primary-accent)' : 'transparent', color: selectedTime === t ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{t}s</button>
+                ))}
+              </div>
+            )}
 
-        {/* Sub-menu: Appears ONLY when Words mode is active and not in quotes */}
-        {testMode === "words" && !isQuoteMode && (
-          <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
-            {[10, 25, 50, 100].map((w) => (
-              <button
-                key={w}
-                onClick={() => changeWordLimit(w)}
-                style={{
-                  background: wordLimit === w ? 'var(--primary-accent)' : 'transparent',
-                  color: wordLimit === w ? '#fff' : 'var(--text-muted)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontWeight: 'bold'
-                }}
-              >
-                {w}
-              </button>
-            ))}
+            {testMode === "words" && !isQuoteMode && (
+              <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
+                {[10, 25, 50, 100].map((w) => (
+                  <button key={w} onClick={() => changeWordLimit(w)} style={{ background: wordLimit === w ? 'var(--primary-accent)' : 'transparent', color: wordLimit === w ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{w}</button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      </div>
+        </div>
+      )}
+
       {!finished && (
         <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-          
           {isQuoteMode && quoteAuthor && (
-            <div style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '8px', fontStyle: 'italic' }}>
-              ~ {quoteAuthor}
-            </div>
+            <div style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '8px', fontStyle: 'italic' }}>~ {quoteAuthor}</div>
           )}
           <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--primary-accent)' }}>
             {testMode === "time" ? time : elapsedTime}s
           </div>
-
           {isRepeat && repeatBestWpm > 0 && (
             <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: '500' }}>
               👻 Racing Ghost: <span style={{ color: 'var(--primary-accent)', fontWeight: 'bold' }}>{repeatBestWpm} WPM</span>
@@ -373,51 +267,15 @@ function keyHandler(e) {
 
       {!finished && (
         <>
-          <TypingViewport
-            words={words}
-            typed={typed}
-            currentIndex={currentIndex}
-            currentChar={currentChar}
-            ghostPosition={ghostPosition}
-            isRepeat={isRepeat}
-          />
-
-          <Stats
-            wpm={calculateWPM()}
-            rawWpm={calculateRawWPM()}
-            accuracy={calculateAccuracy()}
-            characters={correctCharacters}
-            errors={incorrectCharacters}
-          />
-
-          <input
-            ref={inputRef}
-            autoFocus
-            className="hidden-input"
-            onKeyDown={keyHandler}
-          />
+          <TypingViewport words={words} typed={typed} currentIndex={currentIndex} currentChar={currentChar} ghostPosition={ghostPosition} isRepeat={isRepeat} />
+          <Stats wpm={calculateWPM()} rawWpm={calculateRawWPM()} accuracy={calculateAccuracy()} characters={correctCharacters} errors={incorrectCharacters} />
+          <input ref={inputRef} autoFocus className="hidden-input" onKeyDown={keyHandler} />
         </>
       )}
 
       {finished && (
         <>
-          <Result
-            wpm={calculateWPM()}
-            rawWpm={calculateRawWPM()}
-            accuracy={calculateAccuracy()}
-            characters={correctCharacters}
-            errors={incorrectCharacters}
-            history={wpmHistory}
-            bestWpm={stats.bestWpm}
-            testHistory={stats.recentTests}
-            elapsedTime={elapsedTime}
-            repeatTest={repeatTest}
-            newTest={newTest}
-            missedKeys={missedKeys}
-            wordTimes={wordTimes}
-            keystrokeLog={keystrokeLog}
-            words={words}
-          />
+          <Result wpm={calculateWPM()} rawWpm={calculateRawWPM()} accuracy={calculateAccuracy()} characters={correctCharacters} errors={incorrectCharacters} history={wpmHistory} bestWpm={stats.bestWpm} testHistory={stats.recentTests} elapsedTime={elapsedTime} repeatTest={repeatTest} newTest={newTest} missedKeys={missedKeys} wordTimes={wordTimes} keystrokeLog={keystrokeLog} words={words} />
         </>
       )}
     </div>

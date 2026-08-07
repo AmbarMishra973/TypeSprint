@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-
-export default function Friends({ user, setUser }) {
+export default function Friends({ user, setUser, setActiveView, setActiveChallenge }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,16 +38,21 @@ export default function Friends({ user, setUser }) {
   }, [user]);
 
   // 🔍 Handle Search
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    setLoading(true);
-    setSearchAttempted(true);
+  const handleChallengeResponse = async (challengeId, status) => {
     try {
-      const res = await fetch(`https://ambarmishradb.onrender.com/api/users/search?query=${searchQuery}`);
-      if (res.ok) setSearchResults((await res.json()).filter(u => u.name !== user.name));
-    } catch (err) { console.error("Search failed:", err); }
-    setLoading(false);
+      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
+      if (res.ok) {
+        // Find the challenge data before removing it from the inbox
+        const acceptedChallenge = pendingChallenges.find(c => c.id === challengeId);
+        
+        setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
+        
+        if (status === "ACCEPTED" && acceptedChallenge) {
+          setActiveChallenge(acceptedChallenge); // 🚀 Lock in the challenge data
+          setActiveView("typing"); // 🚀 Switch to the typing screen
+        }
+      }
+    } catch (err) { console.error("Failed to update challenge status:", err); }
   };
 
   // 📨 Send Request
