@@ -98,6 +98,9 @@ function Home() {
           onClose={closeModal} 
         />
       )}
+      <div style={{ border: '5px solid red', padding: '20px' }}>
+    <AchievementsGrid unlockedIds={typingEngine.stats.unlockedAchievements || []} />
+  </div>
       {activeView === "achievements" && (
           <div style={{ animation: "fadeIn 0.3s ease" }}>
             <h1 style={{ textAlign: "center", marginBottom: "10px" }}>Your Trophy Room</h1>
