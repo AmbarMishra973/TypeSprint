@@ -98,19 +98,15 @@ function Home() {
           onClose={closeModal} 
         />
       )}
-      <div style={{ border: '5px solid red', padding: '20px' }}>
-    <AchievementsGrid unlockedIds={typingEngine.stats.unlockedAchievements || []} />
-  </div>
       {activeView === "achievements" && (
-          <div style={{ animation: "fadeIn 0.3s ease" }}>
-            <h1 style={{ textAlign: "center", marginBottom: "10px" }}>Your Trophy Room</h1>
-            <p style={{ textAlign: "center", color: "#666", marginBottom: "40px" }}>
-              Complete challenges to unlock badges and level up your typing status.
-            </p>
-            <AchievementsGrid unlockedIds={typingEngine.stats.unlockedAchievements || []} />
-          </div>
-        )}
-
+    <div style={{ animation: "fadeIn 0.3s ease", paddingBottom: "40px" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "10px", fontSize: "2.5rem" }}>Your Trophy Room</h1>
+      <p style={{ textAlign: "center", color: "var(--text-muted, #666)", marginBottom: "40px" }}>
+        Complete challenges to unlock badges and level up your typing status.
+      </p>
+      <AchievementsGrid unlockedIds={typingEngine?.stats?.unlockedAchievements || []} />
+    </div>
+  )}
     </div>
   );
 }
