@@ -16,7 +16,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User request) {
-        User user = userService.authenticate(request.getName(), request.getPassword());
+        // Matches userService.login(...)
+        User user = userService.login(request.getName(), request.getPassword());
         if (user == null) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
@@ -25,14 +26,18 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User request) {
-        User user = userService.register(request.getName(), request.getPassword());
-        if (user == null) {
+        // Check if user already exists
+        if (userService.existsByName(request.getName())) {
             return ResponseEntity.status(400).body("User already exists");
+        }
+        // Matches userService.signup(...)
+        User user = userService.signup(request);
+        if (user == null) {
+            return ResponseEntity.status(400).body("Signup failed");
         }
         return ResponseEntity.ok(user);
     }
 
-    // 🚀 Handles the stats sync call throwing the 404 error
     @PutMapping("/sync")
     public ResponseEntity<?> syncStats(@RequestBody User request) {
         User updatedUser = userService.syncStats(request.getName(), request.getPassword(), request.getTypingStats());
