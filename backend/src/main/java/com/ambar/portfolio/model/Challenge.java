@@ -19,6 +19,9 @@ public class Challenge {
     private int receiverWpm;
     private String winnerName;
 
+    @Column(columnDefinition = "TEXT")
+    private String wordsText; // Stores space-separated words for the rac
+
     public Challenge() {}
 
     public Challenge(String senderName, String receiverName, int duration) {
@@ -45,4 +48,7 @@ public class Challenge {
     public void setReceiverWpm(int receiverWpm) { this.receiverWpm = receiverWpm; }
     public String getWinnerName() { return winnerName; }
     public void setWinnerName(String winnerName) { this.winnerName = winnerName; }
+   
+    public String getWordsText() { return wordsText; }
+    public void setWordsText(String wordsText) { this.wordsText = wordsText; }
 }

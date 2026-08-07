@@ -60,13 +60,24 @@ public class ChallengeService {
         return null;
     }
     // 🔍 Find if user has a game about to start
+    // 🔍 Find ONLY active matches that haven't been completed yet
     public Challenge getActiveMatch(String username) {
         List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
-        if (!asSender.isEmpty()) return asSender.get(0);
+        if (!asSender.isEmpty() && asSender.get(0).getWinnerName() == null) return asSender.get(0);
 
         List<Challenge> asReceiver = challengeRepository.findByReceiverNameAndStatus(username, "ACCEPTED");
-        if (!asReceiver.isEmpty()) return asReceiver.get(0);
+        if (!asReceiver.isEmpty() && asReceiver.get(0).getWinnerName() == null) return asReceiver.get(0);
 
         return null;
+    }
+
+    // 📊 Update live typing position during a match
+    public void updateProgress(Long challengeId, String username, int position) {
+        Challenge c = challengeRepository.findById(challengeId).orElse(null);
+        if (c != null) {
+            // We can store temporary progress or piggyback on WPM field updates
+            // Let's create a quick helper or use existing fields if needed, 
+            // or better yet, fetch progress via a lightweight endpoint.
+        }
     }
 }

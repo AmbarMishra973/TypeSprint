@@ -18,9 +18,11 @@ public class ChallengeController {
 
     // ⚔️ Send a Challenge
     @PostMapping("/send")
-    public ResponseEntity<?> sendChallenge(@RequestParam String sender, @RequestParam String receiver, @RequestParam int duration) {
-        Challenge challenge = challengeService.createChallenge(sender, receiver, duration);
-        return ResponseEntity.ok(challenge);
+    public ResponseEntity<?> sendChallenge(@RequestParam String sender, @RequestParam String receiver, @RequestParam int duration, @RequestParam(required = false) String wordsText) {
+        Challenge challenge = new Challenge(sender, receiver, duration);
+        if (wordsText != null) challenge.setWordsText(wordsText);
+        Challenge saved = challengeRepository.save(challenge);
+        return ResponseEntity.ok(saved);
     }
 
     // 📬 Get Challenge Inbox
@@ -56,5 +58,19 @@ public class ChallengeController {
             return ResponseEntity.ok(active);
         }
         return ResponseEntity.noContent().build();
+    }
+
+    // In-memory live positions: Map<ChallengeId, Map<Username, CharacterIndex>>
+    private final java.util.Map<Long, java.util.Map<String, Integer>> livePositions = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @PostMapping("/{challengeId}/progress")
+    public ResponseEntity<?> updateProgress(@PathVariable Long challengeId, @RequestParam String username, @RequestParam int position) {
+        livePositions.computeIfAbsent(challengeId, k => new java.util.concurrent.ConcurrentHashMap<>()).put(username, position);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{challengeId}/progress")
+    public ResponseEntity<?> getProgress(@PathVariable Long challengeId) {
+        return ResponseEntity.ok(livePositions.getOrDefault(challengeId, java.util.Collections.emptyMap()));
     }
 }

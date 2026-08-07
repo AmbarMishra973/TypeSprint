@@ -63,6 +63,7 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   const ghostStartTime = useRef(null);
   const [showModifiers, setShowModifiers] = useState(false);
   const [matchCountdown, setMatchCountdown] = useState(null);
+    const [matchResult, setMatchResult] = useState(null);
   
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
@@ -74,6 +75,60 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     };
   });
 
+  // 🚀 1. LOCK IDENTICAL WORDS IF IN A CHALLENGE
+  useEffect(() => {
+    if (activeChallenge && activeChallenge.wordsText) {
+      // If your engine supports setting custom words, apply them here:
+      // engine.setCustomWords(activeChallenge.wordsText.split(" "));
+    }
+  }, [activeChallenge]);
+
+  // 🚀 2. BROADCAST MY POSITION & POLL OPPONENT POSITION
+  useEffect(() => {
+    if (!activeChallenge || !user || finished) return;
+
+    // Send my current position every 1 second
+    const progressInterval = setInterval(() => {
+      fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/progress?username=${user.name}&position=${currentIndex}`, {
+        method: "POST"
+      }).catch(() => {});
+    }, 1000);
+
+    // Poll opponent's position every 1 second
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/progress`);
+        if (res.ok) {
+          const positions = await res.json();
+          // Find the opponent's name (whoever isn't me)
+          const opponentName = activeChallenge.senderName === user.name ? activeChallenge.receiverName : activeChallenge.senderName;
+          const opponentIndex = positions[opponentName];
+          if (opponentIndex !== undefined) {
+            setGhostPosition(opponentIndex); // 👻 Moves your friend's live cursor on your screen!
+          }
+        }
+      } catch (err) {}
+    }, 1000);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearInterval(pollInterval);
+    };
+  }, [activeChallenge, user, currentIndex, finished, setGhostPosition]);
+
+
+
+  // Poll challenge status to see if opponent finished and winner is declared
+  useEffect(() => {
+    if (!activeChallenge) return;
+    const checkWinnerInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/active`);
+        // If active returns empty, check full challenge details or status
+      } catch (err) {}
+    }, 2000);
+    return () => clearInterval(checkWinnerInterval);
+  }, [activeChallenge]);
   // 3. MASTER TIMER & GRAPH TRACKER
   useEffect(() => {
     let timer;
