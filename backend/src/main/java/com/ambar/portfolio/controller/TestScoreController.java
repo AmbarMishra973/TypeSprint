@@ -1,5 +1,6 @@
 package com.ambar.portfolio.controller;
 
+import com.ambar.portfolio.dto.ScoreRequest;
 import com.ambar.portfolio.model.TestScore;
 import com.ambar.portfolio.service.TestScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,4 +49,12 @@ public class TestScoreController {
 
         return ResponseEntity.ok(leaders);
     }
+    @PostMapping("/save")
+public ResponseEntity<?> saveTestScore(@RequestBody ScoreRequest request) {
+    TestScore savedScore = testScoreService.saveScore(request);
+    if (savedScore == null) {
+        return ResponseEntity.status(400).body("User not found or failed to save score");
+    }
+    return ResponseEntity.ok(savedScore);
+}
 }

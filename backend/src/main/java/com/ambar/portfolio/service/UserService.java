@@ -34,4 +34,12 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.findFirstByEmail(email) != null;
     }
+    public User syncStats(String name, String password, String typingStats) {
+    User user = userRepository.findFirstByName(name);
+    if (user != null && user.getPassword().equals(password)) {
+        user.setTypingStats(typingStats);
+        return userRepository.save(user);
+    }
+    return null;
+}
 }
