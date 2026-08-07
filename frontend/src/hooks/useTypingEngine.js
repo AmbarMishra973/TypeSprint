@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
-
+import { syncUserStats } from "../services/api";
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const wordBank = [
@@ -394,10 +394,14 @@ function useTypingEngine(user) {
       };
 
       saveStats(updatedStatsObj);
+      
+      if (user && user.name && user.password) {
+        syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
+      }
+
       return updatedStatsObj;
     });
   }
-
   function resetTest() {
     setTyped("");
     setCurrentIndex(0);
@@ -486,6 +490,10 @@ function useTypingEngine(user) {
   function clearStatistics() {
     resetStats();
     setStats(defaultStats);
+  
+    if (user && user.name && user.password) {
+      syncUserStats(user.name, user.password, JSON.stringify(defaultStats));
+    }
   }
 
   return {

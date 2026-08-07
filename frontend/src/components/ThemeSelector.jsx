@@ -12,12 +12,8 @@ function ThemeSelector() {
 
   return (
     <div 
-      style={{ 
-        position: 'fixed',
-        top: '20px', 
-        right: '20px', 
-        zIndex: 9999    
-      }}
+      onClick={(e) => e.stopPropagation()} 
+      style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999 }}
     >
       <select 
         value={theme} 

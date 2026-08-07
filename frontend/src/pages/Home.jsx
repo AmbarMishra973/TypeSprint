@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/home.css";
 import Navbar from "../components/Navbar";
 import TypingBox from "../components/TypingBox";
 import Dashboard from "../components/Dashboard";
-import useTypingEngine from "../hooks/useTypingEngine"; // 👈 Ensure path matches your project
+import useTypingEngine from "../hooks/useTypingEngine"; 
 import AuthModal from "../components/AuthModal";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
+
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   
@@ -14,17 +15,29 @@ function Home() {
     const savedUser = localStorage.getItem("typingUser");
     return savedUser ? JSON.parse(savedUser) : null;
   });
-const handleLoginSuccess = (userData) => {
+
+  const handleLoginSuccess = (userData) => {
+    if (userData.typingStats) {
+      localStorage.setItem(`typingStats_${userData.name}`, userData.typingStats);
+    }
+    
     setUser(userData);
-    localStorage.setItem("typingUser", JSON.stringify(userData)); // 👈 Persist session
-  
+    localStorage.setItem("typingUser", JSON.stringify(userData)); 
   };
+
   const [activeModal, setActiveModal] = useState(null);
   const openModal = (modalName) => setActiveModal(modalName);
   const closeModal = () => setActiveModal(null);
 
-  // 🚀 Initialize the engine here at the top level
-  const typingEngine = useTypingEngine();
+  // 🚀 FIX 1: Pass the user into the typing engine so stats save to the right account
+  const typingEngine = useTypingEngine(user);
+
+  // 🚀 FIX 2: Wake up the Render backend as soon as the website loads
+  useEffect(() => {
+    fetch("https://ambarmishradb.onrender.com/")
+      .then(() => console.log("Backend server is awake!"))
+      .catch((err) => console.log("Waking up server...", err));
+  }, []);
 
   return (
     <div className="home">
@@ -42,7 +55,11 @@ const handleLoginSuccess = (userData) => {
             <TypingBox engine={typingEngine} />
           </>
         ) : (
-          <Dashboard user={user} />
+          <Dashboard 
+            user={user} 
+            liveStats={typingEngine.stats} 
+            clearStats={typingEngine.clearStatistics} 
+          />
         )}
       </main>
 
@@ -59,17 +76,14 @@ const handleLoginSuccess = (userData) => {
       )}
       
       {activeModal === "settings" && (
-  <SettingsModal 
-    soundEnabled={typingEngine.soundEnabled} 
-    setSoundEnabled={typingEngine.setSoundEnabled} 
-    onClose={closeModal} 
-  />
-)}
+        <SettingsModal 
+          soundEnabled={typingEngine.soundEnabled} 
+          setSoundEnabled={typingEngine.setSoundEnabled} 
+          onClose={closeModal} 
+        />
+      )}
     </div>
   );
 }
-
-const overlayStyle = { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 };
-const modalStyle = { background: 'var(--card-bg)', padding: '30px', borderRadius: '12px', width: '350px', textAlign: 'center', border: '1px solid var(--text-muted)' };
 
 export default Home;

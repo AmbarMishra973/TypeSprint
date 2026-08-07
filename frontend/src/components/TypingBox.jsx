@@ -185,10 +185,10 @@ function keyHandler(e) {
 
       <div
         style={{ position: "fixed", top: "120px", right: "20px", zIndex: 9999 }}
-        onMouseEnter={() => setShowModifiers(true)}
-        onMouseLeave={() => setShowModifiers(false)}
+        onClick={(e) => e.stopPropagation()}
       >
         <button
+        onClick={() => setShowModifiers(!showModifiers)}
           style={{
             padding: "8px 12px",
             borderRadius: "8px",

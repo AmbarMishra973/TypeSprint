@@ -40,6 +40,9 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
+    @Column(columnDefinition = "TEXT")
+    private String typingStats;
+
 
     public User(String name, String email, String password) {
 
@@ -82,6 +85,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getTypingStats() {
+        return typingStats;
+    }
+
+    public void setTypingStats(String typingStats) {
+        this.typingStats = typingStats;
     }
 
 }

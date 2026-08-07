@@ -88,7 +88,7 @@ function ProfileModal({ user, stats, onClose }) {
     canvas.height = finalSize;
 
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       const scaleX = imgSize.natW / imgSize.w;
       const scaleY = imgSize.natH / imgSize.h;
       
@@ -99,22 +99,32 @@ function ProfileModal({ user, stats, onClose }) {
         0, 0, finalSize, finalSize 
       );
       
-      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.9);
+      // 🚀 FIX: Compress the image slightly to ensure it passes Tomcat limits
+      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.8);
 
-      fetch("http://localhost:8080/api/auth/update-picture", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: user.name, password: user.password, profilePicture: croppedBase64 })
-      })
-      .then(res => res.json())
-      .then(updatedUser => {
+      try {
+        const response = await fetch("https://ambarmishradb.onrender.com/api/auth/update-picture", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            name: user.name, 
+            password: user.password, 
+            profilePicture: croppedBase64 
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Server rejected image. Ensure backend limits are updated.");
+        }
+
+        const updatedUser = await response.json();
         localStorage.setItem("typingUser", JSON.stringify(updatedUser));
         window.location.reload(); 
-      })
-      .catch(err => {
-        console.error("Upload failed", err);
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert(`Upload failed: ${err.message}`);
         setIsUploading(false);
-      });
+      }
     };
     img.src = preview;
   };

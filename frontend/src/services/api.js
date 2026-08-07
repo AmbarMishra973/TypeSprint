@@ -45,3 +45,24 @@ export async function signupUser(userData) {
 export async function saveTestScore(scoreData) {
   return await postData("/tests/save", scoreData);
 }
+
+
+// ☁️ Cloud Sync API Call
+export async function syncUserStats(name, password, statsJson) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/sync-stats`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        name: name, 
+        password: password, 
+        typingStats: statsJson 
+      }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to sync stats to cloud:", error);
+  }
+}

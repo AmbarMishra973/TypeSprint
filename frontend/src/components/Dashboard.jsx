@@ -1,33 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import KeyboardHeatmap from "./KeyboardHeatmap";
 
-function Dashboard({ user }) {
+function Dashboard({ user, liveStats, clearStats }) {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
-  const [stats, setStats] = useState(null);
 
-  // 1. Helper function to get the correct storage key based on who is logged in
-  const getStorageKey = () => {
-    return user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
-  };
+  // 1. Use the live stats directly from the typing engine
+  const stats = liveStats || {};
 
-  // 2. Fetch stats directly from local storage on mount OR when user switches
-  useEffect(() => {
-    const storageKey = getStorageKey();
-    const savedData = localStorage.getItem(storageKey); 
-    
-    if (savedData) {
-      setStats(JSON.parse(savedData));
-    } else {
-      setStats({}); 
-    }
-    
-    // Hide the reset confirmation if someone switches accounts
-    setShowConfirmReset(false);
-  }, [user]); // 👈 Re-runs automatically if 'user' changes (login/logout)
-
-  if (!stats) return <div style={{ textAlign: "center", padding: "50px" }}>Loading Dashboard...</div>;
-
-  // Safe fallback defaults so it never crashes
+  // 2. Safe fallback defaults so it never crashes
   const safeStats = {
     totalTests: stats.totalTests || 0,
     bestWpm: stats.bestWpm || 0,
@@ -56,12 +36,10 @@ function Dashboard({ user }) {
     });
   };
 
-  // 3. Update the reset button to only delete the current user's data
+  // 3. Reset stats using the clearStats function passed from Home.jsx
   const handleResetClick = () => {
     if (showConfirmReset) {
-      const storageKey = getStorageKey();
-      localStorage.removeItem(storageKey); // 👈 Safely removes ONLY this user's stats
-      setStats({}); 
+      clearStats(); // 👈 Safely clears stats through the engine
       setShowConfirmReset(false);
     } else {
       setShowConfirmReset(true);
@@ -78,7 +56,6 @@ function Dashboard({ user }) {
   return (
     <div className="dashboard">
       <div className="dashboard-header" style={{ marginBottom: "20px" }}>
-        {/* 4. Make the Header personalized! */}
         <h2>📊 {user ? `${user.name}'s Analytics` : "Guest Analytics"}</h2>
         <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
           Your long-term performance overview across all typing sessions.

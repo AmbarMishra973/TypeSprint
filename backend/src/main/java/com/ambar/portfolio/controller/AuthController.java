@@ -54,4 +54,17 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
     }
+
+    @PutMapping("/sync-stats")
+    public ResponseEntity<?> syncStats(@RequestBody User userRequest) {
+        // Find the user to verify credentials
+        User existingUser = userService.login(userRequest.getName(), userRequest.getPassword());
+        
+        if (existingUser != null) {
+            existingUser.setTypingStats(userRequest.getTypingStats());
+            userService.signup(existingUser); // Re-save the user with updated stats
+            return ResponseEntity.ok(existingUser);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+    }
 }
