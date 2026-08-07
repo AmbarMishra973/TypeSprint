@@ -84,25 +84,22 @@ export async function saveTestScore(scoreData) {
     console.error("Leaderboard Save Error:", error);
   }
 }
-
-// 🏆 Fetch the top 5 scores based on active filters
-export async function getLeaderboard(filters) {
+export const getLeaderboard = async (filters) => {
   try {
-    // Dynamically build the query string (e.g., ?mode=time&timeLimit=30&punctuation=true...)
-    const queryParams = new URLSearchParams();
-    queryParams.append("mode", filters.mode);
-    queryParams.append("punctuation", filters.punctuation);
-    queryParams.append("numbers", filters.numbers);
+    const query = new URLSearchParams();
     
-    if (filters.mode === "time" && filters.timeLimit) {
-      queryParams.append("timeLimit", filters.timeLimit);
-    }
-    if (filters.mode === "words" && filters.wordLimit) {
-      queryParams.append("wordLimit", filters.wordLimit);
-    }
+    // Original filters
+    if (filters.mode) query.append("mode", filters.mode);
+    if (filters.timeLimit) query.append("timeLimit", filters.timeLimit);
+    if (filters.wordLimit) query.append("wordLimit", filters.wordLimit);
+    if (filters.punctuation !== undefined) query.append("punctuation", filters.punctuation);
+    if (filters.numbers !== undefined) query.append("numbers", filters.numbers);
+    
+    // 🚀 NEW: Added Scope and Time Range
+    if (filters.scope) query.append("scope", filters.scope); 
+    if (filters.timeRange) query.append("timeRange", filters.timeRange); 
 
-    const response = await fetch(`${API_BASE_URL}/tests/leaderboard?${queryParams.toString()}`);
-    
+    const response = await fetch(`${API_URL}/tests/leaderboard?${query.toString()}`);
     if (!response.ok) {
       throw new Error("Failed to fetch leaderboard");
     }
@@ -111,4 +108,4 @@ export async function getLeaderboard(filters) {
     console.error("Leaderboard Fetch Error:", error);
     return [];
   }
-}
+};

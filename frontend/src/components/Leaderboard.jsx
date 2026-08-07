@@ -82,7 +82,10 @@ export default function Leaderboard({ user }) {
           transform: scale(1.01);
         }
       `}</style>
-
+{/* 🚀 DYNAMIC TITLE */}
+      <h2 style={styles.header}>
+        🏆 {scope === "global" ? "Global" : "Friends"} Leaderboard
+      </h2>
       {/* 🚀 SCOPE TOGGLE (Global vs Friends) */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '30px' }}>
         <button 
@@ -190,16 +193,18 @@ export default function Leaderboard({ user }) {
     </div>
   );
 }
-
 const styles = {
   container: { maxWidth: '750px', margin: '0 auto', padding: '40px 20px', color: 'var(--text-main, #333)' },
+  
+  header: { fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '30px' },
+  
   filterRow: { display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '12px' },
   listContainer: { background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px', overflow: 'hidden' },
   emptyState: { padding: '60px 20px', textAlign: 'center', color: '#666', fontSize: '1.1rem' },
   leaderCard: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' },
   highlightedCard: { 
-    background: 'rgba(251, 191, 36, 0.1)', // Light amber background
-    borderLeft: '5px solid #fbbf24',       // Thick amber accent line on the left
+    background: 'rgba(251, 191, 36, 0.1)',
+    borderLeft: '5px solid #fbbf24',      
   },
   rankBadge: { fontSize: '1.5rem', fontWeight: '900', width: '40px' },
   avatar: { width: '45px', height: '45px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: '#475569', border: '2px solid rgba(0,0,0,0.1)' },
