@@ -94,6 +94,9 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
                 >
                   ⚙️ Settings
                 </button>
+                <button onClick={() => setActiveView("achievements")}>
+  🏆 Achievements
+</button>
               </>
             )}
           </div>

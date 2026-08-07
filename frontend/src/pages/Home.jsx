@@ -8,6 +8,7 @@ import AuthModal from "../components/AuthModal";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
 import Leaderboard from "../components/Leaderboard";
+import AchievementsGrid from "..components/AchievementsGrid";
 
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
@@ -97,6 +98,15 @@ function Home() {
           onClose={closeModal} 
         />
       )}
+      {activeModal === "achievements" && (
+          <div style={{ animation: "fadeIn 0.3s ease" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "10px" }}>Your Trophy Room</h1>
+            <p style={{ textAlign: "center", color: "#666", marginBottom: "40px" }}>
+              Complete challenges to unlock badges and level up your typing status.
+            </p>
+            <AchievementsGrid unlockedIds={typingEngine.stats.unlockedAchievements || []} />
+          </div>
+        )}
 
     </div>
   );

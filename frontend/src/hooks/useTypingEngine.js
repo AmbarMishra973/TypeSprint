@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
 import { syncUserStats, saveTestScore } from "../services/api";
-
+import { checkAchievements } from "../utils/achievements";
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const wordBank = [
@@ -73,7 +73,8 @@ function useTypingEngine(user) {
     totalCharacters: 0,
     totalPracticeSeconds: 0,
     recentTests: [],
-    globalMissedKeys: {}
+    globalMissedKeys: {},
+    unlockedAchievements: []
   };
 
   const storageKey = user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
@@ -372,7 +373,7 @@ function useTypingEngine(user) {
       };
 
       const updatedTests = [newTestEntry, ...(prev.recentTests || [])].slice(0, 20);
-      const newTotalTests = prev.totalTests + 1;
+      const newTotalTests = (prev.totalTests || 0) + 1;
       const newTotalWords = (prev.totalWords || 0) + wordsCompleted;
       const newTotalChars = (prev.totalCharacters || 0) + charsTyped;
       const newTotalTime = (prev.totalPracticeSeconds || 0) + finalElapsedVal;
@@ -381,6 +382,15 @@ function useTypingEngine(user) {
         updatedTests.reduce((sum, t) => sum + Number(t.wpm), 0) / updatedTests.length
       );
       const newHighestAcc = Math.max(prev.highestAccuracy || 0, finalAccuracy);
+
+      const statsForCheck = { totalTests: newTotalTests, unlockedAchievements: prev.unlockedAchievements || [] };
+      const newBadges = checkAchievements(statsForCheck, finalWpm, finalAccuracy);
+      
+      if (newBadges.length > 0) {
+        console.log("🎉 NEW ACHIEVEMENTS UNLOCKED:", newBadges);
+      }
+
+      const finalAchievementsList = [...(prev.unlockedAchievements || []), ...newBadges];
 
       const updatedStatsObj = {
         totalTests: newTotalTests,
@@ -391,10 +401,12 @@ function useTypingEngine(user) {
         totalCharacters: newTotalChars,
         totalPracticeSeconds: newTotalTime,
         recentTests: updatedTests,
-        globalMissedKeys: newGlobalMissed
+        globalMissedKeys: newGlobalMissed,
+        unlockedAchievements: finalAchievementsList
       };
 
       saveStats(updatedStatsObj);
+      
       
       if (user && user.name && user.password) {
         syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
