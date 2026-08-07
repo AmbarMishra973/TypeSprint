@@ -39,18 +39,15 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
 
   // 🔍 Handle Search
   // 🎮 Accept/Decline Challenge API Call
+  // 🎮 Accept/Decline Challenge API Call
   const handleChallengeResponse = async (challengeId, status) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
       if (res.ok) {
-        // Find the challenge data before removing it from the inbox
-        const acceptedChallenge = pendingChallenges.find(c => c.id === challengeId);
-        
         setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
-        
-        if (status === "ACCEPTED" && acceptedChallenge) {
-          setActiveChallenge(acceptedChallenge); // 🚀 Lock in the challenge data
-          setActiveView("typing"); // 🚀 Switch to the typing screen
+        if (status === "ACCEPTED") {
+          // 🚀 DO NOT REDIRECT MANUALLY! Just wait 1 second for the global sync to catch it!
+          alert("Match accepted! Syncing with opponent..."); 
         }
       }
     } catch (err) { console.error("Failed to update challenge status:", err); }

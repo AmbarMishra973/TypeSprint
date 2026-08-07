@@ -47,4 +47,14 @@ public class ChallengeController {
         }
         return ResponseEntity.ok(updatedChallenge);
     }
+
+    // 🔍 Check for Active Match
+    @GetMapping("/{username}/active")
+    public ResponseEntity<?> getActiveChallenge(@PathVariable String username) {
+        Challenge active = challengeService.getActiveMatch(username);
+        if (active != null) {
+            return ResponseEntity.ok(active);
+        }
+        return ResponseEntity.noContent().build();
+    }
 }

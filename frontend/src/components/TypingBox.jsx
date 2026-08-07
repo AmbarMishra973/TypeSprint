@@ -62,6 +62,7 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
   const [showModifiers, setShowModifiers] = useState(false);
+  const [matchCountdown, setMatchCountdown] = useState(null);
   
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
@@ -97,30 +98,27 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   }, [isRunning, testMode, setTime]);
 
   // 🚀 CHALLENGE MODE PART 1: LOCK THE TIMER
+  // 🚀 CHALLENGE MODE: Start 3-2-1 Countdown Sync
   useEffect(() => {
-    if (activeChallenge) {
-      changeTestMode("time"); // Force it into time mode
-      changeTimeLimit(activeChallenge.duration); // Set to 15, 30, or 60
-      setTime(activeChallenge.duration); // Update the visual clock
+    if (activeChallenge && !finished && !isRunning) {
+      setMatchCountdown(3); // Trigger the 3 second countdown
+      changeTestMode("time"); 
+      changeTimeLimit(activeChallenge.duration); 
+      setTime(activeChallenge.duration); 
     }
-  }, [activeChallenge]);
+  }, [activeChallenge, finished]);
 
-  // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE WHEN FINISHED
+  // 🚀 CHALLENGE MODE: Handle the Countdown & Auto-Start
   useEffect(() => {
-    // When the test finishes, and we have an active challenge...
-    if (finished && activeChallenge && user) {
-      const finalWpm = calculateWPM();
-      
-      fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/submit?username=${user.name}&wpm=${finalWpm}`, {
-        method: "POST"
-      }).then(res => {
-        if (res.ok) {
-          alert(`Challenge Complete! You scored ${finalWpm} WPM. Waiting for opponent...`);
-          setActiveChallenge(null); // Clear challenge so they can practice normally again
-        }
-      }).catch(err => console.error("Error submitting challenge:", err));
+    if (matchCountdown !== null && matchCountdown > 0) {
+      const timer = setTimeout(() => setMatchCountdown(matchCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (matchCountdown === 0) {
+      setMatchCountdown(null); // Clear countdown overlay
+      setIsRunning(true); // 🚀 FORCE START THE ENGINE
+      if (inputRef.current) inputRef.current.focus(); // Focus the invisible input box
     }
-  }, [finished, activeChallenge, user, calculateWPM, setActiveChallenge]);
+  }, [matchCountdown, setIsRunning]);
 
 
   // GHOST ANIMATION
@@ -174,7 +172,14 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   return (
     <div className="typing-box" onClick={() => inputRef.current?.focus()}>
       <ThemeSelector />
-      
+      {matchCountdown !== null && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.85)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
+          <h2 style={{ color: "#fff", fontSize: "2rem", marginBottom: "20px" }}>Match Starting...</h2>
+          <div style={{ color: "#fbbf24", fontSize: "10rem", fontWeight: "bold", animation: "pulse 1s infinite" }}>
+            {matchCountdown > 0 ? matchCountdown : "GO!"}
+          </div>
+        </div>
+      )}
       {/* Sound Settings Button */}
       <div style={{ position: "fixed", top: "70px", right: "20px", zIndex: 9999 }}>
         <button

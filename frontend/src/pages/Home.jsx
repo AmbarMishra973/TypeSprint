@@ -43,6 +43,27 @@ function Home() {
       .catch((err) => console.log("Waking up server...", err));
   }, []);
 
+  // 🔄 GLOBAL MATCHMAKER: Poll for an ACCEPTED match every 2.5 seconds
+  useEffect(() => {
+    if (!user) return;
+    
+    const checkActiveMatch = async () => {
+      try {
+        const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${user.name}/active`);
+        if (res.status === 200) {
+          const match = await res.json();
+          // If we found an active match and we aren't already playing it...
+          if (!activeChallenge || activeChallenge.id !== match.id) {
+            setActiveChallenge(match);
+            setActiveView("typing"); // Snap both players to the typing screen!
+          }
+        }
+      } catch (err) { console.error("Matchmaker error:", err); }
+    };
+
+    const interval = setInterval(checkActiveMatch, 2500); // Check every 2.5s
+    return () => clearInterval(interval);
+  }, [user, activeChallenge]);
   return (
     <div className="home">
      

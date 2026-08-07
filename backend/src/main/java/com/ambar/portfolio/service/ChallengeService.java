@@ -59,4 +59,14 @@ public class ChallengeService {
         }
         return null;
     }
+    // 🔍 Find if user has a game about to start
+    public Challenge getActiveMatch(String username) {
+        List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
+        if (!asSender.isEmpty()) return asSender.get(0);
+
+        List<Challenge> asReceiver = challengeRepository.findByReceiverNameAndStatus(username, "ACCEPTED");
+        if (!asReceiver.isEmpty()) return asReceiver.get(0);
+
+        return null;
+    }
 }

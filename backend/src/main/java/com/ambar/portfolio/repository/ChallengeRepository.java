@@ -13,4 +13,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     
     // Find all active or past matches for a user
     List<Challenge> findBySenderNameOrReceiverName(String senderName, String receiverName);
+    List<Challenge> findBySenderNameAndStatus(String senderName, String status);
+    List<Challenge> findByReceiverNameAndStatus(String receiverName, String status);
 }
