@@ -7,7 +7,8 @@ import useTypingEngine from "../hooks/useTypingEngine";
 import AuthModal from "../components/AuthModal";
 import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
-import Leaderboard from "../components/Leaderboard"; // (Adjust path if needed)
+import Leaderboard from "../components/Leaderboard";
+
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   
@@ -51,20 +52,32 @@ function Home() {
       />
 
       <main style={{ padding: "0 40px", maxWidth: "1200px", margin: "0 auto" }}>
-        {activeView === "typing" ? (
+        
+        {/* Strictly render ONLY the TypingBox when activeView is "typing" */}
+        {activeView === "typing" && (
           <>
             <h1>Improve your typing speed every day</h1>
             <TypingBox engine={typingEngine} />
           </>
-        ) : (
+        )}
+
+        {/* Strictly render ONLY the Dashboard when activeView is "dashboard" */}
+        {activeView === "dashboard" && (
           <Dashboard 
             user={user} 
             liveStats={typingEngine.stats} 
             clearStats={typingEngine.clearStatistics} 
           />
         )}
+
+        {/* Strictly render ONLY the Leaderboard when activeView is "leaderboard" */}
+        {activeView === "leaderboard" && (
+          <Leaderboard />
+        )}
+
       </main>
 
+      {/* Modals */}
       {activeModal === "auth" && (
         <AuthModal onClose={closeModal} onLoginSuccess={handleLoginSuccess} />
       )}
@@ -84,7 +97,7 @@ function Home() {
           onClose={closeModal} 
         />
       )}
-      {activeView === "leaderboard" && <Leaderboard />}
+
     </div>
   );
 }
