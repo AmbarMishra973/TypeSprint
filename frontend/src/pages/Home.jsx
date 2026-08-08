@@ -44,7 +44,6 @@ function Home() {
   }, []);
 
   // 🔄 GLOBAL MATCHMAKER: Poll for an ACCEPTED match every 2.5 seconds
- // 🔄 GLOBAL MATCHMAKER: Poll for an ACCEPTED match every 2.5 seconds
   useEffect(() => {
     if (!user) return;
     
@@ -62,16 +61,15 @@ function Home() {
           // Safety Net: If backend says NO active matches, but frontend is stuck in one, clear it!
           setActiveChallenge(null);
         }
-      } catch (err) { console.error("Matchmaker error:", err); }
+      } catch (err) { 
+        console.error("Matchmaker error:", err); 
+      }
     };
 
     const interval = setInterval(checkActiveMatch, 2500);
     return () => clearInterval(interval);
   }, [user, activeChallenge]);
 
-    const interval = setInterval(checkActiveMatch, 2500); // Check every 2.5s
-    return () => clearInterval(interval);
-  }, [user, activeChallenge]);
   return (
     <div className="home">
      
