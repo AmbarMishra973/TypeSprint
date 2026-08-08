@@ -38,17 +38,19 @@ public class ChallengeService {
     }
 
     // 🔍 Helper method to find a waiting player in the queue
+    // 🔍 Safe helper method using findAll() to avoid repository method missing errors
     private Challenge findWaitingPlayerInQueue(String currentUsername) {
-        // Search your database for a challenge that is PENDING and doesn't belong to the current user
         try {
-            java.util.List<Challenge> pendingList = challengeRepository.findByStatus("PENDING");
-            for (Challenge c : pendingList) {
-                if (c.getSenderName() != null && !c.getSenderName().equals(currentUsername)) {
+            java.util.List<Challenge> allChallenges = challengeRepository.findAll();
+            for (Challenge c : allChallenges) {
+                if ("PENDING".equalsIgnoreCase(c.getStatus()) && 
+                    c.getSenderName() != null && 
+                    !c.getSenderName().equals(currentUsername)) {
                     return c;
                 }
             }
         } catch (Exception e) {
-            // Fallback if repository query needs adjustment
+            System.err.println("Error finding waiting player: " + e.getMessage());
         }
         return null;
     }
