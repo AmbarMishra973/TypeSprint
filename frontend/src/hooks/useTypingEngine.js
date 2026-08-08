@@ -5,38 +5,11 @@ import { checkAchievements } from "../utils/achievements";
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const wordBank = [
-  "the",
-  "quick",
-  "brown",
-  "fox",
-  "jumps",
-  "over",
-  "lazy",
-  "dog",
-  "typing",
-  "speed",
-  "accuracy",
-  "practice",
-  "keyboard",
-  "developer",
-  "coding",
-  "javascript",
-  "react",
-  "spring",
-  "boot",
-  "database",
-  "project",
-  "learning",
-  "future",
-  "technology",
-  "computer",
-  "science",
-  "design",
-  "build",
-  "experience",
-  "improve",
-  "daily",
-  "challenge"
+  "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
+  "typing", "speed", "accuracy", "practice", "keyboard", "developer",
+  "coding", "javascript", "react", "spring", "boot", "database",
+  "project", "learning", "future", "technology", "computer",
+  "science", "design", "build", "experience", "improve", "daily", "challenge"
 ];
 
 function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
@@ -52,8 +25,7 @@ function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
       if (Math.random() < 0.5)
         word = word.charAt(0).toUpperCase() + word.slice(1);
 
-      const punc =
-        punctuations[Math.floor(Math.random() * punctuations.length)];
+      const punc = punctuations[Math.floor(Math.random() * punctuations.length)];
       if (punc === '"') word = `"${word}"`;
       else if (punc === "()") word = `(${word})`;
       else word += punc;
@@ -65,40 +37,24 @@ function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
 
 function useTypingEngine(user) {
   const defaultStats = {
-    totalTests: 0,
-    bestWpm: 0,
-    averageWpm: 0,
-    highestAccuracy: 0,
-    totalWords: 0,
-    totalCharacters: 0,
-    totalPracticeSeconds: 0,
-    recentTests: [],
-    globalMissedKeys: {},
-    unlockedAchievements: []
+    totalTests: 0, bestWpm: 0, averageWpm: 0, highestAccuracy: 0,
+    totalWords: 0, totalCharacters: 0, totalPracticeSeconds: 0,
+    recentTests: [], globalMissedKeys: {}, unlockedAchievements: []
   };
 
   const storageKey = user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
 
-  // Helper to load stats dynamically
   const loadStats = (key) => {
     const saved = localStorage.getItem(key);
     return saved ? JSON.parse(saved) : null;
   };
 
-  const [stats, setStats] = useState({
-    ...defaultStats,
-    ...(loadStats(storageKey) || {})
-  });
+  const [stats, setStats] = useState({ ...defaultStats, ...(loadStats(storageKey) || {}) });
 
-  // 3. ✨ NEW: When a user logs in or out, switch their stats instantly!
   useEffect(() => {
-    setStats({
-      ...defaultStats,
-      ...(loadStats(storageKey) || {})
-    });
-  }, [storageKey]); // Runs every time the user changes
+    setStats({ ...defaultStats, ...(loadStats(storageKey) || {}) });
+  }, [storageKey]);
 
-  // 4. Save to their specific unique key
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(stats));
   }, [stats, storageKey]);
@@ -121,7 +77,7 @@ function useTypingEngine(user) {
   const [wrongWords, setWrongWords] = useState(0);
   const [correctCharacters, setCorrectCharacters] = useState(0);
   const [incorrectCharacters, setIncorrectCharacters] = useState(0);
-  const [extraCharacters, setExtraCharacters] = useState(0); // 👈 Added missing state
+  const [extraCharacters, setExtraCharacters] = useState(0);
   const [isRepeat, setIsRepeat] = useState(false);
   const [missedKeys, setMissedKeys] = useState({});
   const [wordTimes, setWordTimes] = useState([]);
@@ -144,13 +100,7 @@ function useTypingEngine(user) {
 
   const sampleQuotes = [
     { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
-    { content: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-    { content: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
-    { content: "Success is not final; failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
-    { content: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
-    { content: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson" },
-    { content: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
-    { content: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde" }
+    { content: "Talk is cheap. Show me the code.", author: "Linus Torvalds" }
   ];
 
   function fetchQuoteTest() {
@@ -169,9 +119,7 @@ function useTypingEngine(user) {
   function updateModifiers(pFreq, nFreq) {
     setPunctuationFreq(pFreq);
     setNumberFreq(nFreq);
-    setWords(
-      generateWords(testMode === "words" ? wordLimit : 300, pFreq, nFreq)
-    );
+    setWords(generateWords(testMode === "words" ? wordLimit : 300, pFreq, nFreq));
     resetTest();
   }
 
@@ -183,17 +131,12 @@ function useTypingEngine(user) {
 
   function playKeySound(isError = false) {
     if (!soundEnabled) return;
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-
+    if (audioCtx.state === "suspended") audioCtx.resume();
     try {
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-
       if (isError) {
         osc.type = "sawtooth";
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
@@ -211,22 +154,17 @@ function useTypingEngine(user) {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.02);
       }
-    } catch (e) {
-      console.log("Audio error", e);
-    }
+    } catch (e) {}
   }
 
   function handleKey(key) {
     if (finished) return;
-
     let currentStartTime = startTime;
-
     if (!isRunning) {
       setIsRunning(true);
       setStartTime(Date.now());
       setStartTime(currentStartTime);
     }
-
     if (!startTimeRef.current) {
       startTimeRef.current = Date.now();
       setStartTime(startTimeRef.current);
@@ -237,16 +175,13 @@ function useTypingEngine(user) {
     if (key === "Backspace") {
       playKeySound(false);
       if (typed.length === 0) return;
-
       const charBeingDeleted = typed[typed.length - 1];
       const expectedChar = words[currentIndex]?.[currentChar - 1];
-
       if (charBeingDeleted === expectedChar) {
         setCorrectCharacters((prev) => Math.max(prev - 1, 0));
       } else {
         setIncorrectCharacters((prev) => Math.max(prev - 1, 0));
       }
-
       setTyped((prev) => prev.slice(0, -1));
       setCurrentChar((prev) => Math.max(prev - 1, 0));
       return;
@@ -255,28 +190,20 @@ function useTypingEngine(user) {
     if (key === " ") {
       playKeySound(false);
       const expected = words[currentIndex];
-
-      if (typed === expected) {
-        setCorrectWords((prev) => prev + 1);
-      } else {
-        setWrongWords((prev) => prev + 1);
-      }
+      if (typed === expected) setCorrectWords((prev) => prev + 1);
+      else setWrongWords((prev) => prev + 1);
+      
       const now = Date.now();
       if (currentWordStartTime) {
         const timeTaken = (now - currentWordStartTime) / 1000;
         setWordTimes((prev) => [...prev, { word: expected, time: timeTaken }]);
       }
       setCurrentWordStartTime(now);
-
       setTyped("");
       setCurrentChar(0);
-
       const next = currentIndex + 1;
       setCurrentIndex(next);
-
-      if (testMode === "words" && next >= wordLimit) {
-        finishTest();
-      }
+      if (testMode === "words" && next >= wordLimit) finishTest();
       return;
     }
 
@@ -284,19 +211,14 @@ function useTypingEngine(user) {
       const expected = words[currentIndex]?.[currentChar];
       const isError = key !== expected;
       playKeySound(isError);
-
       if (key === expected) {
         setCorrectCharacters((prev) => prev + 1);
       } else {
         setIncorrectCharacters((prev) => prev + 1);
         if (expected) {
-          setMissedKeys((prev) => ({
-            ...prev,
-            [expected]: (prev[expected] || 0) + 1
-          }));
+          setMissedKeys((prev) => ({ ...prev, [expected]: (prev[expected] || 0) + 1 }));
         }
       }
-
       setTyped((prev) => prev + key);
       setCurrentChar((prev) => prev + 1);
     }
@@ -315,35 +237,23 @@ function useTypingEngine(user) {
 
   function calculateRawWPM() {
     const elapsed = Math.max(getElapsedSeconds(), 1);
-    return Math.round(
-      (correctCharacters + incorrectCharacters) / 5 / (elapsed / 60)
-    );
+    return Math.round((correctCharacters + incorrectCharacters) / 5 / (elapsed / 60));
   }
 
   function addWpmPoint() {
     const elapsed = getElapsedSeconds();
     if (elapsed <= 0) return;
-
     const currentWpm = Math.round(correctCharacters / 5 / (elapsed / 60));
-    setWpmHistory((prev) => [
-      ...prev,
-      { time: Math.floor(elapsed), wpm: currentWpm }
-    ]);
+    setWpmHistory((prev) => [...prev, { time: Math.floor(elapsed), wpm: currentWpm }]);
   }
 
   const totalTyped = correctCharacters + incorrectCharacters + extraCharacters;
-  const currentElapsed = getElapsedSeconds() || 1;
-  const rawWpm = Math.round((totalTyped / 5) / (currentElapsed / 60)) || 0;
-  const wpm = Math.round((correctCharacters / 5) / (currentElapsed / 60)) || 0;
-  
   const totalAttempts = correctCharacters + incorrectCharacters;
-  const accuracy = totalAttempts > 0 ? Math.round((correctCharacters / totalAttempts) * 100) : 100;
 
   function finishTest() {
     setIsRunning(false);
     setFinished(true);
     if (timerRef.current) clearInterval(timerRef.current);
-
     const finalElapsedVal = getElapsedSeconds() || 1;
     setFinalElapsed(finalElapsedVal);
 
@@ -353,233 +263,113 @@ function useTypingEngine(user) {
     const wordsCompleted = currentIndex;
     const charsTyped = correctCharacters + incorrectCharacters;
 
-    if (isRepeat && finalWpm > repeatBestWpm) {
-      setRepeatBestWpm(finalWpm);
-    }
+    if (isRepeat && finalWpm > repeatBestWpm) setRepeatBestWpm(finalWpm);
 
     setStats((prev) => {
       const newGlobalMissed = { ...(prev.globalMissedKeys || {}) };
       for (const [key, count] of Object.entries(missedKeys)) {
         newGlobalMissed[key] = (newGlobalMissed[key] || 0) + count;
       }
-
-      const newTestEntry = {
-        wpm: finalWpm,
-        rawWpm: finalRawWpm,
-        accuracy: finalAccuracy,
-        time: Math.round(finalElapsedVal),
-        mode: isQuoteMode ? "quote" : testMode,
-        date: Date.now()
-      };
-
+      const newTestEntry = { wpm: finalWpm, rawWpm: finalRawWpm, accuracy: finalAccuracy, time: Math.round(finalElapsedVal), mode: isQuoteMode ? "quote" : testMode, date: Date.now() };
       const updatedTests = [newTestEntry, ...(prev.recentTests || [])].slice(0, 20);
       const newTotalTests = (prev.totalTests || 0) + 1;
       const newTotalWords = (prev.totalWords || 0) + wordsCompleted;
       const newTotalChars = (prev.totalCharacters || 0) + charsTyped;
       const newTotalTime = (prev.totalPracticeSeconds || 0) + finalElapsedVal;
       const newBestWpm = Math.max(prev.bestWpm || 0, finalWpm);
-      const newAvgWpm = Math.round(
-        updatedTests.reduce((sum, t) => sum + Number(t.wpm), 0) / updatedTests.length
-      );
+      const newAvgWpm = Math.round(updatedTests.reduce((sum, t) => sum + Number(t.wpm), 0) / updatedTests.length);
       const newHighestAcc = Math.max(prev.highestAccuracy || 0, finalAccuracy);
-
       const statsForCheck = { totalTests: newTotalTests, unlockedAchievements: prev.unlockedAchievements || [] };
       const newBadges = checkAchievements(statsForCheck, finalWpm, finalAccuracy);
-      
-      if (newBadges.length > 0) {
-        console.log("🎉 NEW ACHIEVEMENTS UNLOCKED:", newBadges);
-      }
-
       const finalAchievementsList = [...(prev.unlockedAchievements || []), ...newBadges];
 
       const updatedStatsObj = {
-        totalTests: newTotalTests,
-        bestWpm: newBestWpm,
-        averageWpm: newAvgWpm,
-        highestAccuracy: newHighestAcc,
-        totalWords: newTotalWords,
-        totalCharacters: newTotalChars,
-        totalPracticeSeconds: newTotalTime,
-        recentTests: updatedTests,
-        globalMissedKeys: newGlobalMissed,
-        unlockedAchievements: finalAchievementsList
+        totalTests: newTotalTests, bestWpm: newBestWpm, averageWpm: newAvgWpm, highestAccuracy: newHighestAcc,
+        totalWords: newTotalWords, totalCharacters: newTotalChars, totalPracticeSeconds: newTotalTime,
+        recentTests: updatedTests, globalMissedKeys: newGlobalMissed, unlockedAchievements: finalAchievementsList
       };
 
       saveStats(updatedStatsObj);
       
-      
       if (user && user.name && user.password) {
         syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
-        
         const leaderboardPayload = {
-          username: user.name,
-          wpm: finalWpm,           // Submits the current test's WPM
-          accuracy: finalAccuracy, // Submits the current test's accuracy
-          mode: isQuoteMode ? "quote" : testMode, // Correctly checks if it's a quote
-          timeLimit: testMode === "time" ? selectedTime : null, // Replaced 'duration' with 'selectedTime'
-          wordLimit: testMode === "words" ? wordLimit : null,   // Replaced 'wordCount' with 'wordLimit'
-          punctuation: punctuationFreq > 0, // Replaced 'includePunctuation'
-          numbers: numberFreq > 0,          // Replaced 'includeNumbers'
-          timestamp: Date.now()
+          username: user.name, wpm: finalWpm, accuracy: finalAccuracy,
+          mode: isQuoteMode ? "quote" : testMode, timeLimit: testMode === "time" ? selectedTime : null,
+          wordLimit: testMode === "words" ? wordLimit : null, punctuation: punctuationFreq > 0,
+          numbers: numberFreq > 0, timestamp: Date.now()
         };
-
         saveTestScore(leaderboardPayload);
       }
-
       return updatedStatsObj;
     });
   }
+
   function resetTest() {
-    setTyped("");
-    setCurrentIndex(0);
-    setCurrentChar(0);
-    setCorrectWords(0);
-    setWrongWords(0);
-    setCorrectCharacters(0);
-    setIncorrectCharacters(0);
-    setTime(selectedTime);
-    setStartTime(null);
-    startTimeRef.current = null;
-    setFinalElapsed(0);
-    setIsRunning(false);
-    setFinished(false);
-    setResultSaved(false);
-    setWpmHistory([]);
-    setGhostPosition(0);
-    setMissedKeys({});
-    setWordTimes([]);
-    setCurrentWordStartTime(null);
-    setKeystrokeLog([]);
+    setTyped(""); setCurrentIndex(0); setCurrentChar(0);
+    setCorrectWords(0); setWrongWords(0); setCorrectCharacters(0); setIncorrectCharacters(0);
+    setTime(selectedTime); setStartTime(null); startTimeRef.current = null;
+    setFinalElapsed(0); setIsRunning(false); setFinished(false);
+    setResultSaved(false); setWpmHistory([]); setGhostPosition(0);
+    setMissedKeys({}); setWordTimes([]); setCurrentWordStartTime(null); setKeystrokeLog([]);
   }
 
   function changeTestMode(mode) {
-    setIsQuoteMode(false); 
-    setQuoteAuthor("");    
-    setTestMode(mode);
-    setWords(
-      generateWords(
-        mode === "words" ? wordLimit : 300,
-        punctuationFreq,
-        numberFreq       
-      )
-    );
+    setIsQuoteMode(false); setQuoteAuthor(""); setTestMode(mode);
+    setWords(generateWords(mode === "words" ? wordLimit : 300, punctuationFreq, numberFreq));
     resetTest();
   }
 
   function changeTimeLimit(value) {
-    setSelectedTime(value);
-    setTime(value); 
-    setIsQuoteMode(false);
-    setQuoteAuthor("");
+    setSelectedTime(value); setTime(value); setIsQuoteMode(false); setQuoteAuthor("");
     if (testMode === "time") {
       setWords(generateWords(300, punctuationFreq, numberFreq));
-      resetTest();
-      setTime(value); 
+      resetTest(); setTime(value); 
     }
   }
 
   function changeWordLimit(value) {
-    setWordLimit(value);
-    setIsQuoteMode(false); 
-    setQuoteAuthor("");
+    setWordLimit(value); setIsQuoteMode(false); setQuoteAuthor("");
     if (testMode === "words") {
       setWords(generateWords(value, punctuationFreq, numberFreq));
       resetTest();
     }
   }
 
-  function repeatTest() {
-    resetTest();
-    setIsRepeat(true);
-    setGhostWpm(repeatBestWpm);
-  }
-
-  function newTest() {
-    setWords(
-      generateWords(
-        testMode === "words" ? wordLimit : 300,
-        punctuationFreq, 
-        numberFreq
-      )
-    );
-    resetTest();
-    setIsRepeat(false);
-    setRepeatBestWpm(0);
-  }
-
-  function updateBest() {
-    const current = calculateWPM();
-    if (current > bestRepeatedWpm) {
-      setBestRepeatedWpm(current);
-    }
-  }
-
+  function repeatTest() { resetTest(); setIsRepeat(true); setGhostWpm(repeatBestWpm); }
+  function newTest() { setWords(generateWords(testMode === "words" ? wordLimit : 300, punctuationFreq, numberFreq)); resetTest(); setIsRepeat(false); setRepeatBestWpm(0); }
+  function updateBest() { const current = calculateWPM(); if (current > bestRepeatedWpm) setBestRepeatedWpm(current); }
   function clearStatistics() {
-    resetStats();
-    setStats(defaultStats);
-  
-    if (user && user.name && user.password) {
-      syncUserStats(user.name, user.password, JSON.stringify(defaultStats));
-    }
+    resetStats(); setStats(defaultStats);
+    if (user && user.name && user.password) syncUserStats(user.name, user.password, JSON.stringify(defaultStats));
   }
+
+  // 🚀 NEW: Point 'restart' exactly to 'resetTest'
+  const restart = resetTest;
+
+  // 🚀 NEW: Intelligently convert multiplayer database string to an array!
+  const handleSetWords = (newWords) => {
+    if (typeof newWords === "string") {
+      setWords(newWords.split(" ")); // Convert backend string into an array
+    } else {
+      setWords(newWords); // Normal array for solo mode
+    }
+  };
 
   return {
-    words,
-    typed,
-    currentIndex,
-    currentChar,
-    handleKey,
-    time,
-    setTime,
-    selectedTime,
-    setSelectedTime,
-    testMode,
-    changeTestMode,
-    wordLimit,
-    changeWordLimit,
-    isRunning,
-    setIsRunning,
-    finished,
-    resetTest,
-    repeatTest,
-    newTest,
-    calculateAccuracy,
-    calculateWPM,
-    calculateRawWPM,
-    correctCharacters,
-    incorrectCharacters,
-    wpmHistory,
-    addWpmPoint,
-    ghostPosition,
-    setGhostPosition,
-    ghostWpm,
-    setGhostWpm,
-    stats,
-    bestWpm: stats.bestWpm,
-    testHistory: stats.recentTests,
-    clearStatistics,
-    getElapsedSeconds,
-    finishTest,
-    saveCurrentTest: () => {},
-    updateBest,
-    bestRepeatedWpm,
-    isRepeat,
-    missedKeys,
-    wordTimes,
-    keystrokeLog,
-    soundEnabled,
-    setSoundEnabled,
-    punctuationFreq,
-    numberFreq,
-    updateModifiers,
-    isQuoteMode,
-    quoteAuthor,
-    fetchQuoteTest,
-    changeTimeLimit,
-    repeatBestWpm,
-    restart,
-    setWords,
-
+    words, typed, currentIndex, currentChar, handleKey, time, setTime, selectedTime,
+    setSelectedTime, testMode, changeTestMode, wordLimit, changeWordLimit, isRunning,
+    setIsRunning, finished, resetTest, repeatTest, newTest, calculateAccuracy,
+    calculateWPM, calculateRawWPM, correctCharacters, incorrectCharacters, wpmHistory,
+    addWpmPoint, ghostPosition, setGhostPosition, ghostWpm, setGhostWpm, stats,
+    bestWpm: stats.bestWpm, testHistory: stats.recentTests, clearStatistics,
+    getElapsedSeconds, finishTest, saveCurrentTest: () => {}, updateBest,
+    bestRepeatedWpm, isRepeat, missedKeys, wordTimes, keystrokeLog, soundEnabled,
+    setSoundEnabled, punctuationFreq, numberFreq, updateModifiers, isQuoteMode,
+    quoteAuthor, fetchQuoteTest, changeTimeLimit, repeatBestWpm,
+    
+    restart, // Exported!
+    setWords: handleSetWords, // Safe backend string parser exported!
     globalMissedKeys: stats.globalMissedKeys || {}
   };
 }
