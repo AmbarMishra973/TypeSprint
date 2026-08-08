@@ -28,6 +28,7 @@ public class ChallengeService {
             // We found someone! Create an instant 30-second match
             Challenge challenge = new Challenge(opponent, username, 30);
             challenge.setStatus("ACCEPTED"); // Auto-accept the match!
+            challenge.setWordsText(generateSharedWords());
             // challenge.setWordsText("Optional: You can generate seed words here");
             return challengeRepository.save(challenge);
         } else {
@@ -45,6 +46,7 @@ public class ChallengeService {
     // ⚔️ Send a new challenge
     public Challenge createChallenge(String sender, String receiver, int duration) {
         Challenge challenge = new Challenge(sender, receiver, duration);
+        challenge.setWordsText(generateSharedWords());
         return challengeRepository.save(challenge);
     }
 
@@ -164,5 +166,16 @@ public class ChallengeService {
         stats.put("winRate", total > 0 ? (wins * 100 / total) : 0);
         
         return stats;
+    }
+
+    // 📝 Generate universal shared words for multiplayer matches
+    private String generateSharedWords() {
+        String[] words = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time", "no", "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us"};
+        StringBuilder sb = new StringBuilder();
+        java.util.Random r = new java.util.Random();
+        for(int i = 0; i < 100; i++) {
+            sb.append(words[r.nextInt(words.length)]).append(" ");
+        }
+        return sb.toString().trim();
     }
 }

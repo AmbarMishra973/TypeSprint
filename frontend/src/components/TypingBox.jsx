@@ -195,6 +195,7 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   }, [matchCountdown, setIsRunning]); // (Make sure to include playSound in dependencies if linter complains, or leave as is)
 
   // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE & WAIT FOR OPPONENT
+ // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE & WAIT FOR OPPONENT
   useEffect(() => {
     if (finished && activeChallenge && user && !waitingForOpponent && !completedMatch) {
       const finalWpm = calculateWPM();
@@ -202,10 +203,26 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
 
       fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/submit?username=${user.name}&wpm=${finalWpm}`, {
         method: "POST"
-      }).catch(err => console.error("Error submitting challenge:", err));
+      })
+      .then(res => res.json())
+      .then(data => {
+        // 🐛 BUG 1 FIX: If the backend says the match is ALREADY COMPLETED (opponent finished first), show modal instantly!
+        if (data.status === "COMPLETED") {
+          setCompletedMatch(data);
+          setWaitingForOpponent(false);
+        }
+      })
+      .catch(err => console.error("Error submitting challenge:", err));
     }
   }, [finished, activeChallenge, user, calculateWPM, waitingForOpponent, completedMatch]);
 
+  // 🧹 BUG 2 FIX: Clear old match results when a NEW challenge ID arrives
+  useEffect(() => {
+    if (activeChallenge) {
+      setCompletedMatch(null);
+      setWaitingForOpponent(false);
+    }
+  }, [activeChallenge?.id]);
   // 🚀 CHALLENGE MODE PART 3: POLL FOR MATCH RESULT
   useEffect(() => {
     let pollTimer;
@@ -245,6 +262,12 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     closeMatchModal();
   };
 
+  // 📝 BUG 3 FIX: Override local words with the shared multiplayer words!
+  useEffect(() => {
+    if (activeChallenge && activeChallenge.wordsText && engine.setWords) {
+      engine.setWords(activeChallenge.wordsText);
+    }
+  }, [activeChallenge, engine]);
   // GHOST ANIMATION
   useEffect(() => {
     let frame;
