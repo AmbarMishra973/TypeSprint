@@ -85,4 +85,33 @@ public class ChallengeService {
     public Challenge getChallengeById(Long challengeId) {
         return challengeRepository.findById(challengeId).orElse(null);
     }
+
+    // 📊 Calculate total wins, losses, and win rate for a user
+    public java.util.Map<String, Object> getUserDuelStats(String username) {
+        List<Challenge> matches = challengeRepository.findBySenderNameOrReceiverName(username, username);
+        
+        int wins = 0, losses = 0, ties = 0, total = 0;
+        
+        for (Challenge c : matches) {
+            if ("COMPLETED".equals(c.getStatus())) {
+                total++;
+                if (username.equals(c.getWinnerName())) {
+                    wins++;
+                } else if ("TIE".equals(c.getWinnerName())) {
+                    ties++;
+                } else {
+                    losses++;
+                }
+            }
+        }
+        
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        stats.put("totalMatches", total);
+        stats.put("wins", wins);
+        stats.put("losses", losses);
+        stats.put("ties", ties);
+        stats.put("winRate", total > 0 ? (wins * 100 / total) : 0);
+        
+        return stats;
+    }
 }

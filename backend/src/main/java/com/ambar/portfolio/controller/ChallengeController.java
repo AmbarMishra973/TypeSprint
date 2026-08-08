@@ -102,4 +102,10 @@ public class ChallengeController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    // 📊 Get Duel Statistics for Profile
+    @GetMapping("/{username}/stats")
+    public ResponseEntity<Map<String, Object>> getUserStats(@PathVariable String username) {
+        return ResponseEntity.ok(challengeService.getUserDuelStats(username));
+    }
 }
