@@ -108,4 +108,21 @@ public class ChallengeController {
     public ResponseEntity<Map<String, Object>> getUserStats(@PathVariable String username) {
         return ResponseEntity.ok(challengeService.getUserDuelStats(username));
     }
+
+    // 🎲 Join Global Matchmaking Queue
+    @PostMapping("/matchmake/join")
+    public ResponseEntity<?> joinQueue(@RequestParam String username) {
+        Challenge match = challengeService.joinMatchmaking(username);
+        if (match != null) {
+            return ResponseEntity.ok(match); // Instantly matched!
+        }
+        return ResponseEntity.accepted().body("Waiting for opponent..."); // Placed in queue
+    }
+
+    // 🛑 Leave Global Matchmaking Queue
+    @PostMapping("/matchmake/leave")
+    public ResponseEntity<?> leaveQueue(@RequestParam String username) {
+        challengeService.leaveMatchmaking(username);
+        return ResponseEntity.ok("Left queue");
+    }
 }

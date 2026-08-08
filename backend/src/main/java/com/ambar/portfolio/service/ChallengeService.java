@@ -12,6 +12,35 @@ public class ChallengeService {
 
     @Autowired
     private ChallengeRepository challengeRepository;
+    // 🚦 Matchmaking Queue
+    private final java.util.concurrent.ConcurrentLinkedQueue<String> matchmakingQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
+
+    // 🎲 Attempt to find a random match
+    public Challenge joinMatchmaking(String username) {
+        // Prevent duplicate queueing
+        if (matchmakingQueue.contains(username)) {
+            return null; // Already waiting
+        }
+
+        String opponent = matchmakingQueue.poll(); // Grab the first person waiting
+
+        if (opponent != null && !opponent.equals(username)) {
+            // We found someone! Create an instant 30-second match
+            Challenge challenge = new Challenge(opponent, username, 30);
+            challenge.setStatus("ACCEPTED"); // Auto-accept the match!
+            // challenge.setWordsText("Optional: You can generate seed words here");
+            return challengeRepository.save(challenge);
+        } else {
+            // Nobody is waiting, so we enter the queue
+            matchmakingQueue.add(username);
+            return null; 
+        }
+    }
+
+    // 🛑 Leave the matchmaking queue
+    public void leaveMatchmaking(String username) {
+        matchmakingQueue.remove(username);
+    }
 
     // ⚔️ Send a new challenge
     public Challenge createChallenge(String sender, String receiver, int duration) {

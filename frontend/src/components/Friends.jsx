@@ -12,12 +12,33 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
   const [friendToRemove, setFriendToRemove] = useState(null);
   const [challengeTarget, setChallengeTarget] = useState(null);
   const [challengeTime, setChallengeTime] = useState(30);
-
+const [isSearching, setIsSearching] = useState(false);
   const updateUserState = (updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("typingUser", JSON.stringify(updatedUser));
   };
 
+  // 🎲 Join Random Matchmaking
+  const findQuickMatch = async () => {
+    setIsSearching(true);
+    try {
+      await fetch(`https://ambarmishradb.onrender.com/api/challenges/matchmake/join?username=${user.name}`, { method: "POST" });
+      // We don't need to do anything else! Our Global Matchmaker in Home.jsx 
+      // is already checking for "ACCEPTED" matches every 2.5 seconds. 
+      // When it finds one, it will automatically pull us into the game!
+    } catch (err) {
+      console.error("Matchmaking failed:", err);
+      setIsSearching(false);
+    }
+  };
+
+  // 🛑 Cancel Matchmaking
+  const cancelSearch = async () => {
+    try {
+      await fetch(`https://ambarmishradb.onrender.com/api/challenges/matchmake/leave?username=${user.name}`, { method: "POST" });
+      setIsSearching(false);
+    } catch (err) { console.error("Failed to leave queue:", err); }
+  };
   // 🔄 Fetch Pending Challenges (Polls every 5 seconds)
   useEffect(() => {
     if (!user) return;
@@ -166,7 +187,24 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
         
         {/* LEFT COLUMN: Inboxes & Friends */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          
+          {/* 🌍 GLOBAL QUICK MATCH */}
+          <div style={{...styles.card, background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', border: '2px solid #8b5cf6', textAlign: 'center'}}>
+            <h2 style={{ color: "#a78bfa", marginTop: 0 }}>🌍 Global Matchmaking</h2>
+            <p style={{ color: "#cbd5e1", marginBottom: "20px" }}>Play a random 30-second duel against anyone online!</p>
+            
+            {isSearching ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+                <div style={{ color: '#fbbf24', fontSize: '1.2rem', animation: 'pulse 1.5s infinite' }}>
+                  ⏳ Searching for opponent...
+                </div>
+                <button onClick={cancelSearch} style={{...styles.cancelBtn, width: '100%'}}>Cancel Search</button>
+              </div>
+            ) : (
+              <button onClick={findQuickMatch} style={{ padding: "15px 30px", fontSize: "1.2rem", fontWeight: "bold", background: "#8b5cf6", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", width: "100%", boxShadow: "0 4px 15px rgba(139, 92, 246, 0.4)" }}>
+                ⚔️ Find Quick Match
+              </button>
+            )}
+          </div>
           {/* CHALLENGE INBOX */}
           {pendingChallenges.length > 0 && (
             <div style={{...styles.card, border: "2px solid #fbbf24"}}>
