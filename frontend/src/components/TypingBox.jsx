@@ -250,6 +250,21 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     return () => clearInterval(pollTimer);
   }, [waitingForOpponent, activeChallenge]);
 
+  // 🤖 BOT LOGIC: If playing against a bot, automatically submit the bot's score after test starts
+  useEffect(() => {
+    if (activeChallenge && (activeChallenge.receiverName === "Bot_Typist" || activeChallenge.senderName === "Bot_Typist") && user) {
+      const botName = activeChallenge.senderName === user.name ? activeChallenge.receiverName : activeChallenge.senderName;
+      
+      // If the bot hasn't submitted a score yet, simulate it finishing after 20 seconds
+      const botTimer = setTimeout(() => {
+        fetch(`${API_BASE_URL}/api/challenges/${activeChallenge.id}/submit?username=${botName}&wpm=55`, {
+          method: "POST"
+        }).catch(err => console.error("Bot submission error:", err));
+      }, 20000); // Bot finishes typing in 20 seconds (around 55 WPM)
+
+      return () => clearTimeout(botTimer);
+    }
+  }, [activeChallenge, user]);
   // Handle closing modal & rematching
   // Handle closing modal & rematching
   const closeMatchModal = () => {

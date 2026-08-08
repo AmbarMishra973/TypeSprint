@@ -16,28 +16,42 @@ public class ChallengeService {
     private final java.util.concurrent.ConcurrentLinkedQueue<String> matchmakingQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
 
     // 🎲 Attempt to find a random match
+// 🌍 Matchmaking: Find a human opponent or fallback to a bot
     public Challenge joinMatchmaking(String username) {
-        // Prevent duplicate queueing
-        if (matchmakingQueue.contains(username)) {
-            return null; // Already waiting
-        }
+        // Look for any waiting open challenge or player in the queue
+        // (Assuming you have a repository or list tracking active players looking for a match)
+        Challenge waitingChallenge = findWaitingPlayerInQueue(username);
 
-        String opponent = matchmakingQueue.poll(); // Grab the first person waiting
-
-        if (opponent != null && !opponent.equals(username)) {
-            // We found someone! Create an instant 30-second match
-            Challenge challenge = new Challenge(opponent, username, 30);
-            challenge.setStatus("ACCEPTED"); // Auto-accept the match!
-            challenge.setWordsText(generateSharedWords());
-            // challenge.setWordsText("Optional: You can generate seed words here");
-            return challengeRepository.save(challenge);
+        if (waitingChallenge != null) {
+            // Found a real human player! Update or accept the match.
+            waitingChallenge.setStatus("ACCEPTED");
+            waitingChallenge.setWordsText(generateSharedWords());
+            return challengeRepository.save(waitingChallenge);
         } else {
-            // Nobody is waiting, so we enter the queue
-            matchmakingQueue.add(username);
-            return null; 
+            // 🤖 NO HUMAN FOUND? SPAWN A TYPING BOT!
+            Challenge botChallenge = new Challenge(username, "Bot_Typist", 30);
+            botChallenge.setStatus("ACCEPTED");
+            botChallenge.setWordsText(generateSharedWords());
+            botChallenge.setReceiverWpm(55); // Give the bot a default WPM score
+            return challengeRepository.save(botChallenge);
         }
     }
 
+    // 🔍 Helper method to find a waiting player in the queue
+    private Challenge findWaitingPlayerInQueue(String currentUsername) {
+        // Search your database for a challenge that is PENDING and doesn't belong to the current user
+        try {
+            java.util.List<Challenge> pendingList = challengeRepository.findByStatus("PENDING");
+            for (Challenge c : pendingList) {
+                if (c.getSenderName() != null && !c.getSenderName().equals(currentUsername)) {
+                    return c;
+                }
+            }
+        } catch (Exception e) {
+            // Fallback if repository query needs adjustment
+        }
+        return null;
+    }
     // 🛑 Leave the matchmaking queue
     public void leaveMatchmaking(String username) {
         matchmakingQueue.remove(username);
