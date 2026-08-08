@@ -66,7 +66,21 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     const [matchResult, setMatchResult] = useState(null);
     const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const [completedMatch, setCompletedMatch] = useState(null);
-  
+  // 🔊 AUDIO SETUP (Only initialize once)
+  const audioRefs = useRef({
+    tick: new Audio('/sounds/tick.mp3'),
+    go: new Audio('/sounds/go.mp3'),
+    win: new Audio('/sounds/win.mp3'),
+    lose: new Audio('/sounds/lose.mp3')
+  });
+
+  // Helper function to play sound if not muted
+  const playSound = (soundName) => {
+    if (soundEnabled && audioRefs.current[soundName]) {
+      audioRefs.current[soundName].currentTime = 0; // Reset to start
+      audioRefs.current[soundName].play().catch(e => console.log("Audio play blocked by browser:", e));
+    }
+  };
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
   });
@@ -166,17 +180,19 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   }, [activeChallenge, finished]);
 
   // 🚀 CHALLENGE MODE: Handle the Countdown & Auto-Start
+  // 🚀 CHALLENGE MODE: Handle the Countdown & Auto-Start
   useEffect(() => {
     if (matchCountdown !== null && matchCountdown > 0) {
+      playSound("tick"); // 🔊 Play tick on 3, 2, 1
       const timer = setTimeout(() => setMatchCountdown(matchCountdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (matchCountdown === 0) {
+      playSound("go"); // 🔊 Play loud chime on GO!
       setMatchCountdown(null); // Clear countdown overlay
       setIsRunning(true); // 🚀 FORCE START THE ENGINE
       if (inputRef.current) inputRef.current.focus(); // Focus the invisible input box
     }
-  }, [matchCountdown, setIsRunning]);
-
+  }, [matchCountdown, setIsRunning]); // (Make sure to include playSound in dependencies if linter complains, or leave as is)
 
   // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE & WAIT FOR OPPONENT
   useEffect(() => {
@@ -202,6 +218,13 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
             if (data.status === "COMPLETED") {
               setCompletedMatch(data); // Triggers the scoreboard modal
               setWaitingForOpponent(false); // Removes the waiting overlay
+              
+              // 🔊 Play Win or Loss sound!
+              if (data.winnerName === user.name) {
+                playSound("win");
+              } else if (data.winnerName !== "TIE") {
+                playSound("lose");
+              }
             }
           }
         } catch (e) {}
