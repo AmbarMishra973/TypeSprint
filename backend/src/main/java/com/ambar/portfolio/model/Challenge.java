@@ -19,8 +19,8 @@ public class Challenge {
     private int receiverWpm;
     private String winnerName;
 
-    // 🕒 Add this to track when the challenge was created
-    private long createdAt = System.currentTimeMillis();
+    // 🕒 Use Long object so existing database records with NULL don't crash the server
+    private Long createdAt;
 
 
     @Column(columnDefinition = "TEXT")
@@ -33,6 +33,7 @@ public class Challenge {
         this.receiverName = receiverName;
         this.duration = duration;
         this.status = "PENDING";
+        this.createdAt = System.currentTimeMillis();
     }
 
     // --- GETTERS & SETTERS ---
@@ -56,8 +57,14 @@ public class Challenge {
     public String getWordsText() { return wordsText; }
     public void setWordsText(String wordsText) { this.wordsText = wordsText; }
 
+
+    // Getters and setters
+    public Long getCreatedAt() { 
+        // If it's an old database record (null), return 0 so it gets instantly auto-cleaned up!
+        return createdAt != null ? createdAt : 0L; 
+    }
     
-    // Add these getters and setters at the bottom:
-    public long getCreatedAt() { return createdAt; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    public void setCreatedAt(Long createdAt) { 
+        this.createdAt = createdAt; 
+    }
 }
