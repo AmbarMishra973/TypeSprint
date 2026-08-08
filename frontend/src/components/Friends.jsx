@@ -178,7 +178,7 @@ const [isSearching, setIsSearching] = useState(false);
             </div>
             <div style={styles.modalActions}>
               <button onClick={() => setChallengeTarget(null)} style={styles.cancelBtn}>Cancel</button>
-              <button onClick={sendChallenge} style={styles.sendChallengeBtn}>Send Challenge</button>
+              <button onClick={() => sendChallenge(challengeTarget, challengeTime)} style={styles.sendChallengeBtn}>Send Challenge</button>
             </div>
           </div>
         </div>
