@@ -74,16 +74,16 @@ const [isSearching, setIsSearching] = useState(false);
       }
     } catch (err) { console.error("Failed to update challenge status:", err); }
   };
-
-  // ⚔️ Send a Challenge to a Friend
-  const handleSendChallenge = async (receiverName, duration) => {
+// ⚔️ Send a Challenge to a Friend
+  const sendChallenge = async (receiverName, duration = 30) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${receiverName}&duration=${duration}`, { method: "POST" });
       if (res.ok) {
         alert(`Challenge sent to ${receiverName}! Waiting for them to accept.`);
-        // Note: Do NOT set searching or syncing here. You are just waiting for them to accept.
       }
-    } catch (err) { console.error("Failed to send challenge:", err); }
+    } catch (err) { 
+      console.error("Failed to send challenge:", err); 
+    }
   };
   const handleSearch = async (e) => {
     e.preventDefault();
