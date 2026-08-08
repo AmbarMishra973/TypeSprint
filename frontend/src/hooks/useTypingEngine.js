@@ -577,6 +577,9 @@ function useTypingEngine(user) {
     fetchQuoteTest,
     changeTimeLimit,
     repeatBestWpm,
+    restart,
+    setWords,
+
     globalMissedKeys: stats.globalMissedKeys || {}
   };
 }

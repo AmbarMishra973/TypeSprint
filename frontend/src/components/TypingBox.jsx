@@ -251,15 +251,23 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   }, [waitingForOpponent, activeChallenge]);
 
   // Handle closing modal & rematching
+  // Handle closing modal & rematching
   const closeMatchModal = () => {
     setCompletedMatch(null);
     setActiveChallenge(null);
+    
+    // 🧹 FORCE RESET THE ENGINE FOR THE NEXT MATCH
+    if (engine.restart) {
+      engine.restart(); 
+    } else if (engine.reset) {
+      engine.reset(); // Just in case you named it reset instead of restart!
+    }
   };
 
   const handleRematch = async (opponentName, duration) => {
     await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${opponentName}&duration=${duration}`, { method: "POST" });
     alert(`Rematch sent to ${opponentName}! Waiting for them to accept.`);
-    closeMatchModal();
+    closeMatchModal(); // This will now clear the modal AND reset the engine!
   };
 
   // 📝 BUG 3 FIX: Override local words with the shared multiplayer words!

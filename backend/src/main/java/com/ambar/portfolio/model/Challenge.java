@@ -23,7 +23,8 @@ public class Challenge {
     private Long createdAt;
 
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",length = 1000)
+    
     private String wordsText; // Stores space-separated words for the rac
 
     public Challenge() {}
