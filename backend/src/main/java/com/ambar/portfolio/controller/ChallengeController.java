@@ -92,4 +92,14 @@ public class ChallengeController {
     public ResponseEntity<Map<String, Integer>> getProgress(@PathVariable Long challengeId) {
         return ResponseEntity.ok(livePositions.getOrDefault(challengeId, Collections.emptyMap()));
     }
+
+    // 🔍 Fetch specific challenge details (used to check if match is COMPLETED)
+    @GetMapping("/{challengeId}")
+    public ResponseEntity<Challenge> getChallengeById(@PathVariable Long challengeId) {
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        if (challenge != null) {
+            return ResponseEntity.ok(challenge);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

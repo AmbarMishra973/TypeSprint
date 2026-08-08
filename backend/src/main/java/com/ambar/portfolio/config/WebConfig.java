@@ -1,4 +1,4 @@
-package com.ambar.portfolio;
+package com.ambar.portfolio.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

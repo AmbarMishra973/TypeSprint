@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ElementCollection;
 
 @Entity

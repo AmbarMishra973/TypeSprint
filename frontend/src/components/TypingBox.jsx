@@ -6,7 +6,7 @@ import Result from "./Result";
 import ModeSelector from "./ModeSelector";
 import ThemeSelector from "./ThemeSelector";
 import "../styles/typingBox.css";
-
+import MatchResultModal from "./MatchResultModal";
 // 🚀 ADDED NEW PROPS: user, activeChallenge, setActiveChallenge
 function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   const {
@@ -64,6 +64,8 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   const [showModifiers, setShowModifiers] = useState(false);
   const [matchCountdown, setMatchCountdown] = useState(null);
     const [matchResult, setMatchResult] = useState(null);
+    const [waitingForOpponent, setWaitingForOpponent] = useState(false);
+  const [completedMatch, setCompletedMatch] = useState(null);
   
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
@@ -175,6 +177,50 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     }
   }, [matchCountdown, setIsRunning]);
 
+
+  // 🚀 CHALLENGE MODE PART 2: SUBMIT SCORE & WAIT FOR OPPONENT
+  useEffect(() => {
+    if (finished && activeChallenge && user && !waitingForOpponent && !completedMatch) {
+      const finalWpm = calculateWPM();
+      setWaitingForOpponent(true); // Stop player from leaving screen
+
+      fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/submit?username=${user.name}&wpm=${finalWpm}`, {
+        method: "POST"
+      }).catch(err => console.error("Error submitting challenge:", err));
+    }
+  }, [finished, activeChallenge, user, calculateWPM, waitingForOpponent, completedMatch]);
+
+  // 🚀 CHALLENGE MODE PART 3: POLL FOR MATCH RESULT
+  useEffect(() => {
+    let pollTimer;
+    if (waitingForOpponent && activeChallenge) {
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === "COMPLETED") {
+              setCompletedMatch(data); // Triggers the scoreboard modal
+              setWaitingForOpponent(false); // Removes the waiting overlay
+            }
+          }
+        } catch (e) {}
+      }, 2000); // Check every 2 seconds if opponent finished
+    }
+    return () => clearInterval(pollTimer);
+  }, [waitingForOpponent, activeChallenge]);
+
+  // Handle closing modal & rematching
+  const closeMatchModal = () => {
+    setCompletedMatch(null);
+    setActiveChallenge(null);
+  };
+
+  const handleRematch = async (opponentName, duration) => {
+    await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${opponentName}&duration=${duration}`, { method: "POST" });
+    alert(`Rematch sent to ${opponentName}! Waiting for them to accept.`);
+    closeMatchModal();
+  };
 
   // GHOST ANIMATION
   useEffect(() => {
@@ -337,6 +383,22 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
         <>
           <Result wpm={calculateWPM()} rawWpm={calculateRawWPM()} accuracy={calculateAccuracy()} characters={correctCharacters} errors={incorrectCharacters} history={wpmHistory} bestWpm={stats.bestWpm} testHistory={stats.recentTests} elapsedTime={elapsedTime} repeatTest={repeatTest} newTest={newTest} missedKeys={missedKeys} wordTimes={wordTimes} keystrokeLog={keystrokeLog} words={words} />
         </>
+      )}
+      {/* 🚀 WAITING OVERLAY (Shows when you finish before opponent) */}
+      {waitingForOpponent && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
+          <h2 style={{ color: "#38bdf8", animation: "pulse 1.5s infinite" }}>Waiting for opponent to finish... ⏳</h2>
+        </div>
+      )}
+
+      {/* 🚀 SCOREBOARD MODAL (Shows when both are finished) */}
+      {completedMatch && (
+        <MatchResultModal 
+          challenge={completedMatch} 
+          currentUser={user} 
+          onClose={closeMatchModal} 
+          onRematch={handleRematch} 
+        />
       )}
     </div>
   );

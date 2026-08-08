@@ -80,4 +80,9 @@ public class ChallengeService {
             // or better yet, fetch progress via a lightweight endpoint.
         }
     }
+
+    // 🔍 Get a specific challenge by ID
+    public Challenge getChallengeById(Long challengeId) {
+        return challengeRepository.findById(challengeId).orElse(null);
+    }
 }
