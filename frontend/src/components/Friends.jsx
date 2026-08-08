@@ -61,17 +61,29 @@ const [isSearching, setIsSearching] = useState(false);
   // 🔍 Handle Search
   // 🎮 Accept/Decline Challenge API Call
   // 🎮 Accept/Decline Challenge API Call
+  // 🎮 Accept/Decline Challenge API Call
   const handleChallengeResponse = async (challengeId, status) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${challengeId}/status?status=${status}`, { method: "PUT" });
       if (res.ok) {
         setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
         if (status === "ACCEPTED") {
-          // 🚀 DO NOT REDIRECT MANUALLY! Just wait 1 second for the global sync to catch it!
-          alert("Match accepted! Syncing with opponent..."); 
+          // 🚀 Just let the user know. The Home.jsx global poller will auto-pull them in < 2.5s
+          console.log("Match accepted! Waiting for global sync...");
         }
       }
     } catch (err) { console.error("Failed to update challenge status:", err); }
+  };
+
+  // ⚔️ Send a Challenge to a Friend
+  const handleSendChallenge = async (receiverName, duration) => {
+    try {
+      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${receiverName}&duration=${duration}`, { method: "POST" });
+      if (res.ok) {
+        alert(`Challenge sent to ${receiverName}! Waiting for them to accept.`);
+        // Note: Do NOT set searching or syncing here. You are just waiting for them to accept.
+      }
+    } catch (err) { console.error("Failed to send challenge:", err); }
   };
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -120,17 +132,7 @@ const [isSearching, setIsSearching] = useState(false);
     } catch (err) { console.error("Failed to remove friend:", err); }
   };
 
-  // ⚔️ Send Challenge API Call
-  const sendChallenge = async () => {
-    if (!challengeTarget) return;
-    try {
-      const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${challengeTarget}&duration=${challengeTime}`, { method: "POST" });
-      if (res.ok) {
-        alert(`Challenge sent to ${challengeTarget}! Waiting for them to accept.`);
-        setChallengeTarget(null);
-      }
-    } catch (err) { console.error("Failed to send challenge:", err); }
-  };
+  
 
 
 

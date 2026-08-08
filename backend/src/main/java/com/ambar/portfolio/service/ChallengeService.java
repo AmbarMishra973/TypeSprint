@@ -90,16 +90,38 @@ public class ChallengeService {
     }
     // 🔍 Find if user has a game about to start
     // 🔍 Find ONLY active matches that haven't been completed yet
+    // 🔍 Find ONLY fresh active matches, and auto-delete stale ones
     public Challenge getActiveMatch(String username) {
-        List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
-        if (!asSender.isEmpty() && asSender.get(0).getWinnerName() == null) return asSender.get(0);
+        long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
 
+        // Check challenges sent by this user
+        List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
+        for (Challenge c : asSender) {
+            if (c.getWinnerName() == null) {
+                if (c.getCreatedAt() < fiveMinutesAgo) {
+                    c.setStatus("CANCELLED"); // 🧹 Clean up stale match
+                    challengeRepository.save(c);
+                } else {
+                    return c; // 🚀 Return fresh match!
+                }
+            }
+        }
+
+        // Check challenges received by this user
         List<Challenge> asReceiver = challengeRepository.findByReceiverNameAndStatus(username, "ACCEPTED");
-        if (!asReceiver.isEmpty() && asReceiver.get(0).getWinnerName() == null) return asReceiver.get(0);
+        for (Challenge c : asReceiver) {
+            if (c.getWinnerName() == null) {
+                if (c.getCreatedAt() < fiveMinutesAgo) {
+                    c.setStatus("CANCELLED"); // 🧹 Clean up stale match
+                    challengeRepository.save(c);
+                } else {
+                    return c; // 🚀 Return fresh match!
+                }
+            }
+        }
 
         return null;
     }
-
     // 📊 Update live typing position during a match
     public void updateProgress(Long challengeId, String username, int position) {
         Challenge c = challengeRepository.findById(challengeId).orElse(null);

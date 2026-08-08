@@ -19,6 +19,10 @@ public class Challenge {
     private int receiverWpm;
     private String winnerName;
 
+    // 🕒 Add this to track when the challenge was created
+    private long createdAt = System.currentTimeMillis();
+
+
     @Column(columnDefinition = "TEXT")
     private String wordsText; // Stores space-separated words for the rac
 
@@ -51,4 +55,9 @@ public class Challenge {
    
     public String getWordsText() { return wordsText; }
     public void setWordsText(String wordsText) { this.wordsText = wordsText; }
+
+    
+    // Add these getters and setters at the bottom:
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 }
