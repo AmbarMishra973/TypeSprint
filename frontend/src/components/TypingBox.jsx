@@ -218,20 +218,21 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
 
   // 🧹 BUG 2 FIX: Clear old match results when a NEW challenge ID arrives
   // 🧹 FORCE RESET ON EVERY NEW CHALLENGE ID
+  // 🧹 FORCE RESET ON EVERY NEW CHALLENGE ID
+  // 🧹 FORCE RESET ON EVERY NEW CHALLENGE ID
   useEffect(() => {
     if (activeChallenge) {
-      // 1. Wipe out old match result screens immediately
       setCompletedMatch(null);
       setWaitingForOpponent(false);
-      setFinished(false);
       
-      // 2. Clear out typing input and restart engine
-      if (engine.restart) {
+      // Safely reset the typing engine using built-in methods
+      if (typeof engine.resetTest === "function") {
+        engine.resetTest();
+      } else if (typeof engine.restart === "function") {
         engine.restart();
       }
 
-      // 3. Inject new words if provided
-      if (activeChallenge.wordsText && engine.setWords) {
+      if (activeChallenge.wordsText && typeof engine.setWords === "function") {
         engine.setWords(activeChallenge.wordsText);
       }
     }
