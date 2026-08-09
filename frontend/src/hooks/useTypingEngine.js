@@ -367,7 +367,7 @@ function useTypingEngine(user) {
     bestRepeatedWpm, isRepeat, missedKeys, wordTimes, keystrokeLog, soundEnabled,
     setSoundEnabled, punctuationFreq, numberFreq, updateModifiers, isQuoteMode,
     quoteAuthor, fetchQuoteTest, changeTimeLimit, repeatBestWpm,
-    setFinished,
+    
     restart, // Exported!
     setWords: handleSetWords, // Safe backend string parser exported!
     globalMissedKeys: stats.globalMissedKeys || {}
