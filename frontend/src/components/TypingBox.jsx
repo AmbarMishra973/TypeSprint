@@ -217,10 +217,23 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
   }, [finished, activeChallenge, user, calculateWPM, waitingForOpponent, completedMatch]);
 
   // 🧹 BUG 2 FIX: Clear old match results when a NEW challenge ID arrives
+  // 🧹 FORCE RESET ON EVERY NEW CHALLENGE ID
   useEffect(() => {
     if (activeChallenge) {
+      // 1. Wipe out old match result screens immediately
       setCompletedMatch(null);
       setWaitingForOpponent(false);
+      setFinished(false);
+      
+      // 2. Clear out typing input and restart engine
+      if (engine.restart) {
+        engine.restart();
+      }
+
+      // 3. Inject new words if provided
+      if (activeChallenge.wordsText && engine.setWords) {
+        engine.setWords(activeChallenge.wordsText);
+      }
     }
   }, [activeChallenge?.id]);
   // 🚀 CHALLENGE MODE PART 3: POLL FOR MATCH RESULT

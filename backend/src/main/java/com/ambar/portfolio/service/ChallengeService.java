@@ -60,8 +60,10 @@ public class ChallengeService {
     }
 
     // ⚔️ Send a new challenge
+    // Ensure rematches always create a fresh entry
     public Challenge createChallenge(String sender, String receiver, int duration) {
         Challenge challenge = new Challenge(sender, receiver, duration);
+        challenge.setStatus("PENDING"); // Starts fresh
         challenge.setWordsText(generateSharedWords());
         return challengeRepository.save(challenge);
     }
@@ -110,36 +112,38 @@ public class ChallengeService {
     // 🔍 Find ONLY active matches that haven't been completed yet
     // 🔍 Find ONLY fresh active matches, and auto-delete stale ones
     public Challenge getActiveMatch(String username) {
-        long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
+    long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
 
-        // Check challenges sent by this user
-        List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
-        for (Challenge c : asSender) {
-            if (c.getWinnerName() == null) {
-                if (c.getCreatedAt() < fiveMinutesAgo) {
-                    c.setStatus("CANCELLED"); // 🧹 Clean up stale match
-                    challengeRepository.save(c);
-                } else {
-                    return c; // 🚀 Return fresh match!
-                }
+    // Check challenges sent by this user
+    List<Challenge> asSender = challengeRepository.findBySenderNameAndStatus(username, "ACCEPTED");
+    for (Challenge c : asSender) {
+        // 🛡️ Added safety checks to completely ignore completed or finished games
+        if (c.getWinnerName() == null && !"COMPLETED".equals(c.getStatus()) && !"CANCELLED".equals(c.getStatus())) {
+            if (c.getCreatedAt() < fiveMinutesAgo) {
+                c.setStatus("CANCELLED"); 
+                challengeRepository.save(c);
+            } else {
+                return c; 
             }
         }
-
-        // Check challenges received by this user
-        List<Challenge> asReceiver = challengeRepository.findByReceiverNameAndStatus(username, "ACCEPTED");
-        for (Challenge c : asReceiver) {
-            if (c.getWinnerName() == null) {
-                if (c.getCreatedAt() < fiveMinutesAgo) {
-                    c.setStatus("CANCELLED"); // 🧹 Clean up stale match
-                    challengeRepository.save(c);
-                } else {
-                    return c; // 🚀 Return fresh match!
-                }
-            }
-        }
-
-        return null;
     }
+
+    // Check challenges received by this user
+    List<Challenge> asReceiver = challengeRepository.findByReceiverNameAndStatus(username, "ACCEPTED");
+    for (Challenge c : asReceiver) {
+        // 🛡️ Same safety check here
+        if (c.getWinnerName() == null && !"COMPLETED".equals(c.getStatus()) && !"CANCELLED".equals(c.getStatus())) {
+            if (c.getCreatedAt() < fiveMinutesAgo) {
+                c.setStatus("CANCELLED"); 
+                challengeRepository.save(c);
+            } else {
+                return c; 
+            }
+        }
+    }
+
+    return null;
+}
     // 📊 Update live typing position during a match
     public void updateProgress(Long challengeId, String username, int position) {
         Challenge c = challengeRepository.findById(challengeId).orElse(null);
