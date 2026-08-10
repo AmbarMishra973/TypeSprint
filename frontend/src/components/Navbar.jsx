@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SidebarMenu from "./SidebarMenu";
-
+import RankBadge from './RankBadge'; // 🚀 1. Import the Rank Badge
 function Navbar({ activeView, setActiveView, user, openModal }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
