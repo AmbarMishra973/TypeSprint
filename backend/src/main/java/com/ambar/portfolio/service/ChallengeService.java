@@ -4,7 +4,8 @@ import com.ambar.portfolio.model.Challenge;
 import com.ambar.portfolio.repository.ChallengeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.ambar.portfolio.model.User;
+import com.ambar.portfolio.repository.UserRepository;
 import java.util.List;
 
 @Service
@@ -12,6 +13,9 @@ public class ChallengeService {
 
     @Autowired
     private ChallengeRepository challengeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
     // 🚦 Matchmaking Queue
     private final java.util.concurrent.ConcurrentLinkedQueue<String> matchmakingQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
 
