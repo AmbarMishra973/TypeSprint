@@ -2,17 +2,29 @@ import React from 'react';
 
 const RankBadge = ({ xp }) => {
   const getRankDetails = (currentXp) => {
-    if (currentXp < 1000) return { title: "Novice", color: "bg-gray-500", icon: "🌱" };
-    if (currentXp < 5000) return { title: "Amateur", color: "bg-green-500", icon: "⭐" };
-    if (currentXp < 15000) return { title: "Expert", color: "bg-blue-500", icon: "🔥" };
-    if (currentXp < 35000) return { title: "Master", color: "bg-purple-500", icon: "⚡" };
-    return { title: "Grandmaster", color: "bg-yellow-500", icon: "👑" };
+    if (currentXp < 1000) return { title: "Novice", color: "#6b7280", icon: "🌱" }; // Gray
+    if (currentXp < 5000) return { title: "Amateur", color: "#22c55e", icon: "⭐" }; // Green
+    if (currentXp < 15000) return { title: "Expert", color: "#3b82f6", icon: "🔥" }; // Blue
+    if (currentXp < 35000) return { title: "Master", color: "#a855f7", icon: "⚡" }; // Purple
+    return { title: "Grandmaster", color: "#eab308", icon: "👑" }; // Yellow
   };
 
   const { title, color, icon } = getRankDetails(xp || 0);
 
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-white font-bold text-sm ${color} shadow-lg`}>
+    <div style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '4px 12px',
+      borderRadius: '20px',
+      backgroundColor: color,
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: '0.85rem',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+      cursor: 'default'
+    }}>
       <span>{icon}</span>
       <span>{title}</span>
     </div>
