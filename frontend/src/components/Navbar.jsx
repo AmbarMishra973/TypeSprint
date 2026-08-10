@@ -1,54 +1,46 @@
-import { useState } from "react";
-import SidebarMenu from "./SidebarMenu";
-import RankBadge from './RankBadge'; // 🚀 1. Import the Rank Badge
-function Navbar({ activeView, setActiveView, user, openModal }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+import React from 'react';
+import RankBadge from './RankBadge';
 
-  const handleLogout = () => {
-    localStorage.removeItem("typingUser");
-    window.location.reload(); 
-  };
-
+const Navbar = ({ activeView, setActiveView, user, openModal }) => {
   return (
-    <nav className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', position: 'relative' }}>
-      <div 
-        className="logo" 
-        style={{ fontSize: '22px', fontWeight: 'bold', cursor: 'pointer' }} 
-        onClick={() => { setActiveView("typing"); }}
-      >
-        ⌨️ TypeMaster
+    <nav className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px' }}>
+      
+      {/* LEFT: Logo */}
+      <div className="navbar-left">
+        <h2 onClick={() => setActiveView("typing")} style={{ cursor: 'pointer', margin: 0 }}>
+          ⌨️ TypeSprint
+        </h2>
+      </div>
+      
+      {/* CENTER: All Nav Buttons including Daily Challenge */}
+      <div className="navbar-center" style={{ display: 'flex', gap: '10px' }}>
+        <button className={activeView === "typing" ? "active" : ""} onClick={() => setActiveView("typing")}>Home</button>
+        <button className={activeView === "dashboard" ? "active" : ""} onClick={() => setActiveView("dashboard")}>Dashboard</button>
+        <button className={activeView === "leaderboard" ? "active" : ""} onClick={() => setActiveView("leaderboard")}>Leaderboard</button>
+        <button className={activeView === "friends" ? "active" : ""} onClick={() => setActiveView("friends")}>Friends</button>
+        <button className={activeView === "daily" ? "active" : ""} onClick={() => setActiveView("daily")}>
+          📅 Daily Challenge
+        </button>
       </div>
 
-      {/* Hamburger Toggle Button */}
-      <button 
-        onClick={() => setIsSidebarOpen(true)}
-        style={{ 
-          background: 'none', border: 'none', fontSize: '26px', 
-          cursor: 'pointer', color: 'var(--text-main)', padding: '4px 8px' 
-        }}
-      >
-        ☰
-      </button>
-      {/* Add this button wherever your other nav buttons (Friends, Leaderboard) are */}
-<button 
-  className={activeView === "daily" ? "active" : ""} 
-  onClick={() => setActiveView("daily")}
->
-  📅 Daily Challenge
-</button>
+      {/* RIGHT: User Profile & XP Rank Badge (or Login) */}
+      <div className="navbar-right">
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            {/* 🌟 This is where your XP Rank Badge will pop up once logged in! */}
+            <RankBadge xp={user.xp || 0} />
+            
+            <span style={{ fontWeight: 'bold' }}>{user.name}</span>
+            <button onClick={() => openModal("profile")}>Profile</button>
+            <button onClick={() => openModal("settings")}>⚙️</button>
+          </div>
+        ) : (
+          <button onClick={() => openModal("auth")}>Login / Sign Up</button>
+        )}
+      </div>
 
-      {/* Slide-out Sidebar Drawer */}
-      <SidebarMenu 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        user={user}
-        openModal={openModal}
-        onLogout={handleLogout}
-      />
     </nav>
   );
-}
+};
 
 export default Navbar;
