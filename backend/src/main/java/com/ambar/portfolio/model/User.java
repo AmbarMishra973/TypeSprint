@@ -145,7 +145,7 @@ public class User {
 
     // Add Getter and Setter
     public int getXp() { return xp; }
-    public void setXp(int xp) { this xp = xp; }
+    public void setXp(int xp) { this.xp = xp; }
 
     // 🏆 Dynamic Rank Calculator
     public String getRank() {
