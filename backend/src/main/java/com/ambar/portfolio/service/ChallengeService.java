@@ -198,4 +198,17 @@ public class ChallengeService {
         }
         return sb.toString().trim();
     }
+
+    // Example inside your ScoreService or ChallengeService
+    public void awardXp(User user, int wpm, double accuracy) {
+        // Prevent negative or zero accuracy calculations
+        if (accuracy < 0) accuracy = 0;
+        
+        // Calculate XP
+        int xpEarned = (int) Math.round((wpm * 2) * (accuracy / 100.0));
+        
+        // Add to total and save
+        user.setXp(user.getXp() + xpEarned);
+        userRepository.save(user);
+    }
 }

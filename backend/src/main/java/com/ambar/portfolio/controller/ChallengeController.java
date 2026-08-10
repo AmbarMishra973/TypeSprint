@@ -125,4 +125,12 @@ public class ChallengeController {
         challengeService.leaveMatchmaking(username);
         return ResponseEntity.ok("Left queue");
     }
+
+    @Autowired
+    private DailyChallengeService dailyChallengeService;
+
+    @GetMapping("/daily-text")
+    public ResponseEntity<String> getDailyText() {
+        return ResponseEntity.ok(dailyChallengeService.getDailyText());
+    }
 }

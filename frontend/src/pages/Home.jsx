@@ -10,6 +10,7 @@ import SettingsModal from "../components/SettingsModal";
 import Leaderboard from "../components/Leaderboard";
 import AchievementsGrid from "../components/AchievementsGrid";
 import Friends from "../components/Friends";
+import DailyChallenge from "../pages/DailyChallenge";
 
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
@@ -152,6 +153,9 @@ function Home() {
           onClose={closeModal} 
         />
       )}
+      {activeView === "daily" && (
+          <DailyChallenge user={user} />
+        )}
 
     </div>
   );

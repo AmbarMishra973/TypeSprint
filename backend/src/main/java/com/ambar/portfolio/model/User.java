@@ -37,6 +37,10 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
+    // Add this to your User entity
+    @Column(name = "xp", columnDefinition = "integer default 0")
+    private int xp = 0;
+
     // Add the Getter and Setter at the bottom of your file
     public String getProfilePicture() {
         return profilePicture;
@@ -135,5 +139,20 @@ public class User {
 
     public void setSentRequests(List<String> sentRequests) {
         this.sentRequests = sentRequests;
+    }
+
+    
+
+    // Add Getter and Setter
+    public int getXp() { return xp; }
+    public void setXp(int xp) { this xp = xp; }
+
+    // 🏆 Dynamic Rank Calculator
+    public String getRank() {
+        if (xp < 1000) return "Novice";
+        if (xp < 5000) return "Amateur";
+        if (xp < 15000) return "Expert";
+        if (xp < 35000) return "Master";
+        return "Grandmaster";
     }
 }

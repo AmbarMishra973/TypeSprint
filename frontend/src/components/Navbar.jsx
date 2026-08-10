@@ -29,6 +29,13 @@ function Navbar({ activeView, setActiveView, user, openModal }) {
       >
         ☰
       </button>
+      {/* Add this button wherever your other nav buttons (Friends, Leaderboard) are */}
+<button 
+  className={activeView === "daily" ? "active" : ""} 
+  onClick={() => setActiveView("daily")}
+>
+  📅 Daily Challenge
+</button>
 
       {/* Slide-out Sidebar Drawer */}
       <SidebarMenu 
