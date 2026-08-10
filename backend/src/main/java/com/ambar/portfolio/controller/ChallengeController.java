@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ambar.portfolio.service.DailyChallengeService;
+import com.ambar.portfolio.repository.DailyScoreRepository;
+import com.ambar.portfolio.model.DailyScore;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
@@ -132,5 +135,28 @@ public class ChallengeController {
     @GetMapping("/daily-text")
     public ResponseEntity<String> getDailyText() {
         return ResponseEntity.ok(dailyChallengeService.getDailyText());
+    }
+
+    @Autowired
+    private DailyScoreRepository dailyScoreRepository;
+
+    @GetMapping("/daily-leaderboard")
+    public ResponseEntity<List<DailyScore>> getDailyLeaderboard() {
+        LocalDate today = LocalDate.now();
+        List<DailyScore> scores = dailyScoreRepository.findByChallengeDateOrderByWpmDesc(today);
+        return ResponseEntity.ok(scores);
+    }
+
+    @PostMapping("/submit-daily")
+    public ResponseEntity<String> submitDailyScore(@RequestBody DailyScore score) {
+        // Force the date to be today to prevent cheating
+        DailyScore newScore = new DailyScore(
+            score.getUsername(), 
+            score.getWpm(), 
+            score.getAccuracy(), 
+            LocalDate.now()
+        );
+        dailyScoreRepository.save(newScore);
+        return ResponseEntity.ok("Daily score submitted successfully!");
     }
 }
