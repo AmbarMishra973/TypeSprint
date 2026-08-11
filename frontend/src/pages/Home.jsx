@@ -11,6 +11,7 @@ import Leaderboard from "../components/Leaderboard";
 import AchievementsGrid from "../components/AchievementsGrid";
 import Friends from "../components/Friends";
 import DailyChallenge from "../pages/DailyChallenge";
+import Profile from "../components/Profile"; // 🚀 Replace ProfileModal with this
 import { calculateXpReward } from '../utils/xpCalculator';
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
@@ -173,13 +174,13 @@ function Home() {
         <AuthModal onClose={closeModal} onLoginSuccess={handleLoginSuccess} />
       )}
 
-      {activeModal === "profile" && (
-        <ProfileModal 
-          user={user} 
-          stats={typingEngine.stats} 
-          onClose={closeModal} 
-        />
-      )}
+      {/* Inside the <main> tag in Home.jsx */}
+        {activeView === "profile" && (
+          <Profile 
+            user={user} 
+            stats={typingEngine.stats} 
+          />
+        )}
       
       {activeModal === "settings" && (
         <SettingsModal 
