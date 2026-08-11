@@ -11,7 +11,7 @@ import Leaderboard from "../components/Leaderboard";
 import AchievementsGrid from "../components/AchievementsGrid";
 import Friends from "../components/Friends";
 import DailyChallenge from "../pages/DailyChallenge";
-
+import { calculateXpReward } from '../utils/xpCalculator';
 function Home() {
   const [activeView, setActiveView] = useState("typing"); 
   const [activeChallenge, setActiveChallenge] = useState(null);
@@ -66,6 +66,24 @@ function Home() {
         console.error("Matchmaker error:", err); 
       }
     };
+    const handleTestComplete = (finalWpm, finalAccuracy) => {
+  const xpGained = calculateXpReward(finalWpm, finalAccuracy);
+
+  if (user) {
+    fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, xpGained })
+    })
+      .then((res) => res.json())
+      .then((updatedUser) => {
+        // Update user state globally in your app
+        setUser(updatedUser);
+        console.log(`Earned ${xpGained} XP! New total: ${updatedUser.xp}`);
+      })
+      .catch((err) => console.error("Error updating XP", err));
+  }
+};
 
     const interval = setInterval(checkActiveMatch, 2500);
     return () => clearInterval(interval);

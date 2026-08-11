@@ -80,6 +80,7 @@ export default function ProfileModal({ user, stats, onClose }) {
                 </div>
               </div>
             )}
+            <XpProgressBar xp={user?.xp || 0} />
           </div>
         </div>
       </div>

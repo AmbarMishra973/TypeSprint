@@ -2,10 +2,12 @@ package com.ambar.portfolio.controller;
 
 import com.ambar.portfolio.model.User;
 import com.ambar.portfolio.service.UserService;
-
+import com.ambar.portfolio.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User request) {
@@ -77,4 +82,17 @@ public ResponseEntity<?> searchUsers(@RequestParam String query) {
     public ResponseEntity<?> removeFriend(@PathVariable String username, @PathVariable String friendName) {
         return ResponseEntity.ok(userService.removeFriend(username, friendName));
     }
+    @PostMapping("/update-xp")
+public ResponseEntity<User> updateUserXp(@RequestBody Map<String, Object> request) {
+    String email = (String) request.get("email");
+    int earnedXp = (int) request.get("xpGained");
+
+    User user = userRepository.findFirstByEmail(email);
+    if (user != null) {
+        user.setXp(user.getXp() + earnedXp);
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
+    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+}
 }
