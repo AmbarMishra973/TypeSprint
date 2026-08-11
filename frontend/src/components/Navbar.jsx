@@ -31,7 +31,7 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
             <RankBadge xp={user.xp || 0} />
             
             <span style={{ fontWeight: 'bold' }}>{user.name}</span>
-            <button onClick={() => openModal("profile")}>Profile</button>
+            <button onClick={() => setActiveView("profile")}>Profile</button>
             <button onClick={() => openModal("settings")}>⚙️</button>
           </div>
         ) : (
