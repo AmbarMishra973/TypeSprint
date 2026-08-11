@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import FriendProfileModal from './FriendProfileModal';
 import { 
   Globe, Swords, Mail, User, Check, X, 
   Search, UserPlus, Trash2, Clock, Users 
@@ -12,7 +13,7 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
 
   // Challenge Inbox State
   const [pendingChallenges, setPendingChallenges] = useState([]);
-
+const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
   // Modal States
   const [friendToRemove, setFriendToRemove] = useState(null);
   const [challengeTarget, setChallengeTarget] = useState(null);
@@ -270,9 +271,15 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
                   <div key={challenge.id} style={styles.friendRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16}/></div>
-                      <span style={styles.friendName}>
-                        {challenge.senderName} <span style={styles.mutedText}>({challenge.duration}s)</span>
-                      </span>
+                      {/* Replace your old <span style={styles.friendName}> with this clickable version */}
+<span 
+  style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+  onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+  onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+  onClick={() => setSelectedFriendProfile(friendName)}
+>
+  {friendName}
+</span>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
@@ -295,7 +302,15 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
                   <div key={idx} style={styles.friendRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16}/></div>
-                      <span style={styles.friendName}>{req}</span>
+                      {/* Replace your old <span style={styles.friendName}> with this clickable version */}
+<span 
+  style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+  onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+  onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+  onClick={() => setSelectedFriendProfile(friendName)}
+>
+  {friendName}
+</span>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => acceptRequest(req)} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
@@ -320,7 +335,14 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
                   <div key={idx} style={styles.friendRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16} /></div>
-                      <span style={styles.friendName}>{friendName}</span>
+                      <span 
+                        style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                        onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                        onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                        onClick={() => setSelectedFriendProfile(friendName)}
+                      >
+                        {friendName}
+                      </span>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
@@ -367,7 +389,14 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
                 <div key={idx} style={styles.friendRow}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={styles.avatarMini}><User size={16} /></div>
-                    <span style={styles.friendName}>{result.name}</span>
+                    <span 
+                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                      onClick={() => setSelectedFriendProfile(result.name)}
+                    >
+                      {result.name}
+                    </span>
                   </div>
                   
                   {isFriend ? (
@@ -381,7 +410,13 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
                   )}
                 </div>
               );
-            })}
+            })}{/* Show Friend Profile Modal */}
+      {selectedFriendProfile && (
+        <FriendProfileModal 
+          friendName={selectedFriendProfile} 
+          onClose={() => setSelectedFriendProfile(null)} 
+        />
+      )}
           </div>
         </div>
       </div>

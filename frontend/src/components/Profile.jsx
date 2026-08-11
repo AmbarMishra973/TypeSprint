@@ -5,7 +5,15 @@ import { AlertTriangle, Trash2 } from "lucide-react";
 import KeyboardHeatmap from "./KeyboardHeatmap"; // Make sure the path is correct
 export default function Profile({ user, stats }) {
   const [activeTab, setActiveTab] = useState("speed");
+const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  const fileInputRef = useRef(null);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Create a local preview URL for instant feedback
+      const imageUrl = URL.createObjectURL(file);
+      setAvatarPreview(imageUrl);}};
   // --- 1. CALCULATE ALL-TIME STATS ---
   const allTime = {
     time: formatTime(stats?.totalPracticeSeconds || 0),
@@ -112,11 +120,35 @@ export default function Profile({ user, stats }) {
     <div className="profile-container">
       
       {/* --- HEADER --- */}
+      {/* --- HEADER --- */}
       <header className="profile-header">
         <div className="profile-user-info">
-          <div className="profile-avatar">
-            <User size={40} color="var(--accent-color)" />
+          
+          {/* INTERACTIVE AVATAR UPLOAD */}
+          <div 
+            className="profile-avatar-container" 
+            onClick={() => fileInputRef.current.click()}
+            title="Change Profile Picture"
+          >
+            {avatarPreview ? (
+              <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
+            ) : (
+              <div className="profile-avatar">
+                <User size={40} color="var(--accent-color)" />
+              </div>
+            )}
+            <div className="avatar-overlay">
+              <Camera size={24} color="#fff" />
+            </div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              ref={fileInputRef} 
+              style={{ display: "none" }} 
+              onChange={handleImageChange} 
+            />
           </div>
+
           <h1>{user?.name || "Guest"}'s Profile</h1>
         </div>
         <div className="profile-level-badge">

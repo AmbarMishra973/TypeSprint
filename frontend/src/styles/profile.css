@@ -406,3 +406,36 @@
   transition: color 0.2s;
 }
 .cancel-btn:hover { color: var(--text-primary); }
+
+/* Avatar Upload Styling */
+.profile-avatar-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--accent-color);
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Auto-crops rectangular images perfectly into the circle */
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar-container:hover .avatar-overlay {
+  opacity: 1;
+}
