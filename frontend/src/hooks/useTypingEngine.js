@@ -319,10 +319,11 @@ function handleKey(key) {
       // 🚀 3. XP Update API Call
       const xpGained = Math.max(Math.round(finalWpm * 2 * (finalAccuracy / 100)), 10);
       
+      // 🚀 Send user.name instead of user.email
       fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email, xpGained })
+        body: JSON.stringify({ name: user.name, xpGained }) // Changed to name!
       })
         .then((res) => res.json())
         .then((updatedUser) => {

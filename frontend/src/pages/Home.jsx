@@ -36,7 +36,10 @@ function Home() {
   const closeModal = () => setActiveModal(null);
 
   // 🚀 The engine is named typingEngine here!
-  const typingEngine = useTypingEngine(user);
+  const typingEngine = useTypingEngine(user, (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem("typingUser", JSON.stringify(updatedUser));
+  });
   useEffect(() => {
     // Listen for the custom event we fired from useTypingEngine
     const handleXpUpdate = (e) => {
@@ -47,7 +50,7 @@ function Home() {
     window.addEventListener("xpUpdated", handleXpUpdate);
     return () => window.removeEventListener("xpUpdated", handleXpUpdate);
   }, []); // If setUser isn't a dependency, leave array empty or just [setUser]
-  
+
   useEffect(() => {
     fetch("https://ambarmishradb.onrender.com/")
       .then(() => console.log("Backend server is awake!"))

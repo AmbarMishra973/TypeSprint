@@ -84,14 +84,17 @@ public ResponseEntity<?> searchUsers(@RequestParam String query) {
     }
     @PostMapping("/update-xp")
 public ResponseEntity<?> updateUserXp(@RequestBody Map<String, Object> request) {
-    String email = (String) request.get("email");
+    // 🚀 Change from email to name
+    String name = (String) request.get("name");
     Integer xpGained = (Integer) request.get("xpGained");
 
-    if (email == null || xpGained == null) {
-        return ResponseEntity.badRequest().body("Email and xpGained are required");
+    if (name == null || xpGained == null) {
+        return ResponseEntity.badRequest().body("Name and xpGained are required");
     }
 
-    User user = userRepository.findFirstByEmail(email);
+    // 🚀 Update this line to search by name/username (depends on your repo setup)
+    User user = userRepository.findByName(name); // Or findByUsername(name)
+    
     if (user != null) {
         user.setXp(user.getXp() + xpGained);
         userRepository.save(user);
