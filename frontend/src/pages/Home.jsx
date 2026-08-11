@@ -37,7 +37,17 @@ function Home() {
 
   // 🚀 The engine is named typingEngine here!
   const typingEngine = useTypingEngine(user);
+  useEffect(() => {
+    // Listen for the custom event we fired from useTypingEngine
+    const handleXpUpdate = (e) => {
+      const updatedUser = e.detail;
+      setUser(updatedUser); // This instantly updates your progress bar and rank UI!
+    };
 
+    window.addEventListener("xpUpdated", handleXpUpdate);
+    return () => window.removeEventListener("xpUpdated", handleXpUpdate);
+  }, []); // If setUser isn't a dependency, leave array empty or just [setUser]
+  
   useEffect(() => {
     fetch("https://ambarmishradb.onrender.com/")
       .then(() => console.log("Backend server is awake!"))
@@ -67,16 +77,7 @@ function Home() {
       }
     };
 
-    useEffect(() => {
-    // Listen for the custom event we fired from useTypingEngine
-    const handleXpUpdate = (e) => {
-      const updatedUser = e.detail;
-      setUser(updatedUser); // This instantly updates your progress bar and rank UI!
-    };
-
-    window.addEventListener("xpUpdated", handleXpUpdate);
-    return () => window.removeEventListener("xpUpdated", handleXpUpdate);
-  }, []); // If setUser isn't a dependency, leave array empty or just [setUser]
+   
     
 
     const interval = setInterval(checkActiveMatch, 2500);
