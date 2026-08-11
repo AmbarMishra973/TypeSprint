@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { CalendarDays, Trophy, Clock, CheckCircle2, Send, Activity } from "lucide-react";
 
 const DailyChallenge = ({ user }) => {
   const [dailyText, setDailyText] = useState("");
@@ -69,7 +70,6 @@ const DailyChallenge = ({ user }) => {
     const handleKeyDown = (e) => {
       if (finished || words.length === 0) return;
 
-      // Start timer on first keystroke
       if (!isRunning) {
         setIsRunning(true);
       }
@@ -78,13 +78,11 @@ const DailyChallenge = ({ user }) => {
 
       if (e.key === " ") {
         e.preventDefault();
-        // If space is pressed, move to next word if user typed something
         if (typed.length > 0) {
           const nextIndex = currentIndex + 1;
           setCurrentIndex(nextIndex);
           setTyped("");
 
-          // Check if finished
           if (nextIndex >= words.length) {
             setFinished(true);
             setIsRunning(false);
@@ -93,11 +91,9 @@ const DailyChallenge = ({ user }) => {
       } else if (e.key === "Backspace") {
         setTyped((prev) => prev.slice(0, -1));
       } else if (e.key.length === 1) {
-        // Append typed character
         const newTyped = typed + e.key;
         setTyped(newTyped);
 
-        // Auto-advance if word is completed via typing the exact length
         if (newTyped === currentWord) {
           const nextIndex = currentIndex + 1;
           setCurrentIndex(nextIndex);
@@ -130,7 +126,7 @@ const DailyChallenge = ({ user }) => {
 
     const scoreData = {
       username: user.name,
-      wpm: currentWpm > 0 ? currentWpm : 20, // fallback min
+      wpm: currentWpm > 0 ? currentWpm : 20, 
       accuracy: 100
     };
 
@@ -149,89 +145,179 @@ const DailyChallenge = ({ user }) => {
   };
 
   return (
-    <div style={{ maxWidth: "1100px", margin: "40px auto", display: "grid", gridTemplateColumns: "2fr 1fr", gap: "30px", color: "#fff" }}>
+    <div style={{ maxWidth: "1100px", margin: "40px auto", animation: "fadeIn 0.3s ease", color: "var(--text-primary)" }}>
       
-      {/* LEFT: Interactive Challenge Area */}
-      <div style={{ background: "#1e293b", padding: "30px", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h1 style={{ fontSize: "1.8rem", color: "#38bdf8", margin: 0 }}>🌍 Daily Challenge</h1>
-          <div style={{ background: "#0f172a", padding: "8px 14px", borderRadius: "8px", color: "#facc15", fontWeight: "bold", fontSize: "0.9rem" }}>
-            Resets in: {timeLeft}
+      <style>{`
+        .daily-btn {
+          background: var(--accent-color);
+          color: var(--bg-primary);
+          border: none;
+          padding: 14px 28px;
+          border-radius: 10px;
+          font-weight: bold;
+          font-size: 1.1rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 0 auto;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .daily-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .lb-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 14px 16px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          transition: background 0.2s;
+          border-radius: 8px;
+        }
+        .lb-row:hover {
+          background: rgba(255,255,255,0.03);
+        }
+      `}</style>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "30px" }}>
+        
+        {/* LEFT: Interactive Challenge Area */}
+        <div style={{ background: "var(--bg-secondary)", padding: "30px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 10px 30px rgba(0,0,0,0.15)", gridColumn: "span 2" }}>
+          
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px", flexWrap: "wrap", gap: "15px" }}>
+            <h1 style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "1.8rem", color: "var(--text-primary)", margin: 0 }}>
+              <CalendarDays size={32} color="var(--accent-color)" /> Daily Challenge
+            </h1>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "var(--bg-primary)", padding: "10px 16px", borderRadius: "10px", color: "var(--text-muted)", fontWeight: "600", fontSize: "0.95rem", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <Clock size={16} color="var(--accent-color)" /> Resets in: <span style={{color: 'var(--text-primary)'}}>{timeLeft}</span>
+            </div>
           </div>
-        </div>
 
-        {/* Live Stats Header Bar */}
-        <div style={{ display: "flex", gap: "20px", marginBottom: "20px", background: "#0f172a", padding: "12px 20px", borderRadius: "8px", justifyContent: "space-around" }}>
-          <div><span style={{ color: "#64748b" }}>WPM:</span> <strong style={{ color: "#38bdf8" }}>{currentWpm}</strong></div>
-          <div><span style={{ color: "#64748b" }}>Accuracy:</span> <strong style={{ color: "#4ade80" }}>100%</strong></div>
-          <div><span style={{ color: "#64748b" }}>Time Taken:</span> <strong style={{ color: "#facc15" }}>{time}s</strong></div>
-        </div>
+          {/* Live Stats Header Bar */}
+          <div style={{ display: "flex", gap: "20px", marginBottom: "30px", background: "var(--bg-primary)", padding: "16px 20px", borderRadius: "12px", justifyContent: "space-around", border: "1px solid rgba(255,255,255,0.02)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-muted)" }}>
+              <Activity size={18}/> WPM: <strong style={{ color: "var(--text-primary)", fontSize: "1.2rem", fontFamily: "var(--font-typing, monospace)" }}>{currentWpm}</strong>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-muted)" }}>
+              <CheckCircle2 size={18}/> Acc: <strong style={{ color: "var(--text-primary)", fontSize: "1.2rem", fontFamily: "var(--font-typing, monospace)" }}>100%</strong>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-muted)" }}>
+              <Clock size={18}/> Time: <strong style={{ color: "var(--accent-color)", fontSize: "1.2rem", fontFamily: "var(--font-typing, monospace)" }}>{time}s</strong>
+            </div>
+          </div>
 
-        {/* Typable Text Box Rendering */}
-        <div style={{ fontSize: "1.4rem", fontFamily: "monospace", background: "#0f172a", padding: "25px", borderRadius: "8px", lineHeight: "1.8", color: "#94a3b8", minHeight: "120px", wordBreak: "break-word" }}>
-          {words.length > 0 ? (
-            words.map((word, wIdx) => {
-              const isCurrentWord = wIdx === currentIndex;
-              return (
-                <span key={wIdx} style={{ marginRight: "8px", borderBottom: isCurrentWord ? "2px solid #38bdf8" : "none" }}>
-                  {word.split("").map((char, cIdx) => {
-                    let color = "#94a3b8"; 
-                    if (isCurrentWord && cIdx < typed.length) {
-                      color = typed[cIdx] === char ? "#4ade80" : "#f87171"; 
-                    } else if (wIdx < currentIndex) {
-                      color = "#cbd5e1"; 
-                    }
-                    return <span key={cIdx} style={{ color, backgroundColor: isCurrentWord && cIdx === typed.length ? "rgba(56, 189, 248, 0.3)" : "transparent" }}>{char}</span>;
-                  })}
-                </span>
-              );
-            })
-          ) : (
-            <span>Loading challenge text...</span>
+          {/* Typable Text Box Rendering */}
+          <div style={{ 
+            fontSize: "1.5rem", 
+            fontFamily: "var(--font-typing, monospace)", 
+            lineHeight: "1.7", 
+            color: "var(--text-muted)", 
+            minHeight: "150px", 
+            wordBreak: "break-word",
+            textAlign: "left" 
+          }}>
+            {words.length > 0 ? (
+              words.map((word, wIdx) => {
+                const isCurrentWord = wIdx === currentIndex;
+                return (
+                  <span key={wIdx} style={{ marginRight: "12px", position: "relative" }}>
+                    {/* Subtle underline for current word */}
+                    {isCurrentWord && <div style={{ position: 'absolute', bottom: '-4px', left: 0, width: '100%', height: '2px', background: 'var(--accent-color)', opacity: 0.5, borderRadius: '2px' }}></div>}
+                    
+                    {word.split("").map((char, cIdx) => {
+                      let color = "var(--text-muted)"; 
+                      if (isCurrentWord && cIdx < typed.length) {
+                        color = typed[cIdx] === char ? "var(--text-primary)" : "var(--error-color)"; 
+                      } else if (wIdx < currentIndex) {
+                        color = "var(--text-primary)"; 
+                      }
+                      
+                      // Blinking caret effect on the exact character being typed
+                      const isCaret = isCurrentWord && cIdx === typed.length;
+
+                      return (
+                        <span 
+                          key={cIdx} 
+                          style={{ 
+                            color, 
+                            borderLeft: isCaret ? "2px solid var(--accent-color)" : "2px solid transparent",
+                            marginLeft: "-2px", // offsets the border width
+                            paddingLeft: "2px"
+                          }}
+                        >
+                          {char}
+                        </span>
+                      );
+                    })}
+                  </span>
+                );
+              })
+            ) : (
+              <span style={{ animation: "pulse 1.5s infinite", color: "var(--text-muted)" }}>Loading today's text...</span>
+            )}
+          </div>
+
+          {/* Post-Match States */}
+          {finished && !submitted && (
+            <div style={{ marginTop: "40px", textAlign: "center", background: "var(--bg-primary)", padding: "30px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <h2 style={{ color: "var(--text-primary)", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", margin: "0 0 15px 0" }}>
+                <Trophy color="var(--accent-color)"/> Challenge Finished!
+              </h2>
+              <p style={{ margin: "0 0 25px 0", color: "var(--text-muted)", fontSize: "1.1rem" }}>
+                Final Speed: <strong style={{ color: "var(--text-primary)" }}>{currentWpm} WPM</strong> in <strong style={{ color: "var(--text-primary)" }}>{time}s</strong>
+              </p>
+              <button onClick={handleScoreSubmit} className="daily-btn">
+                <Send size={18} /> Submit to Leaderboard
+              </button>
+            </div>
+          )}
+
+          {submitted && (
+            <div style={{ marginTop: "30px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", color: "var(--bg-primary)", fontWeight: "bold", padding: "15px", background: "var(--accent-color)", borderRadius: "10px" }}>
+              <CheckCircle2 size={20} /> Score successfully recorded for today!
+            </div>
           )}
         </div>
 
-        {finished && !submitted && (
-          <div style={{ marginTop: "25px", textAlign: "center", background: "#0f172a", padding: "20px", borderRadius: "8px" }}>
-            <h2 style={{ color: "#4ade80", margin: "0 0 10px 0" }}>🎉 Challenge Finished!</h2>
-            <p style={{ margin: "0 0 15px 0", color: "#cbd5e1" }}>Final Speed: <strong>{currentWpm} WPM</strong> in <strong>{time}s</strong></p>
-            <button 
-              onClick={handleScoreSubmit}
-              style={{ background: "#22c55e", color: "white", border: "none", padding: "12px 24px", borderRadius: "8px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}
-            >
-              Submit Score to Daily Leaderboard 🚀
-            </button>
-          </div>
-        )}
+        {/* RIGHT: Live Rankings Leaderboard */}
+        <div style={{ background: "var(--bg-secondary)", padding: "25px", borderRadius: "16px", height: "fit-content", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 10px 30px rgba(0,0,0,0.15)", gridColumn: "span 1" }}>
+          <h3 style={{ display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "15px", margin: "0 0 15px 0", color: "var(--text-primary)" }}>
+            <Trophy size={20} color="var(--accent-color)" /> Today's Rankings
+          </h3>
+          
+          {leaderboard.length === 0 ? (
+            <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "30px 0", fontStyle: "italic" }}>
+              <CalendarDays size={32} style={{ opacity: 0.5, marginBottom: "10px" }} />
+              <br/> No scores submitted yet today. <br/> Set the benchmark!
+            </div>
+          ) : (
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {leaderboard.map((entry, index) => {
+                const isMe = user?.name === entry.username;
+                return (
+                  <li key={index} className="lb-row">
+                    <span style={{ 
+                      fontWeight: isMe ? "bold" : "500", 
+                      color: isMe ? "var(--accent-color)" : "var(--text-primary)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}>
+                      <span style={{ color: "var(--text-muted)", fontSize: "0.9rem", width: "20px" }}>{index + 1}.</span> 
+                      {entry.username} {isMe && "(You)"}
+                    </span>
+                    <span style={{ color: "var(--text-primary)", fontWeight: "bold", fontFamily: "var(--font-typing, monospace)" }}>
+                      {entry.wpm} <span style={{fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "normal"}}>WPM</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
 
-        {submitted && (
-          <div style={{ marginTop: "20px", textAlign: "center", color: "#4ade80", fontWeight: "bold", padding: "15px", background: "#064e3b", borderRadius: "8px" }}>
-            ✅ Score successfully recorded on today's leaderboard!
-          </div>
-        )}
       </div>
-
-      {/* RIGHT: Live Rankings Leaderboard */}
-      <div style={{ background: "#1e293b", padding: "20px", borderRadius: "12px", height: "fit-content" }}>
-        <h3 style={{ borderBottom: "2px solid #334155", paddingBottom: "10px", marginTop: 0, color: "#f8fafc" }}>
-          🏆 Today's Rankings
-        </h3>
-        {leaderboard.length === 0 ? (
-          <p style={{ color: "#64748b", textAlign: "center", marginTop: "20px" }}>No scores submitted yet today. Set the benchmark!</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0, margin: "15px 0 0 0" }}>
-            {leaderboard.map((entry, index) => (
-              <li key={index} style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #334155" }}>
-                <span style={{ fontWeight: user?.name === entry.username ? "bold" : "normal", color: user?.name === entry.username ? "#facc15" : "#fff" }}>
-                  {index + 1}. {entry.username}
-                </span>
-                <span style={{ color: "#38bdf8", fontWeight: "bold" }}>{entry.wpm} WPM</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
     </div>
   );
 };

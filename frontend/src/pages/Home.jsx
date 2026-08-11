@@ -188,6 +188,10 @@ function Home() {
           soundEnabled={typingEngine.soundEnabled} 
           setSoundEnabled={typingEngine.setSoundEnabled} 
           onClose={closeModal} 
+          user={user}                       
+    onLogout={() => {               
+      setUser(null);
+      localStorage.removeItem("typingUser");}}
         />
       )}
       {activeView === "daily" && (

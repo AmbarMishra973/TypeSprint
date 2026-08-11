@@ -1,18 +1,11 @@
 import React from 'react';
 import RankBadge from './RankBadge';
 import ThemeSelector from './ThemeSelector';
+
 import { 
-  Keyboard, 
-  Home, 
-  LayoutDashboard, 
-  Trophy, 
-  Users, 
-  CalendarDays, 
-  User, 
-  Settings, 
-  LogIn,
-  Palette // Added for the theme selector
-} from 'lucide-react';
+  House, LayoutGrid, Trophy, Users, Calendar, 
+  Palette, User, Settings, Award, Keyboard, LogIn 
+} from "lucide-react";
 
 const Navbar = ({ activeView, setActiveView, user, openModal }) => {
   return (
@@ -21,7 +14,7 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
       justifyContent: 'space-between', 
       alignItems: 'center', 
       padding: '15px 30px',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.05)' // Subtle separation line
+      borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
     }}>
       
       {/* LEFT: Logo */}
@@ -37,7 +30,7 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
             fontSize: '1.5rem'
           }}
         >
-          <Keyboard size={28} /> {/* Replaced emoji with icon */}
+          <Keyboard size={28} />
           TypeSprint
         </h2>
       </div>
@@ -49,15 +42,15 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
           onClick={() => setActiveView("typing")}
           title="Home"
         >
-          <Home size={20} />
+          <House size={20} />
         </button>
-        
+
         <button 
-          className={`icon-btn ${activeView === "dashboard" ? "active" : ""}`} 
-          onClick={() => setActiveView("dashboard")}
-          title="Dashboard"
+          className={`icon-btn ${activeView === "achievements" ? "active" : ""}`} 
+          onClick={() => setActiveView("achievements")}
+          title="Achievements"
         >
-          <LayoutDashboard size={20} />
+          <Award size={20} />
         </button>
         
         <button 
@@ -81,7 +74,7 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
           onClick={() => setActiveView("daily")}
           title="Daily Challenge"
         >
-          <CalendarDays size={20} />
+          <Calendar size={20} />
         </button>
       </div>
 
@@ -94,7 +87,6 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
             
             {/* Action Icons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* NOTE: You can replace this button with your actual <ThemeSelector /> component */}
               <ThemeSelector />
 
               <button 

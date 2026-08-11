@@ -116,51 +116,246 @@
 
   color: #4ade80;
 }
-
-/* RESULT CARD */
-
-.dashboard {
-  margin-top: 30px;
-
-  padding: 30px;
-
-  border-radius: 25px;
-
-  background: rgba(255, 255, 255, 0.07);
-
-  backdrop-filter: blur(15px);
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.dashboard-grid {
-  display: grid;
-
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-
-  gap: 18px;
-}
-
-
-.dashboard-grid div {
+/* --- DASHBOARD STYLES --- */
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
   padding: 20px;
+  animation: fadeIn 0.4s ease-out;
+}
 
-  border-radius: 18px;
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
 
-  background: rgba(0, 0, 0, 0.25);
+.dashboard-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 5px;
+}
 
+/* Section Titles */
+.dashboard-section-title {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 50px 0 25px 0;
+}
+
+/* Stat Rows */
+.dashboard-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sub-number.accent {
+  color: var(--accent-color);
+}
+
+/* Missed Letters Area */
+.missed-letters-layout {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.missed-letters-bars {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.missed-letters-heatmap {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.error-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.error-key {
+  width: 35px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  font-family: var(--font-typing, monospace);
+  text-align: right;
+}
+
+.error-bar-bg {
+  flex: 1;
+  background: var(--bg-secondary);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.error-bar-fill {
+  background: var(--error-color, #ca4754);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.error-count {
+  width: 30px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Clean Table */
+.table-container {
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.dashboard-table th {
+  padding: 12px;
+  color: var(--text-muted);
+  font-weight: normal;
+  border-bottom: 1px solid var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.dashboard-table td {
+  padding: 15px 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--bg-secondary);
+}
+
+.text-muted { color: var(--text-muted) !important; }
+.accent { color: var(--accent-color) !important; }
+.font-mono { font-family: var(--font-typing, monospace); }
+
+/* Footer / Buttons */
+.dashboard-footer {
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.reset-btn.confirm {
+  background: rgba(202, 71, 84, 0.1);
+  color: var(--error-color, #ca4754);
+  border-color: var(--error-color, #ca4754);
+}
+
+.cancel-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: color 0.2s;
+}
+
+.cancel-btn:hover {
+  color: var(--text-primary);
+}/* --- THEMED STAT BOXES --- */
+
+/* 1. Used for Career Highlights & Lifetime Volume on the Dashboard */
+/* --- COMPACT THEMED STAT BOXES --- */
+.stat-box {
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 20px; /* Reduced padding to save space */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1; /* Allows boxes to share the row evenly */
+  min-width: 140px; /* Prevents them from getting too squished on smaller screens */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Adjust the font inside compact boxes so it doesn't wrap awkwardly */
+.stat-box .sub-label {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
   text-align: center;
 }
 
-.result-stats p,
-.dashboard-grid p {
-  font-size: 28px;
-
-  font-weight: 700;
-
-  color: #4ade80;
+.stat-box .sub-number {
+  font-size: 1.8rem; /* Scaled down slightly to fit a single line */
+  font-weight: bold;
 }
-
+/* 2. Used for the Result Screen (WPM, Accuracy, Errors, etc.) */
+.result-stat-box {
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  border-radius: 14px;
+  text-align: center;
+  min-width: 140px;
+}
+.dashboard-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Reduced gap between boxes */
+  flex-wrap: wrap;
+  width: 100%;
+}
 /* GRAPH */
 
 .graph-container {

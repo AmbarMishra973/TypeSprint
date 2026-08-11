@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { 
+  Globe, Swords, Mail, User, Check, X, 
+  Search, UserPlus, Trash2, Clock, Users 
+} from "lucide-react";
+
 export default function Friends({ user, setUser, setActiveView, setActiveChallenge }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -12,7 +17,8 @@ export default function Friends({ user, setUser, setActiveView, setActiveChallen
   const [friendToRemove, setFriendToRemove] = useState(null);
   const [challengeTarget, setChallengeTarget] = useState(null);
   const [challengeTime, setChallengeTime] = useState(30);
-const [isSearching, setIsSearching] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
   const updateUserState = (updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("typingUser", JSON.stringify(updatedUser));
@@ -23,9 +29,6 @@ const [isSearching, setIsSearching] = useState(false);
     setIsSearching(true);
     try {
       await fetch(`https://ambarmishradb.onrender.com/api/challenges/matchmake/join?username=${user.name}`, { method: "POST" });
-      // We don't need to do anything else! Our Global Matchmaker in Home.jsx 
-      // is already checking for "ACCEPTED" matches every 2.5 seconds. 
-      // When it finds one, it will automatically pull us into the game!
     } catch (err) {
       console.error("Matchmaking failed:", err);
       setIsSearching(false);
@@ -39,10 +42,10 @@ const [isSearching, setIsSearching] = useState(false);
       setIsSearching(false);
     } catch (err) { console.error("Failed to leave queue:", err); }
   };
+
   // 🔄 Fetch Pending Challenges (Polls every 5 seconds)
   useEffect(() => {
     if (!user) return;
-
     const fetchChallenges = async () => {
       try {
         const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/${user.name}/pending`);
@@ -52,15 +55,11 @@ const [isSearching, setIsSearching] = useState(false);
         }
       } catch (err) { console.error("Failed to fetch challenges:", err); }
     };
-
-    fetchChallenges(); // Fetch immediately on load
-    const interval = setInterval(fetchChallenges, 5000); // Check every 5 seconds
+    fetchChallenges();
+    const interval = setInterval(fetchChallenges, 5000);
     return () => clearInterval(interval);
   }, [user]);
 
-  // 🔍 Handle Search
-  // 🎮 Accept/Decline Challenge API Call
-  // 🎮 Accept/Decline Challenge API Call
   // 🎮 Accept/Decline Challenge API Call
   const handleChallengeResponse = async (challengeId, status) => {
     try {
@@ -68,23 +67,25 @@ const [isSearching, setIsSearching] = useState(false);
       if (res.ok) {
         setPendingChallenges(prev => prev.filter(c => c.id !== challengeId));
         if (status === "ACCEPTED") {
-          // 🚀 Just let the user know. The Home.jsx global poller will auto-pull them in < 2.5s
           console.log("Match accepted! Waiting for global sync...");
         }
       }
     } catch (err) { console.error("Failed to update challenge status:", err); }
   };
-// ⚔️ Send a Challenge to a Friend
+
+  // ⚔️ Send a Challenge to a Friend
   const sendChallenge = async (receiverName, duration = 30) => {
     try {
       const res = await fetch(`https://ambarmishradb.onrender.com/api/challenges/send?sender=${user.name}&receiver=${receiverName}&duration=${duration}`, { method: "POST" });
       if (res.ok) {
         alert(`Challenge sent to ${receiverName}! Waiting for them to accept.`);
+        setChallengeTarget(null);
       }
     } catch (err) { 
       console.error("Failed to send challenge:", err); 
     }
   };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -132,26 +133,66 @@ const [isSearching, setIsSearching] = useState(false);
     } catch (err) { console.error("Failed to remove friend:", err); }
   };
 
-  
-
-
-
-  if (!user) return <div style={styles.container}><h2>Please log in to manage friends!</h2></div>;
+  if (!user) return <div className="friends-container"><h2 style={{textAlign: 'center', marginTop: '50px', color: 'var(--text-muted)'}}>Please log in to manage friends!</h2></div>;
 
   const myFriends = user.friends || [];
   const friendRequests = user.friendRequests || [];
   const sentRequests = user.sentRequests || [];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>👥 Friends & Compete</h1>
+    <div className="friends-container" style={styles.container}>
+      <style>{`
+        .action-icon-btn {
+          background: var(--bg-secondary);
+          border: 1px solid rgba(255,255,255,0.05);
+          color: var(--text-muted);
+          padding: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .action-icon-btn:hover {
+          background: rgba(255,255,255,0.1);
+          color: var(--text-primary);
+        }
+        .action-icon-btn.accept:hover { color: #10b981; border-color: #10b981; }
+        .action-icon-btn.reject:hover { color: var(--error-color); border-color: var(--error-color); }
+        .action-icon-btn.challenge:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        
+        .global-match-card {
+          position: relative;
+          overflow: hidden;
+        }
+        .global-match-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          border-radius: 12px;
+          padding: 2px;
+          background: linear-gradient(45deg, transparent, var(--accent-color), transparent);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0.5;
+        }
+      `}</style>
+
+      <h2 style={styles.title}>
+        <Users size={32} color="var(--accent-color)" />
+        Friends & Compete
+      </h2>
 
       {/* --- MODALS --- */}
       {friendToRemove && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <h3>Remove Friend</h3>
-            <p>Remove <strong style={{color: '#ef4444'}}>{friendToRemove}</strong> from friends?</p>
+            <h3 style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
+              <Trash2 color="var(--error-color)" /> Remove Friend
+            </h3>
+            <p style={{color: 'var(--text-muted)', marginTop: '10px'}}>Remove <strong style={{color: 'var(--text-primary)'}}>{friendToRemove}</strong> from your friends list?</p>
             <div style={styles.modalActions}>
               <button onClick={() => setFriendToRemove(null)} style={styles.cancelBtn}>Cancel</button>
               <button onClick={confirmRemoveFriend} style={styles.confirmRemoveBtn}>Yes, Remove</button>
@@ -163,14 +204,21 @@ const [isSearching, setIsSearching] = useState(false);
       {challengeTarget && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <h3 style={{ color: '#fbbf24' }}>⚔️ Challenge {challengeTarget}</h3>
-            <p>Select match duration:</p>
+            <h3 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--accent-color)' }}>
+              <Swords /> Challenge {challengeTarget}
+            </h3>
+            <p style={{color: 'var(--text-muted)', margin: '15px 0'}}>Select match duration:</p>
             <div style={styles.challengeOptions}>
               {[15, 30, 60].map(time => (
                 <button 
                   key={time} 
                   onClick={() => setChallengeTime(time)}
-                  style={{...styles.timeBtn, background: challengeTime === time ? '#38bdf8' : '#334155', color: challengeTime === time ? '#000' : '#fff'}}
+                  style={{
+                    ...styles.timeBtn, 
+                    background: challengeTime === time ? 'var(--accent-color)' : 'var(--bg-primary)', 
+                    color: challengeTime === time ? 'var(--bg-primary)' : 'var(--text-primary)',
+                    border: challengeTime === time ? 'none' : '1px solid var(--text-muted)'
+                  }}
                 >
                   {time}s
                 </button>
@@ -187,39 +235,48 @@ const [isSearching, setIsSearching] = useState(false);
       {/* --- MAIN CONTENT --- */}
       <div style={styles.grid}>
         
-        {/* LEFT COLUMN: Inboxes & Friends */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        {/* LEFT COLUMN */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
+          
           {/* 🌍 GLOBAL QUICK MATCH */}
-          <div style={{...styles.card, background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', border: '2px solid #8b5cf6', textAlign: 'center'}}>
-            <h2 style={{ color: "#a78bfa", marginTop: 0 }}>🌍 Global Matchmaking</h2>
-            <p style={{ color: "#cbd5e1", marginBottom: "20px" }}>Play a random 30-second duel against anyone online!</p>
+          <div className="global-match-card" style={{...styles.card, textAlign: 'center', background: 'var(--bg-secondary)', padding: '30px 20px'}}>
+            <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: "var(--accent-color)", marginTop: 0 }}>
+              <Globe size={28} /> Global Matchmaking
+            </h2>
+            <p style={{ color: "var(--text-muted)", marginBottom: "25px" }}>Play a random 30-second duel against anyone online!</p>
             
             {isSearching ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-                <div style={{ color: '#fbbf24', fontSize: '1.2rem', animation: 'pulse 1.5s infinite' }}>
-                  ⏳ Searching for opponent...
+                <div style={{ color: 'var(--accent-color)', fontSize: '1.2rem', animation: 'pulse 1.5s infinite', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Clock size={20} /> Searching for opponent...
                 </div>
                 <button onClick={cancelSearch} style={{...styles.cancelBtn, width: '100%'}}>Cancel Search</button>
               </div>
             ) : (
-              <button onClick={findQuickMatch} style={{ padding: "15px 30px", fontSize: "1.2rem", fontWeight: "bold", background: "#8b5cf6", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", width: "100%", boxShadow: "0 4px 15px rgba(139, 92, 246, 0.4)" }}>
-                ⚔️ Find Quick Match
+              <button onClick={findQuickMatch} style={styles.quickMatchBtn}>
+                <Swords size={20} /> Find Quick Match
               </button>
             )}
           </div>
+
           {/* CHALLENGE INBOX */}
           {pendingChallenges.length > 0 && (
-            <div style={{...styles.card, border: "2px solid #fbbf24"}}>
-              <h2 style={{ color: "#fbbf24" }}>⚔️ Match Challenges ({pendingChallenges.length})</h2>
+            <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
+                <Swords size={20}/> Match Challenges ({pendingChallenges.length})
+              </h2>
               <div style={styles.list}>
                 {pendingChallenges.map((challenge) => (
                   <div key={challenge.id} style={styles.friendRow}>
-                    <span style={styles.friendName}>
-                      {challenge.senderName} <span style={styles.mutedText}>({challenge.duration}s match)</span>
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={styles.avatarMini}><User size={16}/></div>
+                      <span style={styles.friendName}>
+                        {challenge.senderName} <span style={styles.mutedText}>({challenge.duration}s)</span>
+                      </span>
+                    </div>
                     <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} style={styles.acceptBtn}>✅ Play</button>
-                      <button onClick={() => handleChallengeResponse(challenge.id, "DECLINED")} style={styles.rejectBtn}>❌</button>
+                      <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
+                      <button onClick={() => handleChallengeResponse(challenge.id, "DECLINED")} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
                     </div>
                   </div>
                 ))}
@@ -229,15 +286,20 @@ const [isSearching, setIsSearching] = useState(false);
 
           {/* FRIEND REQUEST INBOX */}
           {friendRequests.length > 0 && (
-            <div style={{...styles.card, border: "2px solid #38bdf8"}}>
-              <h2 style={{ color: "#38bdf8" }}>📬 Friend Requests ({friendRequests.length})</h2>
+            <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
+                <Mail size={20}/> Friend Requests ({friendRequests.length})
+              </h2>
               <div style={styles.list}>
                 {friendRequests.map((req, idx) => (
                   <div key={idx} style={styles.friendRow}>
-                    <span style={styles.friendName}>👤 {req}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={styles.avatarMini}><User size={16}/></div>
+                      <span style={styles.friendName}>{req}</span>
+                    </div>
                     <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => acceptRequest(req)} style={styles.acceptBtn}>✅</button>
-                      <button onClick={() => rejectRequest(req)} style={styles.rejectBtn}>❌</button>
+                      <button onClick={() => acceptRequest(req)} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
+                      <button onClick={() => rejectRequest(req)} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
                     </div>
                   </div>
                 ))}
@@ -247,17 +309,26 @@ const [isSearching, setIsSearching] = useState(false);
 
           {/* MY FRIENDS LIST */}
           <div style={styles.card}>
-            <h2>My Friends ({myFriends.length})</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
+              <Users size={20} /> My Friends ({myFriends.length})
+            </h2>
             {myFriends.length === 0 ? (
-              <p style={styles.mutedText}>You haven't added anyone yet.</p>
+              <p style={styles.emptyStateText}>You haven't added anyone yet.</p>
             ) : (
               <div style={styles.list}>
                 {myFriends.map((friendName, idx) => (
                   <div key={idx} style={styles.friendRow}>
-                    <span style={styles.friendName}>👤 {friendName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={styles.avatarMini}><User size={16} /></div>
+                      <span style={styles.friendName}>{friendName}</span>
+                    </div>
                     <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => setChallengeTarget(friendName)} style={styles.challengeBtn}>⚔️</button>
-                      <button onClick={() => setFriendToRemove(friendName)} style={styles.removeBtn}>🗑️</button>
+                      <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
+                        <Swords size={18} />
+                      </button>
+                      <button onClick={() => setFriendToRemove(friendName)} className="action-icon-btn reject" title="Remove Friend">
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -268,14 +339,25 @@ const [isSearching, setIsSearching] = useState(false);
 
         {/* RIGHT COLUMN: Find Friends */}
         <div style={styles.card}>
-          <h2>Find Friends</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
+            <Search size={20} /> Find Friends
+          </h2>
           <form onSubmit={handleSearch} style={styles.searchForm}>
-            <input type="text" placeholder="Search username..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={styles.searchInput} />
+            <div style={styles.searchInputWrapper}>
+              <Search size={18} color="var(--text-muted)" style={{marginLeft: '12px'}} />
+              <input 
+                type="text" 
+                placeholder="Search username..." 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                style={styles.searchInput} 
+              />
+            </div>
             <button type="submit" style={styles.searchBtn}>Search</button>
           </form>
 
-          {loading && <p>Searching...</p>}
-          {!loading && searchAttempted && searchResults.length === 0 && <p style={{ color: "#ef4444" }}>No users found.</p>}
+          {loading && <p style={styles.emptyStateText}>Searching...</p>}
+          {!loading && searchAttempted && searchResults.length === 0 && <p style={{ color: "var(--error-color)", textAlign: 'center', fontStyle: 'italic' }}>No users found.</p>}
 
           <div style={styles.list}>
             {searchResults.map((result, idx) => {
@@ -283,10 +365,20 @@ const [isSearching, setIsSearching] = useState(false);
               const requestSent = sentRequests.includes(result.name);
               return (
                 <div key={idx} style={styles.friendRow}>
-                  <span style={styles.friendName}>👤 {result.name}</span>
-                  {isFriend ? <span style={styles.mutedText}>Added ✔️</span> 
-                  : requestSent ? <span style={{ color: "#fbbf24", fontSize: "0.9rem" }}>Sent ⏳</span> 
-                  : <button onClick={() => sendRequest(result.name)} style={styles.addBtn}>+ Add</button>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={styles.avatarMini}><User size={16} /></div>
+                    <span style={styles.friendName}>{result.name}</span>
+                  </div>
+                  
+                  {isFriend ? (
+                    <span style={styles.mutedText}><Check size={14} style={{display: 'inline', verticalAlign: 'middle'}}/> Added</span> 
+                  ) : requestSent ? (
+                    <span style={{ color: "var(--accent-color)", fontSize: "0.9rem" }}>Sent ⏳</span> 
+                  ) : (
+                    <button onClick={() => sendRequest(result.name)} style={styles.addBtn}>
+                      <UserPlus size={16} /> Add
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -298,28 +390,33 @@ const [isSearching, setIsSearching] = useState(false);
 }
 
 const styles = {
-  container: { animation: "fadeIn 0.3s ease", paddingBottom: "40px" },
-  title: { textAlign: "center", marginBottom: "30px", fontSize: "2.5rem" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" },
-  card: { background: "var(--card-bg, #1e293b)", padding: "20px", borderRadius: "12px", border: "1px solid var(--text-muted, #475569)" },
-  searchForm: { display: "flex", gap: "10px", marginBottom: "20px" },
-  searchInput: { flex: 1, padding: "10px", borderRadius: "6px", border: "1px solid #475569", background: "#0f172a", color: "#fff" },
-  searchBtn: { padding: "10px 15px", borderRadius: "6px", background: "#38bdf8", color: "#000", border: "none", fontWeight: "bold", cursor: "pointer" },
-  list: { display: "flex", flexDirection: "column", gap: "10px", marginTop: "15px" },
-  friendRow: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.05)", padding: "12px", borderRadius: "8px" },
-  friendName: { fontWeight: "bold", fontSize: "1.1rem" },
-  addBtn: { background: "#10b981", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" },
-  acceptBtn: { background: "#10b981", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
-  rejectBtn: { background: "#ef4444", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
-  challengeBtn: { background: "#fbbf24", color: "#000", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem", fontWeight: "bold" },
-  removeBtn: { background: "transparent", color: "#ef4444", border: "1px solid #ef4444", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", fontSize: "1rem" },
-  mutedText: { color: "#94a3b8", fontSize: "0.9rem" },
-  modalOverlay: { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, backdropFilter: "blur(4px)" },
-  modalContent: { background: "#1e293b", padding: "30px", borderRadius: "12px", width: "90%", maxWidth: "400px", textAlign: "center", border: "1px solid #475569", boxShadow: "0 10px 25px rgba(0,0,0,0.5)" },
-  modalActions: { display: "flex", justifyContent: "center", gap: "15px", marginTop: "25px" },
-  cancelBtn: { padding: "10px 20px", borderRadius: "8px", border: "none", background: "#475569", color: "#fff", cursor: "pointer", fontWeight: "bold" },
-  confirmRemoveBtn: { padding: "10px 20px", borderRadius: "8px", border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontWeight: "bold" },
-  sendChallengeBtn: { padding: "10px 20px", borderRadius: "8px", border: "none", background: "#fbbf24", color: "#000", cursor: "pointer", fontWeight: "bold" },
-  challengeOptions: { display: "flex", justifyContent: "center", gap: "10px", margin: "20px 0" },
-  timeBtn: { padding: "10px 20px", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }
+  container: { maxWidth: "1000px", margin: "0 auto", animation: "fadeIn 0.3s ease", paddingBottom: "40px" },
+  title: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', textAlign: "center", marginBottom: "40px", fontSize: "2.2rem", color: 'var(--text-primary)' },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "25px" },
+  card: { background: "var(--bg-secondary)", padding: "25px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "0 10px 30px rgba(0,0,0,0.15)" },
+  
+  searchForm: { display: "flex", gap: "10px", marginBottom: "25px", marginTop: "15px" },
+  searchInputWrapper: { flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' },
+  searchInput: { flex: 1, padding: "12px 10px", background: "transparent", border: "none", color: "var(--text-primary)", outline: "none", fontSize: "1rem" },
+  searchBtn: { padding: "0 20px", borderRadius: "8px", background: "var(--accent-color)", color: "var(--bg-primary)", border: "none", fontWeight: "bold", cursor: "pointer", transition: "all 0.2s" },
+  
+  list: { display: "flex", flexDirection: "column", gap: "12px", marginTop: "15px" },
+  friendRow: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", padding: "12px 16px", borderRadius: "10px", transition: "all 0.2s ease" },
+  friendName: { fontWeight: "bold", fontSize: "1.1rem", color: "var(--text-primary)" },
+  avatarMini: { width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' },
+  
+  addBtn: { display: 'flex', alignItems: 'center', gap: '6px', background: "transparent", color: "var(--text-primary)", border: "1px solid rgba(255,255,255,0.2)", padding: "6px 14px", borderRadius: "8px", cursor: "pointer", fontWeight: "500", transition: "all 0.2s" },
+  quickMatchBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: "16px", fontSize: "1.2rem", fontWeight: "bold", background: "var(--accent-color)", color: "var(--bg-primary)", border: "none", borderRadius: "12px", cursor: "pointer", width: "100%", transition: "transform 0.2s" },
+  mutedText: { color: "var(--text-muted)", fontSize: "0.9rem", fontStyle: "italic" },
+  emptyStateText: { color: "var(--text-muted)", fontStyle: "italic", textAlign: "center", padding: "20px 0" },
+
+  /* Modals */
+  modalOverlay: { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.75)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, backdropFilter: "blur(5px)" },
+  modalContent: { background: "var(--bg-secondary)", padding: "35px", borderRadius: "16px", width: "90%", maxWidth: "420px", textAlign: "center", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 40px rgba(0,0,0,0.4)" },
+  modalActions: { display: "flex", justifyContent: "center", gap: "15px", marginTop: "30px" },
+  cancelBtn: { padding: "12px 24px", borderRadius: "10px", border: "none", background: "rgba(255,255,255,0.1)", color: "var(--text-primary)", cursor: "pointer", fontWeight: "600", transition: "background 0.2s" },
+  confirmRemoveBtn: { padding: "12px 24px", borderRadius: "10px", border: "none", background: "var(--error-color)", color: "#fff", cursor: "pointer", fontWeight: "600" },
+  sendChallengeBtn: { padding: "12px 24px", borderRadius: "10px", border: "none", background: "var(--accent-color)", color: "var(--bg-primary)", cursor: "pointer", fontWeight: "600" },
+  challengeOptions: { display: "flex", justifyContent: "center", gap: "12px", margin: "20px 0" },
+  timeBtn: { padding: "10px 20px", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }
 };

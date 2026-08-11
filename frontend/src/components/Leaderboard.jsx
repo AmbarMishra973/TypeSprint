@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getLeaderboard } from "../services/api";
+import { Trophy, Globe, Users, Ghost } from "lucide-react";
 
 export default function Leaderboard({ user }) {
   const [scope, setScope] = useState("global"); // "global" or "friends"
@@ -23,8 +24,8 @@ export default function Leaderboard({ user }) {
         wordLimit: mode === "words" ? wordLimit : null,
         punctuation,
         numbers,
-        scope,      // 🚀 NEW: Send scope to API
-        timeRange,  // 🚀 NEW: Send time range to API
+        scope,      
+        timeRange,  
       });
       setLeaders(data || []);
       setLoading(false);
@@ -33,107 +34,121 @@ export default function Leaderboard({ user }) {
   }, [mode, timeLimit, wordLimit, punctuation, numbers, scope, timeRange]);
 
   return (
-    <div style={styles.container}>
+    <div className="leaderboard-container" style={styles.container}>
       <style>{`
-        .lb-btn {
-          padding: 8px 20px;
-          border-radius: 8px;
-          border: 2px solid transparent;
-          background: rgba(0, 0, 0, 0.05);
-          color: var(--text-main, #333);
+        /* Big Segmented Control for Global/Friends */
+        .scope-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 30px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: var(--bg-secondary);
+          color: var(--text-muted);
           cursor: pointer;
           font-weight: 600;
-          font-size: 1rem;
+          font-size: 1.2rem;
           transition: all 0.2s ease;
         }
-        .lb-btn:hover {
-          transform: translateY(-2px);
-          background: rgba(0, 0, 0, 0.1);
+        .scope-btn:hover {
+          color: var(--text-primary);
+          background: rgba(255, 255, 255, 0.05);
         }
-        .lb-btn.active {
-          background: #fbbf24;
-          color: #1a1a1a;
-          box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
+        .scope-btn.active {
+          background: rgba(255, 255, 255, 0.08);
+          color: var(--accent-color);
+          border-color: var(--accent-color);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        .lb-sub-btn {
-          padding: 6px 14px;
-          border-radius: 6px;
-          border: 2px solid rgba(0, 0, 0, 0.1);
+
+        /* Mode & Filter Buttons */
+        .lb-filter-btn {
+          padding: 6px 16px;
+          border-radius: 8px;
+          border: none;
           background: transparent;
-          color: var(--text-muted, #666);
+          color: var(--text-muted);
           cursor: pointer;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
           font-weight: 500;
           transition: all 0.2s ease;
         }
-        .lb-sub-btn:hover {
-          border-color: rgba(0, 0, 0, 0.3);
-          color: var(--text-main, #333);
-        }
-        .lb-sub-btn.active {
-          border-color: #fbbf24;
-          color: #d97706;
-          background: rgba(251, 191, 36, 0.1);
-        }
-        .lb-card {
-          transition: transform 0.2s ease;
-        }
-        .lb-card:hover {
-          transform: scale(1.01);
-        }
+        .lb-filter-btn:hover { color: var(--text-primary); }
+        .lb-filter-btn.active { color: var(--accent-color); }
       `}</style>
-{/* 🚀 DYNAMIC TITLE */}
+
+      {/* 🚀 HEADER */}
       <h2 style={styles.header}>
-        🏆 {scope === "global" ? "Global" : "Friends"} Leaderboard
+        <Trophy size={32} color="var(--accent-color)" />
+        Leaderboard
       </h2>
-      {/* 🚀 SCOPE TOGGLE (Global vs Friends) */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '30px' }}>
+
+      {/* 🚀 ORIGINAL SCOPE TOGGLE (Themed) */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '40px' }}>
         <button 
           onClick={() => setScope("global")} 
-          className={`lb-btn ${scope === "global" ? "active" : ""}`}
-          style={{ fontSize: '1.2rem', padding: '10px 30px' }}
+          className={`scope-btn ${scope === "global" ? "active" : ""}`}
         >
-          🌍 Global
+          <Globe size={20} /> Global
         </button>
         <button 
           onClick={() => setScope("friends")} 
-          className={`lb-btn ${scope === "friends" ? "active" : ""}`}
-          style={{ fontSize: '1.2rem', padding: '10px 30px' }}
+          className={`scope-btn ${scope === "friends" ? "active" : ""}`}
         >
-          👥 Friends
+          <Users size={20} /> Friends
         </button>
       </div>
 
       {/* Main Mode Filters */}
       <div style={styles.filterRow}>
         {["time", "words", "quote"].map((m) => (
-          <button key={m} onClick={() => setMode(m)} className={`lb-btn ${mode === m ? "active" : ""}`} style={{ textTransform: 'capitalize' }}>
+          <button key={m} onClick={() => setMode(m)} className={`lb-filter-btn ${mode === m ? "active" : ""}`} style={{ textTransform: 'capitalize' }}>
             {m}
           </button>
         ))}
       </div>
 
-      {/* Sub-Filters & Modifiers */}
-      <div style={{ ...styles.filterRow, marginBottom: '20px' }}>
+      {/* Sub-Filters, Modifiers, AND Time Range on ONE line */}
+      <div style={{ ...styles.filterRow, marginBottom: '40px' }}>
+        
+        {/* 1. Time / Word Limits */}
         {mode === "time" && [15, 30, 60, 120].map((t) => (
-          <button key={t} onClick={() => setTimeLimit(t)} className={`lb-sub-btn ${timeLimit === t ? "active" : ""}`}>{t}s</button>
+          <button key={t} onClick={() => setTimeLimit(t)} className={`lb-filter-btn ${timeLimit === t ? "active" : ""}`}>{t}</button>
         ))}
-
         {mode === "words" && [10, 25, 50, 100].map((w) => (
-          <button key={w} onClick={() => setWordLimit(w)} className={`lb-sub-btn ${wordLimit === w ? "active" : ""}`}>{w} words</button>
+          <button key={w} onClick={() => setWordLimit(w)} className={`lb-filter-btn ${wordLimit === w ? "active" : ""}`}>{w}</button>
         ))}
 
-        <div style={{ borderLeft: '2px solid rgba(0,0,0,0.1)', height: '24px', margin: '0 10px' }}></div>
+        {/* Separator Dot */}
+        <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--text-muted)', margin: '0 8px' }}></div>
 
-        <button onClick={() => setPunctuation(!punctuation)} className={`lb-sub-btn ${punctuation ? "active" : ""}`}>@ punctuation</button>
-        <button onClick={() => setNumbers(!numbers)} className={`lb-sub-btn ${numbers ? "active" : ""}`}># numbers</button>
-      </div>
+        {/* 2. Modifiers */}
+        <button onClick={() => setPunctuation(!punctuation)} className={`lb-filter-btn ${punctuation ? "active" : ""}`}>@ punctuation</button>
+        <button onClick={() => setNumbers(!numbers)} className={`lb-filter-btn ${numbers ? "active" : ""}`}># numbers</button>
 
-      {/* 🚀 TIME RANGE FILTERS */}
-      <div style={{ ...styles.filterRow, marginBottom: '30px' }}>
-        <button onClick={() => setTimeRange("all")} className={`lb-sub-btn ${timeRange === "all" ? "active" : ""}`}>All-Time</button>
-        <button onClick={() => setTimeRange("month")} className={`lb-sub-btn ${timeRange === "month" ? "active" : ""}`}>Past 30 Days</button>
-        <button onClick={() => setTimeRange("week")} className={`lb-sub-btn ${timeRange === "week" ? "active" : ""}`}>Past 7 Days</button>
+        {/* 3. Time Range Menu Bar (Dropdown with 3 items) */}
+        <select 
+          value={timeRange} 
+          onChange={(e) => setTimeRange(e.target.value)}
+          style={{
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            fontFamily: 'var(--font-ui, sans-serif)',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            outline: 'none',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <option value="all">All-Time</option>
+          <option value="month">Past 30 Days</option>
+          <option value="week">Past 7 Days</option>
+        </select>
+        
       </div>
 
       {/* Rankings List */}
@@ -142,13 +157,12 @@ export default function Leaderboard({ user }) {
           <div style={styles.emptyState}>Loading rankings... ⏳</div>
         ) : leaders.length === 0 ? (
           <div style={styles.emptyState}>
-            <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>👻</span>
-            No scores recorded for this exact mode/time yet.<br/>
-            <strong>Be the first!</strong>
+            <Ghost size={48} color="var(--text-muted)" style={{ marginBottom: '15px', opacity: 0.5 }} />
+            <div style={{ fontSize: '1.2rem', color: 'var(--text-primary)', marginBottom: '5px' }}>No scores found</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Be the first to secure a spot on this board!</div>
           </div>
         ) : (
           leaders.map((score, index) => {
-            // 🚀 CHECK IF THIS ROW BELONGS TO THE LOGGED-IN USER
             const isMe = user && score.user?.name === user.name;
 
             return (
@@ -157,21 +171,24 @@ export default function Leaderboard({ user }) {
                 className="lb-card" 
                 style={{
                   ...styles.leaderCard,
-                  ...(isMe ? styles.highlightedCard : {}) // Apply glowing border if it's the user
+                  ...(isMe ? styles.highlightedCard : {})
                 }}
               >
                 {/* Left Side: Rank & User Info */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <span style={{ 
                     ...styles.rankBadge, 
-                    color: index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : index === 2 ? '#b45309' : '#666'
+                    color: index === 0 ? 'var(--accent-color)' : index === 1 ? '#94a3b8' : index === 2 ? '#b45309' : 'var(--text-muted)'
                   }}>
                     #{index + 1}
                   </span>
-                  <div style={{...styles.avatar, ...(isMe ? {background: '#fef3c7', borderColor: '#fbbf24'} : {})}}>
+                  <div style={{
+                    ...styles.avatar, 
+                    ...(isMe ? { borderColor: 'var(--accent-color)', color: 'var(--accent-color)' } : {})
+                  }}>
                     {score.user?.name?.charAt(0).toUpperCase() || "?"}
                   </div>
-                  <span style={{...styles.username, ...(isMe ? {color: '#d97706'} : {})}}>
+                  <span style={{...styles.username, ...(isMe ? {color: 'var(--accent-color)'} : {})}}>
                     {score.user?.name || "Anonymous"} {isMe && "(You)"}
                   </span>
                 </div>
@@ -180,7 +197,7 @@ export default function Leaderboard({ user }) {
                 <div style={styles.statsContainer}>
                   <div style={{ textAlign: 'right' }}>
                     <div style={styles.wpmText}>
-                      {score.wpm} <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 'normal' }}>WPM</span>
+                      {score.wpm} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>WPM</span>
                     </div>
                     <div style={styles.accuracyText}>{score.accuracy}% accuracy</div>
                   </div>
@@ -193,23 +210,29 @@ export default function Leaderboard({ user }) {
     </div>
   );
 }
+
 const styles = {
-  container: { maxWidth: '750px', margin: '0 auto', padding: '40px 20px', color: 'var(--text-main, #333)' },
-  
-  header: { fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '30px' },
-  
+  container: { maxWidth: '800px', margin: '0 auto', padding: '40px 20px', color: 'var(--text-primary)' },
+  header: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', fontSize: '2rem', fontWeight: 'bold', marginBottom: '20px' },
   filterRow: { display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '12px' },
-  listContainer: { background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px', overflow: 'hidden' },
-  emptyState: { padding: '60px 20px', textAlign: 'center', color: '#666', fontSize: '1.1rem' },
-  leaderCard: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid rgba(0,0,0,0.05)' },
+  
+  listContainer: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  emptyState: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '12px' },
+  
+  leaderCard: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', background: 'transparent', borderRadius: '12px', border: '1px solid transparent' },
   highlightedCard: { 
-    background: 'rgba(251, 191, 36, 0.1)',
-    borderLeft: '5px solid #fbbf24',      
+    background: 'var(--bg-secondary)',
+    borderLeft: '4px solid var(--accent-color)',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
   },
-  rankBadge: { fontSize: '1.5rem', fontWeight: '900', width: '40px' },
-  avatar: { width: '45px', height: '45px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: '#475569', border: '2px solid rgba(0,0,0,0.1)' },
-  username: { fontSize: '1.2rem', fontWeight: '600' },
+  
+  rankBadge: { fontSize: '1.4rem', fontWeight: 'bold', width: '40px', fontFamily: 'var(--font-typing, monospace)' },
+  avatar: { width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)', border: '1px solid rgba(255, 255, 255, 0.1)' },
+  username: { fontSize: '1.1rem', fontWeight: '500' },
+  
   statsContainer: { display: 'flex', alignItems: 'center' },
-  wpmText: { fontSize: '1.8rem', fontWeight: '900', color: '#fbbf24', lineHeight: '1' },
-  accuracyText: { fontSize: '0.85rem', color: '#888', marginTop: '4px' },
+  wpmText: { fontSize: '2rem', fontWeight: 'bold', color: 'var(--accent-color)', lineHeight: '1', fontFamily: 'var(--font-typing, monospace)' },
+  accuracyText: { fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '6px' },
 };

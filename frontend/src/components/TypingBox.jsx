@@ -67,20 +67,58 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const [completedMatch, setCompletedMatch] = useState(null);
   // 🔊 AUDIO SETUP (Only initialize once)
-  const audioRefs = useRef({
-    tick: new Audio('/sounds/tick.mp3'),
-    go: new Audio('/sounds/go.mp3'),
-    win: new Audio('/sounds/win.mp3'),
-    lose: new Audio('/sounds/lose.mp3')
-  });
+  // Sound generator helper using Web Audio API (no external files required!)
+const playSound = (type) => {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
 
-  // Helper function to play sound if not muted
-  const playSound = (soundName) => {
-    if (soundEnabled && audioRefs.current[soundName]) {
-      audioRefs.current[soundName].currentTime = 0; // Reset to start
-      audioRefs.current[soundName].play().catch(e => console.log("Audio play blocked by browser:", e));
+    if (type === 'tick') {
+      // Short mechanical click sound
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } else if (type === 'go') {
+      // Upward start beep
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } else if (type === 'win') {
+      // Cheerful victory chime
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'lose') {
+      // Downward defeat tone
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
     }
-  };
+  } catch (e) {
+    console.error("Audio playback error:", e);
+  }
+};
   const latestEngine = useRef({ 
     addWpmPoint, finishTest, words, currentIndex, currentChar, correctCharacters, incorrectCharacters 
   });
