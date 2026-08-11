@@ -91,7 +91,7 @@ public ResponseEntity<?> updateUserXp(@RequestBody Map<String, Object> request) 
         return ResponseEntity.badRequest().body("Email and xpGained are required");
     }
 
-    User user = userRepository.findByEmail(email);
+    User user = userRepository.findFirstByEmail(email);
     if (user != null) {
         user.setXp(user.getXp() + xpGained);
         userRepository.save(user);
