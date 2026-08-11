@@ -438,4 +438,28 @@
 
 .profile-avatar-container:hover .avatar-overlay {
   opacity: 1;
+}.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: -5px;
+  background: var(--accent-color);
+  border: 2px solid var(--bg-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.avatar-upload-btn:hover {
+  transform: scale(1.1);
 }

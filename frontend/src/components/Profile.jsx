@@ -5,15 +5,32 @@ import { AlertTriangle, Trash2 } from "lucide-react";
 import KeyboardHeatmap from "./KeyboardHeatmap"; // Make sure the path is correct
 export default function Profile({ user, stats }) {
   const [activeTab, setActiveTab] = useState("speed");
-const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+// --- AVATAR STATE ---
+  // Load saved avatar from localStorage on initial render
+  const [avatarPreview, setAvatarPreview] = useState(
+    () => localStorage.getItem(`avatar_${user?.name}`) || user?.avatar || null
+  );
+  const [isAvatarFullscreen, setIsAvatarFullscreen] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a local preview URL for instant feedback
-      const imageUrl = URL.createObjectURL(file);
-      setAvatarPreview(imageUrl);}};
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setAvatarPreview(base64String); // Update UI
+        
+        // Save locally so it survives refreshes
+        if (user?.name) {
+          localStorage.setItem(`avatar_${user.name}`, base64String);
+        }
+
+        // TODO: Send base64String or FormData to your backend API here
+      };
+      reader.readAsDataURL(file); // Convert image to Base64 string
+    }
+  };
   // --- 1. CALCULATE ALL-TIME STATS ---
   const allTime = {
     time: formatTime(stats?.totalPracticeSeconds || 0),
@@ -124,22 +141,32 @@ const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
       <header className="profile-header">
         <div className="profile-user-info">
           
-          {/* INTERACTIVE AVATAR UPLOAD */}
-          <div 
-            className="profile-avatar-container" 
-            onClick={() => fileInputRef.current.click()}
-            title="Change Profile Picture"
-          >
-            {avatarPreview ? (
-              <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
-            ) : (
-              <div className="profile-avatar">
-                <User size={40} color="var(--accent-color)" />
-              </div>
-            )}
-            <div className="avatar-overlay">
-              <Camera size={24} color="#fff" />
+          {/* INTERACTIVE AVATAR */}
+          <div className="profile-avatar-wrapper" style={{ position: 'relative' }}>
+            <div 
+              className="profile-avatar-container" 
+              onClick={() => avatarPreview && setIsAvatarFullscreen(true)}
+              title={avatarPreview ? "View Profile Picture" : "No Picture"}
+              style={{ cursor: avatarPreview ? "pointer" : "default" }}
+            >
+              {avatarPreview ? (
+                <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
+              ) : (
+                <div className="profile-avatar">
+                  <User size={40} color="var(--accent-color)" />
+                </div>
+              )}
             </div>
+
+            {/* Floating Camera Button to Upload */}
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className="avatar-upload-btn"
+              title="Upload New Picture"
+            >
+              <Camera size={16} color="#fff" />
+            </button>
+
             <input 
               type="file" 
               accept="image/*" 
@@ -148,7 +175,6 @@ const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
               onChange={handleImageChange} 
             />
           </div>
-
           <h1>{user?.name || "Guest"}'s Profile</h1>
         </div>
         <div className="profile-level-badge">
@@ -368,7 +394,23 @@ const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
           <button className="cancel-btn" onClick={() => setShowConfirmReset(false)}>
             Cancel
           </button>
-        )}
+        )}{/* FULLSCREEN AVATAR OVERLAY */}
+      {isAvatarFullscreen && (
+        <div 
+          onClick={() => setIsAvatarFullscreen(false)}
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, cursor: 'zoom-out', backdropFilter: 'blur(5px)'
+          }}
+        >
+          <img 
+            src={avatarPreview} 
+            alt="Fullscreen Avatar" 
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }} 
+          />
+        </div>
+      )}
       </div>
         </div>
       </section>

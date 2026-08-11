@@ -199,9 +199,19 @@ export default function Leaderboard({ user }) {
                   </span>
                   <div style={{
                     ...styles.avatar, 
-                    ...(isMe ? { borderColor: 'var(--accent-color)', color: 'var(--accent-color)' } : {})
+                    ...(isMe ? { borderColor: 'var(--accent-color)', color: 'var(--accent-color)' } : {}),
+                    overflow: 'hidden' // Ensure the image stays a perfect circle
                   }}>
-                    {score.user?.name?.charAt(0).toUpperCase() || "?"}
+                    {/* Check if the user has an avatar from the DB, otherwise check local storage for the active user */}
+                    {score.user?.avatar || (isMe && localStorage.getItem(`avatar_${user.name}`)) ? (
+                      <img 
+                        src={score.user?.avatar || localStorage.getItem(`avatar_${score.user?.name}`)} 
+                        alt="Avatar" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <span>{score.user?.name?.charAt(0).toUpperCase() || "?"}</span>
+                    )}
                   </div>
                   <span style={{...styles.username, ...(isMe ? {color: 'var(--accent-color)'} : {})}}>
                     {score.user?.name || "Anonymous"} {isMe && "(You)"}
