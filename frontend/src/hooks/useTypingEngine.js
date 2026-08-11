@@ -333,34 +333,6 @@ function handleKey(key) {
         .catch((err) => console.error("Error updating XP:", err));
     }
   }
-    if (user && user.name && user.password) {
-        // 1. Existing save stats logic
-        syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
-        
-        const leaderboardPayload = { /* ... your leaderboard code ... */ };
-        saveTestScore(leaderboardPayload);
-
-        // 🚀 2. NEW: Calculate and send XP!
-        const xpGained = Math.max(Math.round(finalWpm * 2 * (finalAccuracy / 100)), 15);
-        
-        fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: user.email, xpGained: xpGained })
-        })
-          .then((res) => {
-            if (res.ok) return res.json();
-            throw new Error("Failed to update XP");
-          })
-          .then((updatedUser) => {
-            console.log(`Earned ${xpGained} XP! New total: ${updatedUser.xp}`);
-            
-            // 🚀 Force the browser to trigger a custom event so App.jsx knows to update the UI
-            window.dispatchEvent(new CustomEvent("xpUpdated", { detail: updatedUser }));
-          })
-          .catch((err) => console.error("Error updating XP:", err));
-      }
-  }
 
   function resetTest() {
     setTyped(""); setCurrentIndex(0); setCurrentChar(0);
