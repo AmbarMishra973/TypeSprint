@@ -147,14 +147,18 @@ export default function Profile({ user, stats }) {
               className="profile-avatar-container" 
               onClick={() => avatarPreview && setIsAvatarFullscreen(true)}
               title={avatarPreview ? "View Profile Picture" : "No Picture"}
-              style={{ cursor: avatarPreview ? "pointer" : "default" }}
+              style={{ 
+                cursor: avatarPreview ? "pointer" : "default",
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center' 
+              }}
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
               ) : (
-                <div className="profile-avatar">
-                  <User size={40} color="var(--accent-color)" />
-                </div>
+                /* Removed the extra <div className="profile-avatar"> wrapper here! */
+                <User size={40} color="var(--accent-color)" />
               )}
             </div>
 
