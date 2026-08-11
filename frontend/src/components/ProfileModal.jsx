@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import XpProgressBar from './XpProgressBar'; // Adjust the path depending on where your files are located
 export default function ProfileModal({ user, stats, onClose }) {
   const [duelStats, setDuelStats] = useState(null);
   const [loading, setLoading] = useState(true);
