@@ -154,7 +154,8 @@ function Home() {
         />
       )}
       {activeView === "daily" && (
-          <DailyChallenge user={user} />
+          <DailyChallenge user={user}
+          engine={typingEngine} />
         )}
 
     </div>

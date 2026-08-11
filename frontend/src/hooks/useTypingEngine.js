@@ -51,13 +51,7 @@ function useTypingEngine(user) {
 
   const [stats, setStats] = useState({ ...defaultStats, ...(loadStats(storageKey) || {}) });
 
-  useEffect(() => {
-    setStats({ ...defaultStats, ...(loadStats(storageKey) || {}) });
-  }, [storageKey]);
-
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(stats));
-  }, [stats, storageKey]);
+  
 
   const [testMode, setTestMode] = useState("time");
   const [wordLimit, setWordLimit] = useState(25);
@@ -66,7 +60,7 @@ function useTypingEngine(user) {
   const [typed, setTyped] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
-  const [time, setTime] = useState(30);
+  const [time, setTime] = useState(0);
   const [selectedTime, setSelectedTime] = useState(30);
   const [startTime, setStartTime] = useState(null);
   const startTimeRef = useRef(null);
@@ -102,6 +96,25 @@ function useTypingEngine(user) {
     { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
     { content: "Talk is cheap. Show me the code.", author: "Linus Torvalds" }
   ];
+
+  useEffect(() => {
+    setStats({ ...defaultStats, ...(loadStats(storageKey) || {}) });
+  }, [storageKey]);
+
+  useEffect(() => {
+    let interval = null;
+    if (isRunning && !finished) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 1); // Increments every second
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning, finished]);
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(stats));
+  }, [stats, storageKey]);
 
   function fetchQuoteTest() {
     setIsQuoteMode(true);
