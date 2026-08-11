@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { User, Activity, CalendarDays, Zap, Trophy, Target, Swords, BarChart2 } from "lucide-react";
+import { User, Activity, CalendarDays, Zap, Trophy, Target, Swords, BarChart2, Camera } from "lucide-react";
 import "../styles/profile.css";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import KeyboardHeatmap from "./KeyboardHeatmap"; // Make sure the path is correct
