@@ -1,39 +1,33 @@
-function Stats({
-  wpm,
+import React from 'react';
 
-  rawWpm,
-
-  accuracy,
-
-  characters,
-
-  errors
-}) {
+function Stats({ wpm, rawWpm, accuracy, characters, errors }) {
   return (
-    <div className="stats">
-      <div>
-        Raw WPM:
-        <strong>{rawWpm}</strong>
+    <div 
+      className="live-stats-container" 
+      style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        gap: '40px', 
+        width: '100%',
+        marginBottom: '20px'
+      }}
+    >
+      <div className="live-stat-item">
+        <span className="live-label">wpm</span>
+        <span className="live-value">{wpm}</span>
       </div>
-
-      <div>
-        WPM:
-        <strong>{wpm}</strong>
+      <div className="live-stat-item">
+        <span className="live-label">acc</span>
+        <span className="live-value">{accuracy}%</span>
       </div>
-
-      <div>
-        Accuracy:
-        <strong>{accuracy}%</strong>
+      <div className="live-stat-item">
+        <span className="live-label">raw</span>
+        <span className="live-value">{rawWpm}</span>
       </div>
-
-      <div>
-        Characters:
-        <strong>{characters}</strong>
-      </div>
-
-      <div>
-        Errors:
-        <strong>{errors}</strong>
+      <div className="live-stat-item">
+        <span className="live-label">err</span>
+        <span className="live-value">{errors}</span>
       </div>
     </div>
   );

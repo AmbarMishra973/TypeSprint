@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
+import { AtSign, Hash, Clock, Type, MessageSquareQuote } from 'lucide-react';
 import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
 import Result from "./Result";
@@ -361,7 +361,8 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
 
   return (
     <div className="typing-box" onClick={() => inputRef.current?.focus()}>
-      <ThemeSelector />
+
+      {/* Keep the Countdown Overlay right at the top */}
       {matchCountdown !== null && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.85)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 10000 }}>
           <h2 style={{ color: "#fff", fontSize: "2rem", marginBottom: "20px" }}>Match Starting...</h2>
@@ -370,93 +371,108 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
           </div>
         </div>
       )}
-      {/* Sound Settings Button */}
-      <div style={{ position: "fixed", top: "70px", right: "20px", zIndex: 9999 }}>
-        <button
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          style={{ padding: "8px 12px", borderRadius: "8px", background: soundEnabled ? "var(--primary-accent)" : "var(--card-bg)", color: soundEnabled ? "#fff" : "var(--text-main)", border: "1px solid var(--text-muted)", cursor: "pointer", fontWeight: "bold", transition: "0.2s", width: "140px" }}
-        >
-          {soundEnabled ? "🔊 Sound ON" : "🔇 Sound OFF"}
-        </button>
-      </div>
-
-      {/* Modifiers Button */}
-      <div style={{ position: "fixed", top: "120px", right: "20px", zIndex: 9999 }} onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={() => setShowModifiers(!showModifiers)}
-          style={{ padding: "8px 12px", borderRadius: "8px", background: punctuationFreq > 0 || numberFreq > 0 ? "var(--primary-accent)" : "var(--card-bg)", color: punctuationFreq > 0 || numberFreq > 0 ? "#fff" : "var(--text-main)", border: "1px solid var(--text-muted)", cursor: "pointer", fontWeight: "bold", transition: "0.2s", width: "140px" }}
-        >
-          ⚙️ Modifiers
-        </button>
-
-        {showModifiers && (
-          <div style={{ position: "absolute", top: "100%", right: "0", paddingTop: "8px", background: "var(--card-bg)", border: "1px solid var(--text-muted)", padding: "15px", borderRadius: "12px", marginTop: "8px", width: "220px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)", color: "var(--text-main)" }}>
-            <div style={{ marginBottom: "15px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                <span style={{ fontWeight: "bold" }}>@ Punctuation</span>
-                <span>{punctuationFreq}%</span>
-              </div>
-              <input type="range" min="0" max="100" step="5" value={punctuationFreq} onChange={(e) => updateModifiers(Number(e.target.value), numberFreq)} style={{ width: "100%", cursor: "pointer" }} />
-            </div>
-
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                <span style={{ fontWeight: "bold" }}># Numbers</span>
-                <span>{numberFreq}%</span>
-              </div>
-              <input type="range" min="0" max="100" step="5" value={numberFreq} onChange={(e) => updateModifiers(punctuationFreq, Number(e.target.value))} style={{ width: "100%", cursor: "pointer" }} />
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* 🚀 CHALLENGE MODE: Hide regular settings so user can't cheat */}
       {activeChallenge ? (
-        <div style={{ textAlign: "center", color: "#fbbf24", marginBottom: "20px", fontWeight: "bold", fontSize: "1.2rem", padding: "10px", border: "2px dashed #fbbf24", borderRadius: "8px" }}>
+        <div style={{ textAlign: "center", color: "#fbbf24", marginBottom: "40px", fontWeight: "bold", fontSize: "1.2rem", padding: "10px", border: "2px dashed #fbbf24", borderRadius: "8px" }}>
           ⚔️ CHALLENGE MODE ACTIVE: {activeChallenge.duration}s
         </div>
       ) : (
-        <div className="time-selector">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            
-            <div className="time-selector" style={{ display: 'flex', gap: '10px' }}>
-              <button className={testMode === "time" && !isQuoteMode ? "active-time" : ""} onClick={() => changeTestMode("time")}>Time</button>
-              <button className={testMode === "words" && !isQuoteMode ? "active-time" : ""} onClick={() => changeTestMode("words")}>Words</button>
-              <button className={isQuoteMode ? "active-time" : ""} onClick={fetchQuoteTest}>💬 Quotes</button>
-            </div>
-
-            {testMode === "time" && !isQuoteMode && (
-              <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
-                {[15, 30, 60, 120].map((t) => (
-                  <button key={t} onClick={() => changeTimeLimit(t)} style={{ background: selectedTime === t ? 'var(--primary-accent)' : 'transparent', color: selectedTime === t ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{t}s</button>
-                ))}
-              </div>
-            )}
-
-            {testMode === "words" && !isQuoteMode && (
-              <div style={{ display: 'flex', gap: '8px', fontSize: '14px' }}>
-                {[10, 25, 50, 100].map((w) => (
-                  <button key={w} onClick={() => changeWordLimit(w)} style={{ background: wordLimit === w ? 'var(--primary-accent)' : 'transparent', color: wordLimit === w ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{w}</button>
-                ))}
-              </div>
-            )}
+        /* 🚀 NEW UNIFIED CONTROL BAR */
+        <div className="typing-control-bar">
+          
+          {/* SECTION 1: Modifiers (Left) */}
+          <div className="control-group">
+            <button 
+              className={`control-btn ${punctuationFreq > 0 ? 'active' : ''}`}
+              onClick={() => updateModifiers(punctuationFreq > 0 ? 0 : 50, numberFreq)}
+              title="Toggle Punctuation"
+            >
+              <AtSign size={14} /> punctuation
+            </button>
+            <button 
+              className={`control-btn ${numberFreq > 0 ? 'active' : ''}`}
+              onClick={() => updateModifiers(punctuationFreq, numberFreq > 0 ? 0 : 50)}
+              title="Toggle Numbers"
+            >
+              <Hash size={14} /> numbers
+            </button>
           </div>
+
+          <div className="control-divider"></div>
+
+          {/* SECTION 2: Primary Modes (Center) */}
+          <div className="control-group">
+            <button 
+              className={`control-btn ${testMode === "time" && !isQuoteMode ? "active" : ""}`} 
+              onClick={() => changeTestMode("time")}
+            >
+              <Clock size={14} /> time
+            </button>
+            <button 
+              className={`control-btn ${testMode === "words" && !isQuoteMode ? "active" : ""}`} 
+              onClick={() => changeTestMode("words")}
+            >
+              <Type size={14} /> words
+            </button>
+            <button 
+              className={`control-btn ${isQuoteMode ? "active" : ""}`} 
+              onClick={fetchQuoteTest}
+            >
+              <MessageSquareQuote size={14} /> quote
+            </button>
+          </div>
+
+          {/* SECTION 3: Subtypes (Right) - Dynamically rendered! */}
+          {!isQuoteMode && (
+            <>
+              <div className="control-divider"></div>
+              <div className="control-group">
+                {testMode === "time" && [15, 30, 60, 120].map((t) => (
+                  <button 
+                    key={t} 
+                    className={`control-btn ${selectedTime === t ? "active" : ""}`}
+                    onClick={() => changeTimeLimit(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+                
+                {testMode === "words" && [10, 25, 50, 100].map((w) => (
+                  <button 
+                    key={w} 
+                    className={`control-btn ${wordLimit === w ? "active" : ""}`}
+                    onClick={() => changeWordLimit(w)}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
         </div>
       )}
-
       {!finished && (
-        <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+        <div className="live-timer-container">
+          
+          {/* Quote Author */}
           {isQuoteMode && quoteAuthor && (
-            <div style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '8px', fontStyle: 'italic' }}>~ {quoteAuthor}</div>
+            <div className="quote-author">~ {quoteAuthor}</div>
           )}
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--primary-accent)' }}>
-            {testMode === "time" ? time : elapsedTime}s
+          
+          {/* Centralized Sleek Timer */}
+          <div className="live-countdown">
+            {testMode === "time" ? time : elapsedTime}
           </div>
+          
+          {/* Ghost Racer Info */}
           {isRepeat && repeatBestWpm > 0 && (
-            <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: '500' }}>
-              👻 Racing Ghost: <span style={{ color: 'var(--primary-accent)', fontWeight: 'bold' }}>{repeatBestWpm} WPM</span>
+            <div className="ghost-racer-stats">
+              👻 Racing Ghost: <span>{repeatBestWpm} WPM</span>
             </div>
           )}
+          
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import "../styles/keyboardHeatmap.css";
 
-function KeyboardHeatmap({ missedKeys }) {
+function KeyboardHeatmap({ missedKeys = {} }) {
     // Standard QWERTY layout
     const layout = [
         ['q','w','e','r','t','y','u','i','o','p'],
@@ -8,21 +8,23 @@ function KeyboardHeatmap({ missedKeys }) {
         ['z','x','c','v','b','n','m']
     ];
 
-    // Find the highest number of misses to scale the color intensity
-    const maxMisses = Math.max(...Object.values(missedKeys), 1);
+    // 🚀 FIXED: Safe fallback in case missedKeys is undefined or empty
+    const safeMissedKeys = missedKeys || {};
+    const missValues = Object.values(safeMissedKeys);
+    const maxMisses = missValues.length > 0 ? Math.max(...missValues, 1) : 1;
 
     return (
-        <div className="heatmap-container">
-            <h3>Weak Keys Heatmap ⌨️</h3>
-            <p className="heatmap-sub">Keys highlighted in red were missed the most.</p>
+        <div className="heatmap-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             
+            <h3 className="sub-label" style={{ marginBottom: '20px', textAlign: 'center' }}>
+                Weak Keys Heatmap
+            </h3>
+
             <div className="keyboard">
                 {layout.map((row, rowIndex) => (
                     <div className="keyboard-row" key={rowIndex}>
                         {row.map(key => {
-                            const misses = missedKeys[key] || 0;
-                            
-                            // Calculate opacity: 0 if no misses, up to 1 for the most missed key
+                            const misses = safeMissedKeys[key] || 0;
                             const intensity = misses > 0 ? 0.3 + (misses / maxMisses) * 0.7 : 0;
                             
                             return (
@@ -36,7 +38,7 @@ function KeyboardHeatmap({ missedKeys }) {
                                     title={misses > 0 ? `Missed '${key}' ${misses} times` : `No misses`}
                                 >
                                     {key}
-                                    {misses > 0 && <span className="miss-count">{misses}</span>}
+                                   
                                 </div>
                             );
                         })}

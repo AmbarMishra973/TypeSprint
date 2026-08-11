@@ -1,41 +1,128 @@
 import React from 'react';
 import RankBadge from './RankBadge';
+import { 
+  Keyboard, 
+  Home, 
+  LayoutDashboard, 
+  Trophy, 
+  Users, 
+  CalendarDays, 
+  User, 
+  Settings, 
+  LogIn,
+  Palette // Added for the theme selector
+} from 'lucide-react';
 
 const Navbar = ({ activeView, setActiveView, user, openModal }) => {
   return (
-    <nav className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px' }}>
+    <nav className="navbar" style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      padding: '15px 30px',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.05)' // Subtle separation line
+    }}>
       
       {/* LEFT: Logo */}
       <div className="navbar-left">
-        <h2 onClick={() => setActiveView("typing")} style={{ cursor: 'pointer', margin: 0 }}>
-          ⌨️ TypeSprint
+        <h2 
+          onClick={() => setActiveView("typing")} 
+          style={{ 
+            cursor: 'pointer', 
+            margin: 0, 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            fontSize: '1.5rem'
+          }}
+        >
+          <Keyboard size={28} /> {/* Replaced emoji with icon */}
+          TypeSprint
         </h2>
       </div>
       
-      {/* CENTER: All Nav Buttons including Daily Challenge */}
-      <div className="navbar-center" style={{ display: 'flex', gap: '10px' }}>
-        <button className={activeView === "typing" ? "active" : ""} onClick={() => setActiveView("typing")}>Home</button>
-        <button className={activeView === "dashboard" ? "active" : ""} onClick={() => setActiveView("dashboard")}>Dashboard</button>
-        <button className={activeView === "leaderboard" ? "active" : ""} onClick={() => setActiveView("leaderboard")}>Leaderboard</button>
-        <button className={activeView === "friends" ? "active" : ""} onClick={() => setActiveView("friends")}>Friends</button>
-        <button className={activeView === "daily" ? "active" : ""} onClick={() => setActiveView("daily")}>
-          📅 Daily Challenge
+      {/* CENTER: Icon Navigation */}
+      <div className="navbar-center" style={{ display: 'flex', gap: '15px' }}>
+        <button 
+          className={`icon-btn ${activeView === "typing" ? "active" : ""}`} 
+          onClick={() => setActiveView("typing")}
+          title="Home"
+        >
+          <Home size={20} />
+        </button>
+        
+        <button 
+          className={`icon-btn ${activeView === "dashboard" ? "active" : ""}`} 
+          onClick={() => setActiveView("dashboard")}
+          title="Dashboard"
+        >
+          <LayoutDashboard size={20} />
+        </button>
+        
+        <button 
+          className={`icon-btn ${activeView === "leaderboard" ? "active" : ""}`} 
+          onClick={() => setActiveView("leaderboard")}
+          title="Leaderboard"
+        >
+          <Trophy size={20} />
+        </button>
+        
+        <button 
+          className={`icon-btn ${activeView === "friends" ? "active" : ""}`} 
+          onClick={() => setActiveView("friends")}
+          title="Friends"
+        >
+          <Users size={20} />
+        </button>
+        
+        <button 
+          className={`icon-btn ${activeView === "daily" ? "active" : ""}`} 
+          onClick={() => setActiveView("daily")}
+          title="Daily Challenge"
+        >
+          <CalendarDays size={20} />
         </button>
       </div>
 
-      {/* RIGHT: User Profile & XP Rank Badge (or Login) */}
+      {/* RIGHT: Theme, User Profile & Settings */}
       <div className="navbar-right">
         {user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {/* 🌟 This is where your XP Rank Badge will pop up once logged in! */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            
             <RankBadge xp={user.xp || 0} />
             
-            <span style={{ fontWeight: 'bold' }}>{user.name}</span>
-            <button onClick={() => setActiveView("profile")}>Profile</button>
-            <button onClick={() => openModal("settings")}>⚙️</button>
+            {/* Action Icons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* NOTE: You can replace this button with your actual <ThemeSelector /> component */}
+              <button className="icon-btn" title="Change Theme">
+                <Palette size={20} />
+              </button>
+
+              <button 
+                className={`icon-btn ${activeView === "profile" ? "active" : ""}`} 
+                onClick={() => setActiveView("profile")}
+                title="Profile"
+              >
+                <User size={20} />
+              </button>
+              
+              <button 
+                className="icon-btn" 
+                onClick={() => openModal("settings")}
+                title="Settings"
+              >
+                <Settings size={20} />
+              </button>
+            </div>
           </div>
         ) : (
-          <button onClick={() => openModal("auth")}>Login / Sign Up</button>
+          <button 
+            className="login-btn" 
+            onClick={() => openModal("auth")}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <LogIn size={18} /> Login
+          </button>
         )}
       </div>
 

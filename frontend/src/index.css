@@ -9,3 +9,226 @@ body {
   background: #0f172a;
   color: white;
 }
+/* Base style for icon buttons */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #888); /* Muted color when inactive */
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #fff);
+}
+
+/* Active state */
+.icon-btn.active {
+  color: var(--accent-color, #4ade80); /* Your primary theme color */
+  background: rgba(74, 222, 128, 0.1); /* Subtle glowing background */
+}
+
+/* Make sure the nav buttons inherit text color by default */
+button {
+  font-family: inherit;
+}
+
+/* Container for the whole bar */
+.typing-control-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
+  padding: 8px 16px;
+  border-radius: 12px;
+  width: fit-content;
+  margin: 0 auto 40px auto; /* Centers the bar and pushes typing text down */
+}
+
+/* Groups the buttons together */
+.control-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Subtle vertical divider between sections */
+.control-divider {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--text-muted, #555);
+}
+
+/* The buttons themselves */
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #777);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+/* Hover state */
+.control-btn:hover {
+  color: var(--text-primary, #ddd);
+}
+
+/* Active state (The selected mode/subtype) */
+.control-btn.active {
+  color: var(--accent-color, #4ade80); /* Your active color */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --font-ui: 'Inter', sans-serif;
+  --font-typing: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-ui);
+}
+
+
+.live-timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color, #e2b714);
+}
+
+.live-ghost {
+  font-size: 1rem;
+  color: var(--text-muted, #646669);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The main wrapper for the result screen */
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  animation: fadeIn 0.4s ease-out;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* 1. Hero Stats (WPM & Accuracy) */
+.hero-stats {
+  display: flex;
+  gap: 80px;
+  text-align: center;
+}
+
+.hero-stat-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-label {
+  font-size: 2rem;
+  color: var(--text-muted, #646669);
+  margin-bottom: -10px; /* Pulls the number closer to the label */
+}
+
+.hero-number {
+  font-size: 6rem; /* Massive numbers */
+  font-weight: bold;
+  color: var(--accent-color, #e2b714);
+  font-family: var(--font-typing, monospace);
+  line-height: 1;
+}
+
+/* 2. Secondary Stats (Raw, Errors, Time) */
+.sub-stats {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+
+.sub-stat-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sub-label {
+  font-size: 0.9rem;
+  color: var(--text-muted, #646669);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sub-number {
+  font-size: 1.8rem;
+  color: var(--text-primary, #d1d0c5);
+  font-family: var(--font-typing, monospace);
+}
+
+/* Remove backgrounds from charts and heatmaps */
+.chart-container, .heatmap-container {
+  background: transparent !important; /* Forces the gray box to disappear */
+  border: none !important;
+  width: 100%;
+}
+/* --- LIVE STATS (While Typing) --- */
+.live-stats-container {
+  display: flex;
+  justify-content: center; /* 🚀 Changed from flex-start to center */
+  gap: 30px;
+  margin-bottom: 20px;
+}
+/* ... keep the rest of the live-stat-item CSS the same ... */
+
+/* --- NEW COUNTDOWN TIMER --- */
+.live-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.live-countdown {
+  font-size: 3rem; /* Massive, clean numbers */
+  font-weight: 700;
+  color: var(--accent-color, #e2b714);
+  font-family: var(--font-typing, monospace);
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(226, 183, 20, 0.2); /* Subtle glow effect */
+  opacity: 0.9;
+}
+
+.quote-author {
+  font-size: 1.1rem;
+  color: var(--text-muted, #646669);
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.ghost-racer-stats {
+  font-size: 0.9rem;
+  color: var(--text-muted, #646669);
+  margin-top: 10px;
+}
+.ghost-racer-stats span {
+  color: var(--accent-color, #e2b714);
+  font-weight: bold;
+}
