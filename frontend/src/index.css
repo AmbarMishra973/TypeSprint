@@ -1,3 +1,63 @@
+/* ==========================
+   GLOBAL THEME VARIABLES
+   ========================== */
+
+/* 1. Midnight Dark (Default) */
+:root {
+  --bg-primary: #0f172a;       /* Deep navy background */
+  --bg-secondary: #1e293b;     /* Slightly lighter navy for cards/menus */
+  --text-primary: #cbd5e1;     /* Soft slate for typed/correct text */
+  --text-muted: #475569;       /* Darker slate for untyped text/stats */
+  --accent-color: #38bdf8;     /* Bright sky blue for active elements */
+  --error-color: #f43f5e;      /* Soft rose red for mistakes */
+}
+
+/* 2. Minimalist Light */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-muted: #94a3b8;
+  --accent-color: #3b82f6;     /* Royal blue */
+  --error-color: #ef4444;
+}
+
+/* 3. Hacker / Matrix */
+[data-theme="matrix"] {
+  --bg-primary: #050505;
+  --bg-secondary: #111111;
+  --text-primary: #4ade80;
+  --text-muted: #166534;
+  --accent-color: #22c55e;     /* Terminal green */
+  --error-color: #ff0000;
+}
+
+/* 4. Dracula / Neon */
+[data-theme="dracula"] {
+  --bg-primary: #282a36;
+  --bg-secondary: #44475a;
+  --text-primary: #f8f8f2;
+  --text-muted: #6272a4;
+  --accent-color: #ff79c6;     /* Neon pink */
+  --error-color: #ff5555;
+}
+/* 5. Original Yellow (Classic) */
+[data-theme="original"] {
+  --bg-primary: #323437;       /* Classic dark gray */
+  --bg-secondary: #2c2e31;     /* Slightly darker/richer for dropdowns */
+  --text-primary: #d1d0c5;     /* Soft off-white for typed text */
+  --text-muted: #646669;       /* Muted gray for untyped text */
+  --accent-color: #e2b714;     /* The classic yellow for graphs/counters */
+  --error-color: #ca4754;      /* Soft red for mistakes */
+}
+
+/* Apply smooth transitions when switching themes */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;

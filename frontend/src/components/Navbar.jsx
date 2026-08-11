@@ -1,5 +1,6 @@
 import React from 'react';
 import RankBadge from './RankBadge';
+import ThemeSelector from './ThemeSelector';
 import { 
   Keyboard, 
   Home, 
@@ -94,9 +95,7 @@ const Navbar = ({ activeView, setActiveView, user, openModal }) => {
             {/* Action Icons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {/* NOTE: You can replace this button with your actual <ThemeSelector /> component */}
-              <button className="icon-btn" title="Change Theme">
-                <Palette size={20} />
-              </button>
+              <ThemeSelector />
 
               <button 
                 className={`icon-btn ${activeView === "profile" ? "active" : ""}`} 
