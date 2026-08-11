@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Activity, CalendarDays, Zap, Trophy, Target, Swords, BarChart2 } from "lucide-react";
 import "../styles/profile.css";
 import { AlertTriangle, Trash2 } from "lucide-react";
