@@ -66,29 +66,31 @@ function Home() {
         console.error("Matchmaker error:", err); 
       }
     };
-    const handleTestComplete = (finalWpm, finalAccuracy) => {
-  const xpGained = calculateXpReward(finalWpm, finalAccuracy);
-
-  if (user) {
-    fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: user.email, xpGained })
-    })
-      .then((res) => res.json())
-      .then((updatedUser) => {
-        // Update user state globally in your app
-        setUser(updatedUser);
-        console.log(`Earned ${xpGained} XP! New total: ${updatedUser.xp}`);
-      })
-      .catch((err) => console.error("Error updating XP", err));
-  }
-};
+    
 
     const interval = setInterval(checkActiveMatch, 2500);
     return () => clearInterval(interval);
   }, [user, activeChallenge]);
 
+  const handleTestComplete = (wpm, accuracy) => {
+  if (!user || !user.email) return;
+
+  // Calculate XP reward based on performance
+  const xpGained = Math.max(Math.round(wpm * 2 * (accuracy / 100)), 10);
+
+  fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: user.email, xpGained })
+  })
+    .then((res) => res.json())
+    .then((updatedUser) => {
+      // Update local user state so UI/progress bars reflect new XP immediately
+      setUser(updatedUser);
+      console.log(`Successfully added ${xpGained} XP!`);
+    })
+    .catch((err) => console.error("Failed to update XP:", err));
+};
   return (
     <div className="home">
      

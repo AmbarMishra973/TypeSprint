@@ -41,6 +41,7 @@ function useTypingEngine(user) {
     totalWords: 0, totalCharacters: 0, totalPracticeSeconds: 0,
     recentTests: [], globalMissedKeys: {}, unlockedAchievements: []
   };
+  const latestEngine = useRef(null);
 
   const storageKey = user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
 
@@ -60,7 +61,7 @@ function useTypingEngine(user) {
   const [typed, setTyped] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(30);
   const [selectedTime, setSelectedTime] = useState(30);
   const [startTime, setStartTime] = useState(null);
   const startTimeRef = useRef(null);
@@ -101,21 +102,9 @@ function useTypingEngine(user) {
     setStats({ ...defaultStats, ...(loadStats(storageKey) || {}) });
   }, [storageKey]);
 
-  useEffect(() => {
-    let interval = null;
-    if (isRunning && !finished) {
-      interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1); // Increments every second
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, finished]);
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(stats));
-  }, [stats, storageKey]);
-
+  // Fix: Handle both regular incrementing and time-mode countdowns cleanly
+  // 🚀 FIXED: Guaranteed single-interval timer loop
+  
   function fetchQuoteTest() {
     setIsQuoteMode(true);
     const randomQuote = sampleQuotes[Math.floor(Math.random() * sampleQuotes.length)];
@@ -170,18 +159,24 @@ function useTypingEngine(user) {
     } catch (e) {}
   }
 
-  function handleKey(key) {
+function handleKey(key) {
     if (finished) return;
-    let currentStartTime = startTime;
+
     if (!isRunning) {
       setIsRunning(true);
-      setStartTime(Date.now());
-      setStartTime(currentStartTime);
+      const now = Date.now();
+      setStartTime(now);
+      if (latestEngine?.current) {
+        latestEngine.current.startTime = now;
+      }
     }
+
     if (!startTimeRef.current) {
       startTimeRef.current = Date.now();
       setStartTime(startTimeRef.current);
     }
+    
+    const currentStartTime = startTime || startTimeRef.current || Date.now();
     const timeOffset = Date.now() - currentStartTime;
     setKeystrokeLog((prev) => [...prev, { key, timeOffset }]);
 

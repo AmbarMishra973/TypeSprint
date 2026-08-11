@@ -151,13 +151,18 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
 
     if (isRunning) {
       timer = setInterval(() => {
-        latestEngine.current.addWpmPoint();
+        // Only call graph points if the function exists
+        if (latestEngine.current?.addWpmPoint) {
+          latestEngine.current.addWpmPoint();
+        }
 
         if (testMode === "time") {
           setTime((prev) => {
             if (prev <= 1) {
               clearInterval(timer); 
-              latestEngine.current.finishTest();
+              if (latestEngine.current?.finishTest) {
+                latestEngine.current.finishTest();
+              }
               return 0;
             }
             return prev - 1;
@@ -165,8 +170,9 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
         }
       }, 1000);
     }
+    
     return () => clearInterval(timer);
-  }, [isRunning, testMode, setTime]);
+  }, [isRunning, testMode]); // Removed setTime from dependencies to prevent interval re-triggering loops
 
   // 🚀 CHALLENGE MODE PART 1: LOCK THE TIMER
   // 🚀 CHALLENGE MODE: Start 3-2-1 Countdown Sync

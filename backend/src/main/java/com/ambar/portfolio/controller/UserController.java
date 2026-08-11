@@ -83,16 +83,20 @@ public ResponseEntity<?> searchUsers(@RequestParam String query) {
         return ResponseEntity.ok(userService.removeFriend(username, friendName));
     }
     @PostMapping("/update-xp")
-public ResponseEntity<User> updateUserXp(@RequestBody Map<String, Object> request) {
+public ResponseEntity<?> updateUserXp(@RequestBody Map<String, Object> request) {
     String email = (String) request.get("email");
-    int earnedXp = (int) request.get("xpGained");
+    Integer xpGained = (Integer) request.get("xpGained");
 
-    User user = userRepository.findFirstByEmail(email);
+    if (email == null || xpGained == null) {
+        return ResponseEntity.badRequest().body("Email and xpGained are required");
+    }
+
+    User user = userRepository.findByEmail(email);
     if (user != null) {
-        user.setXp(user.getXp() + earnedXp);
+        user.setXp(user.getXp() + xpGained);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 }
 }
