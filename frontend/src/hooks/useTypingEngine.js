@@ -273,6 +273,9 @@ function handleKey(key) {
 
     if (isRepeat && finalWpm > repeatBestWpm) setRepeatBestWpm(finalWpm);
 
+    // 🚀 1. Declare updatedStatsObj right here inside the state setter block
+    let updatedStatsObj = null;
+
     setStats((prev) => {
       const newGlobalMissed = { ...(prev.globalMissedKeys || {}) };
       for (const [key, count] of Object.entries(missedKeys)) {
@@ -291,26 +294,45 @@ function handleKey(key) {
       const newBadges = checkAchievements(statsForCheck, finalWpm, finalAccuracy);
       const finalAchievementsList = [...(prev.unlockedAchievements || []), ...newBadges];
 
-      const updatedStatsObj = {
+      updatedStatsObj = {
         totalTests: newTotalTests, bestWpm: newBestWpm, averageWpm: newAvgWpm, highestAccuracy: newHighestAcc,
         totalWords: newTotalWords, totalCharacters: newTotalChars, totalPracticeSeconds: newTotalTime,
         recentTests: updatedTests, globalMissedKeys: newGlobalMissed, unlockedAchievements: finalAchievementsList
       };
 
       saveStats(updatedStatsObj);
-      
-      if (user && user.name && user.password) {
-        syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
-        const leaderboardPayload = {
-          username: user.name, wpm: finalWpm, accuracy: finalAccuracy,
-          mode: isQuoteMode ? "quote" : testMode, timeLimit: testMode === "time" ? selectedTime : null,
-          wordLimit: testMode === "words" ? wordLimit : null, punctuation: punctuationFreq > 0,
-          numbers: numberFreq > 0, timestamp: Date.now()
-        };
-        saveTestScore(leaderboardPayload);
-      }
       return updatedStatsObj;
     });
+    
+    // 🚀 2. Now safe to use updatedStatsObj down here!
+    if (user && user.name && user.password) {
+      syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
+      
+      const leaderboardPayload = {
+        username: user.name, wpm: finalWpm, accuracy: finalAccuracy,
+        mode: isQuoteMode ? "quote" : testMode, timeLimit: testMode === "time" ? selectedTime : null,
+        wordLimit: testMode === "words" ? wordLimit : null, punctuation: punctuationFreq > 0,
+        numbers: numberFreq > 0, timestamp: Date.now()
+      };
+      saveTestScore(leaderboardPayload);
+
+      // 🚀 3. XP Update API Call
+      const xpGained = Math.max(Math.round(finalWpm * 2 * (finalAccuracy / 100)), 10);
+      
+      fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, xpGained })
+      })
+        .then((res) => res.json())
+        .then((updatedUser) => {
+          if (onUserUpdate) {
+            onUserUpdate(updatedUser);
+          }
+        })
+        .catch((err) => console.error("Error updating XP:", err));
+    }
+  }
     if (user && user.name && user.password) {
         // 1. Existing save stats logic
         syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
