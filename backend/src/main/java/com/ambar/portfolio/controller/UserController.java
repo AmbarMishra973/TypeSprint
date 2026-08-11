@@ -93,7 +93,7 @@ public ResponseEntity<?> updateUserXp(@RequestBody Map<String, Object> request) 
     }
 
     // 🚀 Update this line to search by name/username (depends on your repo setup)
-    User user = userRepository.findByName(name); // Or findByUsername(name)
+    User user = userRepository.findFirstByName(name); // Or findByUsername(name)
     
     if (user != null) {
         user.setXp(user.getXp() + xpGained);
