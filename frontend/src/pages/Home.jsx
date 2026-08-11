@@ -166,6 +166,14 @@ function Home() {
             <AchievementsGrid unlockedIds={typingEngine?.stats?.unlockedAchievements || []} />
           </div>
         )}
+         {/* Inside the <main> tag in Home.jsx */}
+        {activeView === "profile" && (
+          <Profile 
+            user={user} 
+            stats={typingEngine.stats} 
+          />
+        )}
+      
 
       </main>
 
@@ -174,14 +182,7 @@ function Home() {
         <AuthModal onClose={closeModal} onLoginSuccess={handleLoginSuccess} />
       )}
 
-      {/* Inside the <main> tag in Home.jsx */}
-        {activeView === "profile" && (
-          <Profile 
-            user={user} 
-            stats={typingEngine.stats} 
-          />
-        )}
-      
+     
       {activeModal === "settings" && (
         <SettingsModal 
           soundEnabled={typingEngine.soundEnabled} 
