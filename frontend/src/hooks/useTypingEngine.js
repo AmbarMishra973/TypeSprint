@@ -35,7 +35,7 @@ function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
   return result;
 }
 
-function useTypingEngine(user) {
+function useTypingEngine(user, onUserUpdate) {
   const defaultStats = {
     totalTests: 0, bestWpm: 0, averageWpm: 0, highestAccuracy: 0,
     totalWords: 0, totalCharacters: 0, totalPracticeSeconds: 0,
