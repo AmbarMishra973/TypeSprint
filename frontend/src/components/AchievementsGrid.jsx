@@ -3,14 +3,16 @@ import { Award, Lock, Medal } from "lucide-react";
 import { ACHIEVEMENTS } from "../utils/achievements";
 
 export default function AchievementsGrid({ unlockedIds = [] }) {
-  // Calculate completion percentage
+  // Calculate completion percentage.
   const totalAchievements = ACHIEVEMENTS.length;
   const unlockedCount = unlockedIds.length;
-  const progressPercentage = totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
+  const progressPercentage =
+    totalAchievements > 0
+      ? Math.round((unlockedCount / totalAchievements) * 100)
+      : 0;
 
   return (
     <div className="achievements-container">
-      
       <style>{`
         .achievements-container {
           max-width: 1000px;
@@ -19,7 +21,7 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
           animation: fadeIn 0.4s ease-out;
           color: var(--text-primary);
         }
-        
+
         .achievements-header {
           display: flex;
           align-items: center;
@@ -93,7 +95,7 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
           border-color: var(--accent-color);
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
-        
+
         .badge-card.unlocked:hover {
           transform: translateY(-4px);
           box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
@@ -104,9 +106,8 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
           filter: grayscale(100%);
         }
 
-        /* Subtle glow behind unlocked icons */
         .badge-card.unlocked::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 50%;
           left: 45px;
@@ -155,8 +156,13 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
           margin-bottom: 6px;
         }
 
-        .badge-title.unlocked { color: var(--text-primary); }
-        .badge-title.locked { color: var(--text-muted); }
+        .badge-title.unlocked {
+          color: var(--text-primary);
+        }
+
+        .badge-title.locked {
+          color: var(--text-muted);
+        }
 
         .badge-desc {
           font-size: 0.9rem;
@@ -166,16 +172,29 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
       `}</style>
 
       <header className="achievements-header">
-        
         <div className="progress-wrapper">
           <div className="progress-header">
             <span>Overall Completion</span>
-            <span style={{ color: "var(--accent-color)" }}>{progressPercentage}%</span>
+            <span style={{ color: "var(--accent-color)" }}>
+              {progressPercentage}%
+            </span>
           </div>
+
           <div className="progress-bar-bg">
-            <div className="progress-bar-fill" style={{ width: `${progressPercentage}%` }}></div>
+            <div
+              className="progress-bar-fill"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "right", marginTop: "4px" }}>
+
+          <div
+            style={{
+              fontSize: "0.8rem",
+              color: "var(--text-muted)",
+              textAlign: "right",
+              marginTop: "4px"
+            }}
+          >
             {unlockedCount} / {totalAchievements} Unlocked
           </div>
         </div>
@@ -186,18 +205,30 @@ export default function AchievementsGrid({ unlockedIds = [] }) {
           const isUnlocked = unlockedIds.includes(badge.id);
 
           return (
-            <div key={badge.id} className={`badge-card ${isUnlocked ? "unlocked" : "locked"}`}>
-              <div className={`icon-wrapper ${isUnlocked ? "unlocked" : "locked"}`}>
-                {isUnlocked ? (badge.icon || <Medal size={28} />) : <Lock size={24} />}
+            <div
+              key={badge.id}
+              className={`badge-card ${isUnlocked ? "unlocked" : "locked"}`}
+            >
+              <div
+                className={`icon-wrapper ${isUnlocked ? "unlocked" : "locked"}`}
+              >
+                {isUnlocked ? (
+                  badge.icon || <Medal size={28} />
+                ) : (
+                  <Lock size={24} />
+                )}
               </div>
-              
+
               <div className="badge-info">
-                <div className={`badge-title ${isUnlocked ? "unlocked" : "locked"}`}>
+                <div
+                  className={`badge-title ${
+                    isUnlocked ? "unlocked" : "locked"
+                  }`}
+                >
                   {badge.title}
                 </div>
-                <div className="badge-desc">
-                  {badge.description}
-                </div>
+
+                <div className="badge-desc">{badge.description}</div>
               </div>
             </div>
           );

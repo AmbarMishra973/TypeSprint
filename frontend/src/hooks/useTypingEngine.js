@@ -198,8 +198,18 @@ function handleKey(key) {
     if (key === " ") {
       playKeySound(false);
       const expected = words[currentIndex];
-      if (typed === expected) setCorrectWords((prev) => prev + 1);
-      else setWrongWords((prev) => prev + 1);
+      
+      // 🚀 If space is pressed without typing anything, count it as an error!
+      if (typed.length === 0) {
+        setIncorrectCharacters((prev) => prev + 1);
+        setWrongWords((prev) => prev + 1);
+      } else if (typed === expected) {
+        setCorrectWords((prev) => prev + 1);
+      } else {
+        setWrongWords((prev) => prev + 1);
+        // Optional: Count length difference as incorrect characters if partially typed
+        setIncorrectCharacters((prev) => prev + (expected.length - typed.length));
+      }
       
       const now = Date.now();
       if (currentWordStartTime) {
@@ -262,14 +272,18 @@ function handleKey(key) {
     setIsRunning(false);
     setFinished(true);
     if (timerRef.current) clearInterval(timerRef.current);
-    const finalElapsedVal = getElapsedSeconds() || 1;
-    setFinalElapsed(finalElapsedVal);
+    const finalElapsedVal = Math.max(getElapsedSeconds(), 1);
+setFinalElapsed(finalElapsedVal);
+const wordsCompleted = currentIndex; 
+const charsTyped = correctCharacters + incorrectCharacters;
+// Ensure bounds are safe
+const safeCorrect = Math.max(correctCharacters, 0);
+const safeIncorrect = Math.max(incorrectCharacters, 0);
+const safeTotalAttempts = safeCorrect + safeIncorrect;
 
-    const finalWpm = Math.round((correctCharacters / 5) / (finalElapsedVal / 60)) || 0;
-    const finalRawWpm = Math.round((totalTyped / 5) / (finalElapsedVal / 60)) || 0;
-    const finalAccuracy = totalAttempts > 0 ? Math.round((correctCharacters / totalAttempts) * 100) : 100;
-    const wordsCompleted = currentIndex;
-    const charsTyped = correctCharacters + incorrectCharacters;
+const finalWpm = Math.round((safeCorrect / 5) / (finalElapsedVal / 60)) || 0;
+const finalRawWpm = Math.round(((safeCorrect + safeIncorrect) / 5) / (finalElapsedVal / 60)) || 0;
+const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorrect / safeTotalAttempts) * 100)) : 100;
 
     if (isRepeat && finalWpm > repeatBestWpm) setRepeatBestWpm(finalWpm);
 

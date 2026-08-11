@@ -15,9 +15,11 @@ export default function Leaderboard({ user }) {
   const [leaders, setLeaders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+ useEffect(() => {
     async function fetchScores() {
       setLoading(true);
+      
+      // 1. Fetch the raw data from the API
       const data = await getLeaderboard({
         mode,
         timeLimit: mode === "time" ? timeLimit : null,
@@ -27,12 +29,25 @@ export default function Leaderboard({ user }) {
         scope,      
         timeRange,  
       });
-      setLeaders(data || []);
+
+      const rawScores = data || [];
+      const userBestScores = new Map();
+
+      rawScores.forEach((score) => {
+        const username = score.user?.name || "Anonymous";
+        
+        if (!userBestScores.has(username) || score.wpm > userBestScores.get(username).wpm) {
+          userBestScores.set(username, score);
+        }
+      });
+      const deduplicatedLeaders = Array.from(userBestScores.values()).sort((a, b) => b.wpm - a.wpm);
+
+      setLeaders(deduplicatedLeaders);
       setLoading(false);
     }
+    
     fetchScores();
   }, [mode, timeLimit, wordLimit, punctuation, numbers, scope, timeRange]);
-
   return (
     <div className="leaderboard-container" style={styles.container}>
       <style>{`
