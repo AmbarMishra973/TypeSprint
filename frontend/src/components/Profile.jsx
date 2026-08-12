@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { User, Activity, CalendarDays, Zap, Trophy, Target, Swords, BarChart2, Camera } from "lucide-react";
+import { User, Activity, CalendarDays, Zap, Trophy, Target, Swords, BarChart2, Camera, AlertTriangle, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import "../styles/profile.css";
-import { AlertTriangle, Trash2 } from "lucide-react";
-import KeyboardHeatmap from "./KeyboardHeatmap"; // Make sure the path is correct
+import PracticeCalendar from './PracticeCalendar';
+import RelativeHistogram from './RelativeHistogram';
+import KeyboardHeatmap from "./KeyboardHeatmap";
+
 export default function Profile({ user, stats }) {
   const [activeTab, setActiveTab] = useState("speed");
-// --- AVATAR STATE ---
-  // Load saved avatar from localStorage on initial render
+
+  // --- AVATAR STATE ---
   const [avatarPreview, setAvatarPreview] = useState(
     () => localStorage.getItem(`avatar_${user?.name}`) || user?.avatar || null
   );
@@ -16,29 +18,27 @@ export default function Profile({ user, stats }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Inside handleImageChange in Profile.jsx
-const reader = new FileReader();
-reader.onloadend = async () => {
-  const base64String = reader.result;
-  setAvatarPreview(base64String);
-  
-  // 1. Save locally for instant UI feedback
-  localStorage.setItem(`avatar_${user.name}`, base64String);
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result;
+        setAvatarPreview(base64String);
+        
+        localStorage.setItem(`avatar_${user.name}`, base64String);
 
-  // 2. 🚀 Send to your backend so other computers can see it!
-  try {
-    await fetch(`https://ambarmishradb.onrender.com/api/users/update-avatar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: user.name, avatar: base64String })
-    });
-  } catch (err) {
-    console.error("Failed to sync avatar to backend:", err);
-  }
-};
-reader.readAsDataURL(file);// Convert image to Base64 string
+        try {
+          await fetch(`https://ambarmishradb.onrender.com/api/users/update-avatar`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: user.name, avatar: base64String })
+          });
+        } catch (err) {
+          console.error("Failed to sync avatar to backend:", err);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
+
   // --- 1. CALCULATE ALL-TIME STATS ---
   const allTime = {
     time: formatTime(stats?.totalPracticeSeconds || 0),
@@ -77,23 +77,55 @@ reader.readAsDataURL(file);// Convert image to Base64 string
     };
   }, [stats]);
 
-  // --- 3. GENERATE PRACTICE CALENDAR (Last 30 Days) ---
-  const calendarDays = useMemo(() => {
+  // --- 3. PROFESSIONAL MONTH CALENDAR STATE & NAVIGATION ---
+  const [calendarDate, setCalendarDate] = useState(new Date());
+
+  const handlePrevMonth = () => {
+    setCalendarDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCalendarDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const currentMonthData = useMemo(() => {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth(); // 0-indexed
+    
+    const firstDayIndex = new Date(year, month, 1).getDay(); 
+    const adjustedFirstDay = (firstDayIndex === 0 ? 6 : firstDayIndex - 1); 
+    const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
     const days = [];
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
+    for (let i = 0; i < adjustedFirstDay; i++) {
+      days.push({ empty: true });
+    }
+
+    for (let dayNum = 1; dayNum <= totalDaysInMonth; dayNum++) {
+      const d = new Date(year, month, dayNum);
       const dateStr = d.toDateString();
       
       const testsThisDay = (stats?.recentTests || []).filter(
         (t) => new Date(t.date).toDateString() === dateStr
       ).length;
 
-      days.push({ date: d, count: testsThisDay });
+      days.push({ 
+        empty: false, 
+        dayNum, 
+        date: d, 
+        count: testsThisDay,
+        hasPracticed: testsThisDay > 0 
+      });
     }
-    return days;
-  }, [stats]);
+
+    // Format Month name (e.g., "August 2026")
+    const monthName = calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    return {
+      monthTitle: monthName,
+      days
+    };
+  }, [calendarDate, stats]);
 
   // --- HELPER FUNCTIONS ---
   function formatTime(totalSeconds) {
@@ -109,15 +141,6 @@ reader.readAsDataURL(file);// Convert image to Base64 string
     return Math.round(sum / tests.length);
   }
 
-  const getHeatmapColor = (count) => {
-    if (count === 0) return "var(--bg-secondary)";
-    if (count < 3) return "#065f46"; 
-    if (count < 10) return "#059669";
-    if (count < 20) return "#10b981";
-    return "#34d399"; 
-  };
-
-  // --- DASHBOARD MIGRATION STATES & HELPERS ---
   const [showConfirmReset, setShowConfirmReset] = useState(false);
 
   const missedKeysArray = Object.entries(stats?.globalMissedKeys || {})
@@ -141,51 +164,32 @@ reader.readAsDataURL(file);// Convert image to Base64 string
       setShowConfirmReset(true);
     }
   };
+
   return (
     <div className="profile-container">
       
       {/* --- HEADER --- */}
-      {/* --- HEADER --- */}
       <header className="profile-header">
         <div className="profile-user-info">
-          
-          {/* INTERACTIVE AVATAR */}
           <div className="profile-avatar-wrapper" style={{ position: 'relative' }}>
             <div 
               className="profile-avatar-container" 
               onClick={() => avatarPreview && setIsAvatarFullscreen(true)}
               title={avatarPreview ? "View Profile Picture" : "No Picture"}
-              style={{ 
-                cursor: avatarPreview ? "pointer" : "default",
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center' 
-              }}
+              style={{ cursor: avatarPreview ? "pointer" : "default", display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="profile-avatar-img" />
               ) : (
-                /* Removed the extra <div className="profile-avatar"> wrapper here! */
                 <User size={40} color="var(--accent-color)" />
               )}
             </div>
 
-            {/* Floating Camera Button to Upload */}
-            <button 
-              onClick={() => fileInputRef.current.click()}
-              className="avatar-upload-btn"
-              title="Upload New Picture"
-            >
+            <button onClick={() => fileInputRef.current.click()} className="avatar-upload-btn" title="Upload New Picture">
               <Camera size={16} color="#fff" />
             </button>
 
-            <input 
-              type="file" 
-              accept="image/*" 
-              ref={fileInputRef} 
-              style={{ display: "none" }} 
-              onChange={handleImageChange} 
-            />
+            <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleImageChange} />
           </div>
           <h1>{user?.name || "Guest"}'s Profile</h1>
         </div>
@@ -220,53 +224,75 @@ reader.readAsDataURL(file);// Convert image to Base64 string
         </div>
       </section>
 
-      {/* --- STREAKS & CALENDAR --- */}
-      <div className="profile-split-row">
-        
-        <section className="profile-section flex-half">
-          <h2 className="section-title"><Zap size={20}/> Accuracy Streaks</h2>
-          <div className="streak-card">
-            <div className="streak-info">
-              <span className="streak-label">Accuracy threshold:</span>
-              <span className="streak-value">100%</span>
-            </div>
-            <p className="streak-desc">Maintain 100% accuracy across consecutive tests to build your streak.</p>
-            <div className="streak-info" style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
-              <span className="streak-label">Current longest streak:</span>
-              <span className="streak-value accent">3 Lessons</span>
-            </div>
+      {/* --- PROFESSIONAL PRACTICE CALENDAR WITH ARROWS --- */}
+      <section className="profile-section">
+        <h2 className="section-title"><Target size={20}/> Practice Calendar</h2>
+        <div className="calendar-card" style={{ background: 'var(--bg-secondary)', padding: '25px', borderRadius: '16px', maxWidth: '380px', margin: '0 auto', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+          
+          {/* Header with Nav Arrows */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
+            <button 
+              onClick={handlePrevMonth} 
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+              title="Previous Month"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+              {currentMonthData.monthTitle}
+            </span>
+            <button 
+              onClick={handleNextMonth} 
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+              title="Next Month"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
-        </section>
 
-        <section className="profile-section flex-half">
-          <h2 className="section-title"><Target size={20}/> Practice Calendar (30 Days)</h2>
-          <div className="calendar-card">
-            <div className="heatmap-grid">
-              {calendarDays.map((day, idx) => (
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '20px' }}>This calendar shows the dates of active learning.</p>
+          
+          {/* Weekday headers */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', fontWeight: 'bold', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '10px' }}>
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+
+          {/* Month Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+            {currentMonthData.days.map((item, idx) => (
+              item.empty ? (
+                <div key={idx} />
+              ) : (
                 <div 
                   key={idx} 
-                  className="heatmap-cell" 
-                  style={{ backgroundColor: getHeatmapColor(day.count) }}
-                  title={`${day.date.toDateString()}: ${day.count} tests`}
-                ></div>
-              ))}
-            </div>
-            <div className="heatmap-legend">
-              <span>Less</span>
-              <div className="legend-dot" style={{ background: "var(--bg-secondary)" }}></div>
-              <div className="legend-dot" style={{ background: "#065f46" }}></div>
-              <div className="legend-dot" style={{ background: "#059669" }}></div>
-              <div className="legend-dot" style={{ background: "#10b981" }}></div>
-              <div className="legend-dot" style={{ background: "#34d399" }}></div>
-              <span>More</span>
-            </div>
+                  title={`${item.date.toLocaleDateString()}: ${item.count} tests completed`}
+                  style={{
+                    aspectRatio: '1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    fontWeight: item.hasPracticed ? 'bold' : 'normal',
+                    backgroundColor: item.hasPracticed ? 'var(--accent-color)' : 'rgba(255,255,255,0.03)',
+                    color: item.hasPracticed ? '#000' : 'var(--text-primary)',
+                    boxShadow: item.hasPracticed ? '0 0 10px var(--accent-color)' : 'none',
+                    cursor: 'default',
+                    transition: 'transform 0.1s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  {item.dayNum}
+                </div>
+              )
+            ))}
           </div>
-        </section>
-        
-      </div>
+        </div>
+      </section>
 
       {/* --- RELATIVE STATS & MULTIPLAYER --- */}
-      <section className="profile-section">
+      <section className="profile-section" style={{ marginTop: '40px' }}>
         <div className="profile-tabs">
           <button className={`tab-btn ${activeTab === "speed" ? "active" : ""}`} onClick={() => setActiveTab("speed")}>
             <BarChart2 size={16}/> Relative Speed
@@ -279,50 +305,41 @@ reader.readAsDataURL(file);// Convert image to Base64 string
           </button>
         </div>
 
-        <div className="tab-content-card">
+        <div className="profile-tab-content-card" style={{ marginTop: '20px', background: 'var(--bg-secondary)', padding: '25px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
           {activeTab === "speed" && (
-            <div className="tab-pane">
-              <h3 className="pane-headline">
-                Your all-time average speed beats <strong className="accent-text">{Math.min(99, Math.round(allTime.avgSpeed * 1.2))}%</strong> of users.
-              </h3>
-              <p className="pane-desc">This is a histogram of the typing speeds of all users, and your position in relation to them.</p>
-              <div className="placeholder-chart">Chart Area</div>
+            <div>
+              <h3 style={{ marginBottom: '5px', fontSize: '1.2rem' }}>Your all-time average speed distribution</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '20px' }}>This is a histogram of typing speeds, with your active performance tier highlighted.</p>
+              <RelativeHistogram 
+                data={stats?.recentTests?.map(t => t.wpm) || []} 
+                userScore={stats?.bestWpm || 0} 
+                type="speed" 
+              />
             </div>
           )}
+
           {activeTab === "accuracy" && (
-            <div className="tab-pane">
-              <h3 className="pane-headline">
-                Your accuracy beats <strong className="accent-text">{Math.min(99, Math.round(allTime.avgAccuracy * 1.05))}%</strong> of users.
-              </h3>
-              <p className="pane-desc">Compare your precision against the global player base.</p>
-              <div className="placeholder-chart">Chart Area</div>
+            <div>
+              <h3 style={{ marginBottom: '5px', fontSize: '1.2rem' }}>Your all-time average accuracy distribution</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '20px' }}>This is a histogram of typing accuracies, with your active performance tier highlighted.</p>
+              <RelativeHistogram 
+                data={stats?.recentTests?.map(t => t.accuracy) || []} 
+                userScore={stats?.highestAccuracy || 100} 
+                type="accuracy" 
+              />
             </div>
           )}
+
           {activeTab === "multiplayer" && (
-            <div className="tab-pane">
-              <h3 className="pane-headline">Competitive History</h3>
-              <div className="multiplayer-stats">
-                <div className="mp-stat">
-                  <span className="mp-label">Wins</span>
-                  <span className="mp-value win">{user?.wins || 0}</span>
-                </div>
-                <div className="mp-stat">
-                  <span className="mp-label">Losses</span>
-                  <span className="mp-value loss">{user?.losses || 0}</span>
-                </div>
-              </div>
+            <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+              Multiplayer analytics summary and duels history records load here.
             </div>
           )}
-          {/* =========================================
-          MIGRATED DASHBOARD FEATURES
-          ========================================= */}
-      
-      {/* Sleek Divider to separate Profile from Analytics */}
-      <hr style={{ 
-        border: 'none', 
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)', 
-        margin: '80px 0 60px 0' 
-      }} />
+        </div>
+      </section>
+
+      {/* Sleek Divider */}
+      <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.1)', margin: '60px 0' }} />
 
       {/* 1. MOST MISSED LETTERS */}
       <section className="profile-section" style={{ marginBottom: '60px' }}>
@@ -357,7 +374,7 @@ reader.readAsDataURL(file);// Convert image to Base64 string
       </section>
 
       {/* 2. RECENT ACTIVITY LOG */}
-      <section className="profile-section" style={{ marginBottom: '80px' }}>
+      <section className="profile-section" style={{ marginBottom: '60px' }}>
         <h2 className="section-title">Recent Activity Log</h2>
         <div className="tab-content-card" style={{ padding: '0', overflow: 'hidden' }}>
           {(!stats?.recentTests || stats.recentTests.length === 0) ? (
@@ -406,7 +423,10 @@ reader.readAsDataURL(file);// Convert image to Base64 string
           <button className="cancel-btn" onClick={() => setShowConfirmReset(false)}>
             Cancel
           </button>
-        )}{/* FULLSCREEN AVATAR OVERLAY */}
+        )}
+      </div>
+
+      {/* FULLSCREEN AVATAR OVERLAY */}
       {isAvatarFullscreen && (
         <div 
           onClick={() => setIsAvatarFullscreen(false)}
@@ -423,14 +443,10 @@ reader.readAsDataURL(file);// Convert image to Base64 string
           />
         </div>
       )}
-      </div>
-        </div>
-      </section>
     </div>
   );
 }
 
-// Mini component for the stat boxes
 function StatCard({ label, value }) {
   return (
     <div className="profile-stat-box">
