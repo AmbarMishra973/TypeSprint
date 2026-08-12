@@ -6,9 +6,7 @@ function TimeSelector({ selectedTime, setSelectedTime }) {
       {times.map((time) => (
         <button
           key={time}
-
           className={selectedTime === time ? "active-time" : ""}
-
           onClick={() => setSelectedTime(time)}
         >
           {time}s

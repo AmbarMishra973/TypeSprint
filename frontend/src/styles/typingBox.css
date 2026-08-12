@@ -1,5 +1,4 @@
 /* MAIN CONTAINER */
-
 .typing-box {
   width: 100%;
   max-width: 1000px;
@@ -10,7 +9,6 @@
 }
 
 /* MODE SELECTOR */
-
 .mode-selector {
   display: flex;
   flex-direction: column;
@@ -28,26 +26,18 @@
 }
 
 /* ALL BUTTONS */
-
 .mode-buttons button,
 .option-buttons button,
 .restart-btn {
   border: none;
   outline: none;
-
   padding: 12px 24px;
-
   border-radius: 14px;
-
   background: linear-gradient(135deg, #1f2937, #111827);
-
   color: #e5e7eb;
-
   font-size: 15px;
   font-weight: 600;
-
   cursor: pointer;
-
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -58,65 +48,47 @@
 .option-buttons button:hover,
 .restart-btn:hover {
   transform: translateY(-3px);
-
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* ACTIVE BUTTON */
-
 .active-time {
   background: linear-gradient(135deg, #22c55e, #16a34a) !important;
-
   color: white !important;
-
   box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
 }
 
 /* TIMER DISPLAY */
-
 .timer {
   margin: 20px auto;
-
   width: fit-content;
-
   padding: 14px 35px;
-
   border-radius: 18px;
-
   background: rgba(255, 255, 255, 0.08);
-
   backdrop-filter: blur(10px);
-
   font-size: 22px;
-
   font-weight: 700;
-
   letter-spacing: 0.5px;
 }
 
 /* TYPING AREA */
-
 .typing-viewport {
   margin-top: 30px;
 }
 
 /* STATS CARD */
-
-
 .stats div:hover {
   transform: translateY(-4px);
 }
 
 .stats strong {
   display: block;
-
   margin-top: 8px;
-
   font-size: 22px;
-
   color: #4ade80;
 }
-/* --- DASHBOARD STYLES --- */
+
+/* DASHBOARD STYLES */
 .dashboard-container {
   max-width: 900px;
   margin: 0 auto;
@@ -257,9 +229,17 @@
   border-bottom: 1px solid var(--bg-secondary);
 }
 
-.text-muted { color: var(--text-muted) !important; }
-.accent { color: var(--accent-color) !important; }
-.font-mono { font-family: var(--font-typing, monospace); }
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.accent {
+  color: var(--accent-color) !important;
+}
+
+.font-mono {
+  font-family: var(--font-typing, monospace);
+}
 
 /* Footer / Buttons */
 .dashboard-footer {
@@ -305,20 +285,19 @@
 
 .cancel-btn:hover {
   color: var(--text-primary);
-}/* --- THEMED STAT BOXES --- */
+}
 
-/* 1. Used for Career Highlights & Lifetime Volume on the Dashboard */
-/* --- COMPACT THEMED STAT BOXES --- */
+/* THEMED STAT BOXES */
 .stat-box {
   background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 16px 20px; /* Reduced padding to save space */
+  padding: 16px 20px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1; /* Allows boxes to share the row evenly */
-  min-width: 140px; /* Prevents them from getting too squished on smaller screens */
+  flex: 1;
+  min-width: 140px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   transition: all 0.25s ease;
 }
@@ -329,7 +308,6 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
-/* Adjust the font inside compact boxes so it doesn't wrap awkwardly */
 .stat-box .sub-label {
   font-size: 0.8rem;
   margin-bottom: 4px;
@@ -337,10 +315,10 @@
 }
 
 .stat-box .sub-number {
-  font-size: 1.8rem; /* Scaled down slightly to fit a single line */
+  font-size: 1.8rem;
   font-weight: bold;
 }
-/* 2. Used for the Result Screen (WPM, Accuracy, Errors, etc.) */
+
 .result-stat-box {
   background: var(--bg-secondary, rgba(255, 255, 255, 0.03));
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -349,40 +327,33 @@
   text-align: center;
   min-width: 140px;
 }
+
 .dashboard-stats-row {
   display: flex;
   justify-content: center;
-  gap: 15px; /* Reduced gap between boxes */
+  gap: 15px;
   flex-wrap: wrap;
   width: 100%;
 }
-/* GRAPH */
 
+/* GRAPH */
 .graph-container {
   margin-top: 35px;
-
   text-align: center;
 }
 
 .wpm-graph {
   margin-top: 15px;
-
   background: rgba(0, 0, 0, 0.25);
-
   border-radius: 15px;
 }
 
 /* RESULT BUTTONS */
-
 .result-buttons {
   margin-top: 30px;
-
   display: flex;
-
   justify-content: center;
-
   gap: 20px;
-
   flex-wrap: wrap;
 }
 
@@ -391,25 +362,19 @@
 }
 
 /* DASHBOARD LIST */
-
 .recent-tests {
   list-style: none;
-
   padding: 0;
 }
 
 .recent-tests li {
   padding: 12px;
-
   margin: 8px 0;
-
   border-radius: 12px;
-
   background: rgba(255, 255, 255, 0.08);
 }
 
 /* MOBILE */
-
 @media (max-width: 600px) {
   .typing-box {
     padding: 15px;
@@ -427,11 +392,8 @@
 
 .typing-line {
   display: flex;
-
   gap: 12px;
-
   white-space: nowrap;
-
   margin-bottom: 12px;
 }
 
@@ -439,53 +401,55 @@
   display: inline-block;
 }
 
-
-
 .replay-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(13, 17, 23, 0.95);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(13, 17, 23, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .replay-modal {
-    background: #1c2128;
-    padding: 40px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 1100px;
-    border: 1px solid #444c56;
-    text-align: center;
+  background: #1c2128;
+  padding: 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1100px;
+  border: 1px solid #444c56;
+  text-align: center;
 }
 
 .replay-controls {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
-/* --- LIVE STATS (While Typing) --- */
+
+/* LIVE STATS */
 .live-stats-container {
   display: flex;
   justify-content: flex-start;
   gap: 30px;
   margin-bottom: 20px;
 }
+
 .live-stat-item {
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
+
 .live-label {
   color: var(--text-muted, #646669);
   font-size: 0.9rem;
 }
+
 .live-value {
   color: var(--text-primary, #d1d0c5);
   font-family: var(--font-typing, monospace);
@@ -493,7 +457,7 @@
   font-weight: bold;
 }
 
-/* --- FINAL RESULT SCREEN --- */
+/* FINAL RESULT SCREEN */
 .result-screen {
   display: flex;
   flex-direction: column;
@@ -505,23 +469,26 @@
   padding: 20px;
 }
 
-/* Hero Stats (WPM & ACC) */
+/* Hero Stats */
 .hero-stats {
   display: flex;
   gap: 80px;
   text-align: center;
 }
+
 .hero-stat-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
+
 .hero-label {
   font-size: 2rem;
   color: var(--text-muted, #646669);
-  margin-bottom: -15px; /* Pulls number closer to label */
+  margin-bottom: -15px;
   z-index: 1;
 }
+
 .hero-number {
   font-size: 7rem;
   font-weight: bold;
@@ -536,15 +503,18 @@
   gap: 50px;
   justify-content: center;
 }
+
 .sub-stat-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
+
 .sub-label {
   font-size: 1rem;
   color: var(--text-muted, #646669);
 }
+
 .sub-number {
   font-size: 2.2rem;
   color: var(--text-primary, #d1d0c5);
@@ -557,12 +527,14 @@
   width: 100%;
   margin-top: 20px;
 }
+
 .wpm-graph {
-  overflow: visible; /* Prevents dots from clipping on edges */
+  overflow: visible;
 }
-.heatmap-container, 
+
+.heatmap-container,
 .slowest-words-container {
-  background: transparent !important; /* Removes the heavy #1c2128 boxes */
+  background: transparent !important;
   border: none !important;
   width: 100%;
   padding: 0;
@@ -576,19 +548,22 @@
   gap: 15px;
   flex-wrap: wrap;
 }
+
 .slow-word-card {
   background: transparent;
-  border-bottom: 2px solid #ca4754; /* Just a clean underline instead of a full box */
+  border-bottom: 2px solid #ca4754;
   padding: 5px 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .slow-word-text {
   font-size: 1.2rem;
   font-family: var(--font-typing, monospace);
   color: var(--text-primary, #d1d0c5);
 }
+
 .slow-word-time {
   font-size: 0.9rem;
   color: #ca4754;
@@ -600,6 +575,7 @@
   gap: 30px;
   margin-top: 20px;
 }
+
 .icon-btn-large {
   background: transparent;
   border: none;
@@ -612,6 +588,7 @@
   justify-content: center;
   transition: all 0.2s ease;
 }
+
 .icon-btn-large:hover {
   color: var(--text-primary, #d1d0c5);
   transform: translateY(-3px);

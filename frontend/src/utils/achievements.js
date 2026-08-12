@@ -1,17 +1,51 @@
 // src/utils/achievements.js
 
-// 🏆 The Master List of Badges
+// The Master List of Badges
 export const ACHIEVEMENTS = [
-  { id: "speed_50", title: "Speed Demon", description: "Reach 50 WPM in any test", icon: "🚀" },
-  { id: "speed_100", title: "Lightning Fast", description: "Reach 100 WPM in any test", icon: "⚡" },
-  { id: "speed_150", title: "Keyboard God", description: "Reach 150 WPM in any test", icon: "🔥" },
-  { id: "accuracy_100", title: "Sharpshooter", description: "Finish a test with 100% accuracy", icon: "🎯" },
-  { id: "tests_10", title: "Dedicated Typist", description: "Complete 10 typing tests", icon: "🏃" },
-  { id: "tests_50", title: "Marathoner", description: "Complete 50 typing tests", icon: "🏋️" }
+  {
+    id: "speed_50",
+    title: "Speed Demon",
+    description: "Reach 50 WPM in any test",
+    icon: "🚀",
+  },
+  {
+    id: "speed_100",
+    title: "Lightning Fast",
+    description: "Reach 100 WPM in any test",
+    icon: "⚡",
+  },
+  {
+    id: "speed_150",
+    title: "Keyboard God",
+    description: "Reach 150 WPM in any test",
+    icon: "🔥",
+  },
+  {
+    id: "accuracy_100",
+    title: "Sharpshooter",
+    description: "Finish a test with 100% accuracy",
+    icon: "🎯",
+  },
+  {
+    id: "tests_10",
+    title: "Dedicated Typist",
+    description: "Complete 10 typing tests",
+    icon: "🏃",
+  },
+  {
+    id: "tests_50",
+    title: "Marathoner",
+    description: "Complete 50 typing tests",
+    icon: "🏋️",
+  },
 ];
 
-// 🧠 The Logic: Checks if any new badges were earned
-export const checkAchievements = (currentStats, finalWpm, finalAccuracy) => {
+// The Logic: Checks if any new badges were earned
+export const checkAchievements = (
+  currentStats,
+  finalWpm,
+  finalAccuracy
+) => {
   const newlyUnlocked = [];
   const alreadyUnlocked = currentStats.unlockedAchievements || [];
 

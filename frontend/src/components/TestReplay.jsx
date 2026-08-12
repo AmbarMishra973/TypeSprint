@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import TypingViewport from "./TypingViewport";
-import "../styles/typingBox.css"; // Reuse your box styles
+import "../styles/typingBox.css";
 
 function TestReplay({ words, keystrokeLog, onClose }) {
   const [typed, setTyped] = useState("");
@@ -12,16 +12,13 @@ function TestReplay({ words, keystrokeLog, onClose }) {
   useEffect(() => {
     if (!isPlaying) return;
 
-    // Clear any existing timeouts just in case
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current = [];
 
-    // Reset visual state for replay
     setTyped("");
     setCurrentIndex(0);
     setCurrentChar(0);
 
-    // Schedule every keystroke to fire at its exact recorded timestamp
     keystrokeLog.forEach((log) => {
       const timer = setTimeout(() => {
         if (log.key === "Backspace") {
@@ -48,8 +45,8 @@ function TestReplay({ words, keystrokeLog, onClose }) {
   return (
     <div className="replay-overlay">
       <div className="replay-modal">
-        <h2>Replay Mode 🎥</h2>
-        
+        <h2>Replay Mode</h2>
+
         <TypingViewport
           words={words}
           typed={typed}
@@ -60,15 +57,16 @@ function TestReplay({ words, keystrokeLog, onClose }) {
         />
 
         <div className="replay-controls">
-          <button 
-            className="restart-btn" 
+          <button
+            className="restart-btn"
             onClick={() => setIsPlaying(true)}
-            disabled={isPlaying && currentIndex < words.length -1}
+            disabled={isPlaying && currentIndex < words.length - 1}
           >
-            ▶️ Play
+            Play
           </button>
+
           <button className="restart-btn" onClick={onClose}>
-            ❌ Close
+            Close
           </button>
         </div>
       </div>

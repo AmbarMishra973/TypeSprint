@@ -10,30 +10,30 @@ public class TestScore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🚀 Links this score directly to a user in your database
+    // Links this score directly to a user in your database
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     private int wpm;
     private int accuracy;
-    
+
     private String mode; // "time", "words", or "quote"
-    
-    // We use Integer (wrapper class) instead of int so they can be null 
+
+    // We use Integer (wrapper class) instead of int so they can be null
     // (e.g., a "words" test won't have a time limit)
-    private Integer timeLimit; 
-    private Integer wordLimit; 
-    
+    private Integer timeLimit;
+    private Integer wordLimit;
+
     private boolean punctuation;
     private boolean numbers;
-    
+
     private Long timestamp; // Stores Date.now() from the frontend
 
     public TestScore() {
     }
 
-    // --- Getters and Setters ---
+    // Getters and Setters
 
     public Long getId() {
         return id;

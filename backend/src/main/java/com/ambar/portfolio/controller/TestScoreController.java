@@ -27,12 +27,12 @@ public class TestScoreController {
             @RequestParam(defaultValue = "global") String scope,
             @RequestParam(defaultValue = "all") String timeRange) {
 
-        // 1. Friends scope placeholder
+        // Friends scope placeholder
         if ("friends".equalsIgnoreCase(scope)) {
             return ResponseEntity.ok(List.of());
         }
 
-        // 2. Calculate timestamp for time filters
+        // Calculate timestamp for time filters
         long now = System.currentTimeMillis();
         long sinceTimestamp = 0L;
 
@@ -42,19 +42,30 @@ public class TestScoreController {
             sinceTimestamp = now - (30L * 24 * 60 * 60 * 1000);
         }
 
-        // 3. Call the service layer (passing all 6 parameters)
+        // Call the service layer
         List<TestScore> leaders = testScoreService.getLeaderboard(
-                mode, timeLimit, wordLimit, punctuation, numbers, sinceTimestamp
+                mode,
+                timeLimit,
+                wordLimit,
+                punctuation,
+                numbers,
+                sinceTimestamp
         );
 
         return ResponseEntity.ok(leaders);
     }
+
     @PostMapping("/save")
-public ResponseEntity<?> saveTestScore(@RequestBody ScoreRequest request) {
-    TestScore savedScore = testScoreService.saveScore(request);
-    if (savedScore == null) {
-        return ResponseEntity.status(400).body("User not found or failed to save score");
+    public ResponseEntity<?> saveTestScore(
+            @RequestBody ScoreRequest request) {
+
+        TestScore savedScore = testScoreService.saveScore(request);
+
+        if (savedScore == null) {
+            return ResponseEntity.status(400)
+                    .body("User not found or failed to save score");
+        }
+
+        return ResponseEntity.ok(savedScore);
     }
-    return ResponseEntity.ok(savedScore);
-}
 }

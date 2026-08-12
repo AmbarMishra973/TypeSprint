@@ -28,27 +28,13 @@
   --correct-color: #50fa7b;
 }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-
-  overflow: hidden;
-}
-
 .home {
   min-height: 100vh;
-  background: var(--bg-color); 
-  color: var(--text-main);    
+  background: var(--bg-color);
+  color: var(--text-main);
   padding: 30px;
 }
+
 .navbar {
   display: flex;
   justify-content: center;
@@ -67,18 +53,13 @@ h1 {
 }
 
 .time-selector button {
-  background: #2563eb;
+  background: #1e293b;
   color: white;
-
-  border: none;
+  border: 1px solid #334155;
   padding: 12px 25px;
-
   margin: 10px;
-
   border-radius: 10px;
-
   cursor: pointer;
-
   transition: 0.3s;
 }
 
@@ -87,113 +68,91 @@ h1 {
   transform: translateY(-3px);
 }
 
+.active-time {
+  background: #2563eb !important;
+  box-shadow: 0 0 20px #2563eb;
+}
+
 .typing-box {
   margin-top: 40px;
-  background: var(--card-bg); 
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.6s ease;
 }
 
 textarea {
   width: 100%;
-
   height: 120px;
-
   margin-top: 20px;
-
   padding: 20px;
-
   font-size: 18px;
-
   border-radius: 10px;
 }
 
 .stats {
   display: flex;
-
   justify-content: space-around;
-
   margin-top: 40px;
 }
 
 .stats div {
   background: rgba(255, 255, 255, 0.1);
-
   padding: 20px;
-
   border-radius: 15px;
-
   min-width: 120px;
 }
 
 .paragraph {
   font-size: 20px;
-
   line-height: 1.8;
-
   text-align: left;
-
   margin-bottom: 25px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: text;
 }
 
 .timer {
   font-size: 24px;
   margin-bottom: 20px;
-  color: var(--primary-accent); 
+  color: var(--primary-accent);
   font-weight: bold;
 }
 
-.correct {
-  color: var(--correct-color);
-}
-
-.wrong {
-  color: var(--error-color); 
-}
 .result-card {
   background: rgba(255, 255, 255, 0.1);
-
   padding: 40px;
-
   border-radius: 20px;
-
   margin-top: 30px;
 }
 
 .result-card h2 {
   font-size: 32px;
-
   margin-bottom: 30px;
 }
 
 .result-stats {
   display: flex;
-
   justify-content: space-around;
-
   margin-bottom: 30px;
 }
 
 .result-stats div {
   background: rgba(255, 255, 255, 0.08);
-
   padding: 20px;
-
   border-radius: 15px;
 }
 
 .restart-btn {
   background: #2563eb;
-
   color: white;
-
   border: none;
-
   padding: 15px 35px;
-
   border-radius: 10px;
-
   font-size: 18px;
-
   cursor: pointer;
 }
 
@@ -201,77 +160,34 @@ textarea {
   background: #38bdf8;
 }
 
-.paragraph {
-  user-select: none;
-
-  -webkit-user-select: none;
-
-  cursor: text;
-}
-
-.typing-box {
-  background: rgba(255, 255, 255, 0.08);
-
-  backdrop-filter: blur(15px);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-
-  animation: fadeIn 0.6s ease;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
-
     transform: translateY(20px);
   }
 
   to {
     opacity: 1;
-
     transform: translateY(0);
   }
 }
 
-.time-selector button {
-  background: #1e293b;
-
-  color: white;
-
-  border: 1px solid #334155;
-}
-
-.active-time {
-  background: #2563eb !important;
-
-  box-shadow: 0 0 20px #2563eb;
-}
-
 .typing-text {
   font-size: 28px;
-
   line-height: 1.8;
-
   height: 100%;
-
   overflow: hidden;
-
   display: flex;
-
   align-items: center;
-
   flex-wrap: wrap;
-
   align-content: center;
-
   user-select: none;
 }
 
 .typing-text span {
   transition: 0.1s;
 }
+
 .typing-text .correct {
   color: var(--correct-color);
 }
@@ -281,10 +197,11 @@ textarea {
 }
 
 .typing-text .current {
-  color: var(--text-main); 
-  border-bottom: 3px solid var(--primary-accent); 
+  color: var(--text-main);
+  border-bottom: 3px solid var(--primary-accent);
   animation: blink 1s infinite;
 }
+
 @keyframes blink {
   50% {
     border-color: transparent;
@@ -293,30 +210,20 @@ textarea {
 
 .hidden-input {
   position: absolute;
-
   opacity: 0;
-
   pointer-events: none;
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
-}
-
-body {
-  overflow-x: hidden;
-
-  overflow-y: auto;
-}
-
-h1, h2, h3, h4, p {
+h1,
+h2,
+h3,
+h4,
+p {
   color: var(--text-main);
 }
 
-.stats div, 
-.stats div h3, 
+.stats div,
+.stats div h3,
 .stats div p,
 .result-stats div,
 .result-stats div h3,

@@ -7,7 +7,7 @@ function TypingViewport({
   currentIndex,
   currentChar,
   ghostPosition,
-  isRepeat // Make sure this prop is being received!
+  isRepeat,
 }) {
   const containerRef = useRef(null);
   const measureRef = useRef(null);
@@ -15,20 +15,21 @@ function TypingViewport({
   const [lines, setLines] = useState([]);
   const [ghostStyle, setGhostStyle] = useState({
     left: 0,
-    top: 0
+    top: 0,
   });
 
   const VISIBLE_LINES = 3;
 
-  // SAFETY: Clean up old HTML references when shrinking the word array (e.g., from 300 to 10)
+  // Clean up old references when the word array shrinks.
   wordRefs.current = wordRefs.current.slice(0, words.length);
 
-  // 1. CREATE RESPONSIVE LINES
+  // Create responsive lines based on the available container width.
   useEffect(() => {
     function calculateLines() {
       if (!containerRef.current || !measureRef.current) return;
 
-      const containerRect = containerRef.current.getBoundingClientRect();
+      const containerRect =
+        containerRef.current.getBoundingClientRect();
       const maxWidth = containerRect.width;
 
       const newLines = [];
@@ -61,9 +62,7 @@ function TypingViewport({
       setLines(newLines);
     }
 
-    document.fonts.ready.then(() => {
-      calculateLines();
-    });
+    document.fonts.ready.then(calculateLines);
 
     const observer = new ResizeObserver(calculateLines);
 
@@ -76,20 +75,25 @@ function TypingViewport({
     };
   }, [words]);
 
-  // 2. FIND CURRENT LINE
+  // Find the line containing the current word.
   const currentLineIndex = lines.findIndex((line) =>
     line.includes(currentIndex)
   );
-  const startLine = currentLineIndex === -1 ? 0 : currentLineIndex;
-  const visibleLines = lines.slice(startLine, startLine + VISIBLE_LINES);
 
-  // 3. GHOST WORD POSITION
+  const startLine =
+    currentLineIndex === -1 ? 0 : currentLineIndex;
+
+  const visibleLines = lines.slice(
+    startLine,
+    startLine + VISIBLE_LINES
+  );
+
+  // Calculate the ghost word and character position.
   let total = 0;
   let ghostWord = 0;
   let ghostChar = 0;
 
   for (let i = 0; i < words.length; i++) {
-    // SAFETY: Skip iteration if word is undefined during state transition
     if (!words[i]) continue;
 
     const length = words[i].length + 1;
@@ -99,12 +103,12 @@ function TypingViewport({
       ghostChar = ghostPosition - total;
       break;
     }
+
     total += length;
   }
 
-  // 4. GHOST LOCATION
+  // Find the ghost's position in the visible typing area.
   useEffect(() => {
-    // Optimization: Don't run DOM queries if the ghost isn't active
     if (!isRepeat) return;
 
     const element = document.querySelector(
@@ -117,7 +121,7 @@ function TypingViewport({
 
       setGhostStyle({
         left: rect.left - parent.left,
-        top: rect.top - parent.top
+        top: rect.top - parent.top,
       });
     }
   }, [ghostPosition, lines, ghostWord, ghostChar, isRepeat]);
@@ -127,7 +131,6 @@ function TypingViewport({
       {/* Hidden measuring layer */}
       <div className="measure-box" ref={measureRef}>
         {words.map((word, index) =>
-          // SAFETY: Check if word exists before rendering
           word ? (
             <span
               key={index}
@@ -140,13 +143,12 @@ function TypingViewport({
         )}
       </div>
 
-      {/* Visible Typing Area */}
+      {/* Visible typing area */}
       {visibleLines.map((line, lineIndex) => (
         <div className="typing-line" key={lineIndex}>
           {line.map((wordIndex) => {
             const word = words[wordIndex];
 
-            // CRITICAL SAFETY CHECK: Prevents the '.split is not a function' crash
             if (!word) return null;
 
             const active = wordIndex === currentIndex;
@@ -154,7 +156,11 @@ function TypingViewport({
             return (
               <span
                 key={wordIndex}
-                className={active ? "typing-word active-word" : "typing-word"}
+                className={
+                  active
+                    ? "typing-word active-word"
+                    : "typing-word"
+                }
               >
                 {word.split("").map((char, index) => {
                   let className = "";
@@ -162,7 +168,9 @@ function TypingViewport({
                   if (active) {
                     if (index < typed.length) {
                       className =
-                        typed[index] === char ? "correct-char" : "wrong-char";
+                        typed[index] === char
+                          ? "correct-char"
+                          : "wrong-char";
                     }
 
                     if (index === currentChar) {
@@ -187,12 +195,12 @@ function TypingViewport({
         </div>
       ))}
 
-      {/* Floating Ghost Element - ONLY rendered during repeated tests */}
+      {/* Floating ghost element for repeat tests */}
       {isRepeat && (
         <div
           className="floating-ghost"
           style={{
-            transform: `translate(${ghostStyle.left}px, ${ghostStyle.top}px)`
+            transform: `translate(${ghostStyle.left}px, ${ghostStyle.top}px)`,
           }}
         />
       )}

@@ -13,11 +13,7 @@ function TypingText({ paragraph, typedText }) {
         }
 
         return (
-          <span
-            key={index}
-
-            className={className}
-          >
+          <span key={index} className={className}>
             {char}
           </span>
         );

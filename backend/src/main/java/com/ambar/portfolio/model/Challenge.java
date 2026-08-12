@@ -19,15 +19,14 @@ public class Challenge {
     private int receiverWpm;
     private String winnerName;
 
-    // 🕒 Use Long object so existing database records with NULL don't crash the server
+    // Use Long object so existing database records with NULL don't crash the server
     private Long createdAt;
 
+    @Column(columnDefinition = "TEXT", length = 1000)
+    private String wordsText; // Stores space-separated words for the race
 
-    @Column(columnDefinition = "TEXT",length = 1000)
-    
-    private String wordsText; // Stores space-separated words for the rac
-
-    public Challenge() {}
+    public Challenge() {
+    }
 
     public Challenge(String senderName, String receiverName, int duration) {
         this.senderName = senderName;
@@ -37,35 +36,86 @@ public class Challenge {
         this.createdAt = System.currentTimeMillis();
     }
 
-    // --- GETTERS & SETTERS ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getSenderName() { return senderName; }
-    public void setSenderName(String senderName) { this.senderName = senderName; }
-    public String getReceiverName() { return receiverName; }
-    public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
-    public int getDuration() { return duration; }
-    public void setDuration(int duration) { this.duration = duration; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public int getSenderWpm() { return senderWpm; }
-    public void setSenderWpm(int senderWpm) { this.senderWpm = senderWpm; }
-    public int getReceiverWpm() { return receiverWpm; }
-    public void setReceiverWpm(int receiverWpm) { this.receiverWpm = receiverWpm; }
-    public String getWinnerName() { return winnerName; }
-    public void setWinnerName(String winnerName) { this.winnerName = winnerName; }
-   
-    public String getWordsText() { return wordsText; }
-    public void setWordsText(String wordsText) { this.wordsText = wordsText; }
+    // GETTERS & SETTERS
 
-
-    // Getters and setters
-    public Long getCreatedAt() { 
-        // If it's an old database record (null), return 0 so it gets instantly auto-cleaned up!
-        return createdAt != null ? createdAt : 0L; 
+    public Long getId() {
+        return id;
     }
-    
-    public void setCreatedAt(Long createdAt) { 
-        this.createdAt = createdAt; 
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getSenderWpm() {
+        return senderWpm;
+    }
+
+    public void setSenderWpm(int senderWpm) {
+        this.senderWpm = senderWpm;
+    }
+
+    public int getReceiverWpm() {
+        return receiverWpm;
+    }
+
+    public void setReceiverWpm(int receiverWpm) {
+        this.receiverWpm = receiverWpm;
+    }
+
+    public String getWinnerName() {
+        return winnerName;
+    }
+
+    public void setWinnerName(String winnerName) {
+        this.winnerName = winnerName;
+    }
+
+    public String getWordsText() {
+        return wordsText;
+    }
+
+    public void setWordsText(String wordsText) {
+        this.wordsText = wordsText;
+    }
+
+    public Long getCreatedAt() {
+        // If it's an old database record (null), return 0 so it gets instantly auto-cleaned up!
+        return createdAt != null ? createdAt : 0L;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 }

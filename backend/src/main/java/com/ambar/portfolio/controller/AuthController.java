@@ -18,7 +18,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
-
         if (userService.existsByName(user.getName())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Username already exists! Please choose another.");
@@ -28,53 +27,62 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Email is already registered! Please log in.");
         }
+
         User savedUser = userService.signup(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    // 🚀 Changed from ResponseEntity<String> to ResponseEntity<?>
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         if (user.getName() == null || user.getName().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name cannot be empty");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Name cannot be empty");
         }
-        
+
         User loggedUser = userService.login(
                 user.getName(),
                 user.getPassword()
         );
 
         if (loggedUser != null) {
-            // 🚀 Return the actual user object here!
             return ResponseEntity.ok(loggedUser);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Invalid credentials");
     }
+
     @PutMapping("/update-picture")
     public ResponseEntity<?> updateProfilePicture(@RequestBody User userRequest) {
-        // Find the user in the database by their name or ID
-        User existingUser = userService.login(userRequest.getName(), userRequest.getPassword());
-        
+        User existingUser = userService.login(
+                userRequest.getName(),
+                userRequest.getPassword()
+        );
+
         if (existingUser != null) {
             existingUser.setProfilePicture(userRequest.getProfilePicture());
-            userService.signup(existingUser); // Re-save the user with the new picture
+            userService.signup(existingUser);
             return ResponseEntity.ok(existingUser);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("User not found");
     }
 
     @PutMapping("/sync-stats")
     public ResponseEntity<?> syncStats(@RequestBody User userRequest) {
-        // Find the user to verify credentials
-        User existingUser = userService.login(userRequest.getName(), userRequest.getPassword());
-        
+        User existingUser = userService.login(
+                userRequest.getName(),
+                userRequest.getPassword()
+        );
+
         if (existingUser != null) {
             existingUser.setTypingStats(userRequest.getTypingStats());
-            userService.signup(existingUser); // Re-save the user with updated stats
+            userService.signup(existingUser);
             return ResponseEntity.ok(existingUser);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("User not found");
     }
 }

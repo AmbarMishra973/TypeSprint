@@ -1,22 +1,16 @@
 function ModeSelector({
   testMode,
-
   setTestMode,
-
   selectedTime,
-
   setSelectedTime,
-
   wordLimit,
-
-  setWordLimit
+  setWordLimit,
 }) {
   return (
     <div className="mode-selector">
       <div className="mode-buttons">
         <button
           className={testMode === "time" ? "active-time" : ""}
-
           onClick={() => {
             setTestMode("time");
           }}
@@ -26,7 +20,6 @@ function ModeSelector({
 
         <button
           className={testMode === "words" ? "active-time" : ""}
-
           onClick={() => {
             setTestMode("words");
           }}
@@ -40,9 +33,9 @@ function ModeSelector({
           {[15, 30, 60, 120].map((seconds) => (
             <button
               key={seconds}
-
-              className={selectedTime === seconds ? "active-time" : ""}
-
+              className={
+                selectedTime === seconds ? "active-time" : ""
+              }
               onClick={() => {
                 setSelectedTime(seconds);
               }}
@@ -58,9 +51,7 @@ function ModeSelector({
           {[10, 25, 50, 100].map((words) => (
             <button
               key={words}
-
               className={wordLimit === words ? "active-time" : ""}
-
               onClick={() => {
                 setWordLimit(words);
               }}
