@@ -199,8 +199,13 @@ export default function Leaderboard({ user }) {
                   </span>
 
                   <ZoomableAvatar 
-                    avatarUrl={score.user?.avatar || (isMe ? localStorage.getItem(`avatar_${user.name}`) : null)} 
-                    name={score.user?.name} 
+                    avatarUrl={
+                      score.user?.avatar || 
+                      score.avatar || 
+                      (isMe ? localStorage.getItem(`avatar_${user.name}`) : null) || 
+                      localStorage.getItem(`avatar_${score.user?.name || score.username}`)
+                    } 
+                    name={score.user?.name || score.username} 
                     borderColor={isMe ? 'var(--accent-color)' : 'rgba(255, 255, 255, 0.1)'}
                   />
 

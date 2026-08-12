@@ -16,19 +16,27 @@ export default function Profile({ user, stats }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setAvatarPreview(base64String); // Update UI
-        
-        // Save locally so it survives refreshes
-        if (user?.name) {
-          localStorage.setItem(`avatar_${user.name}`, base64String);
-        }
+      // Inside handleImageChange in Profile.jsx
+const reader = new FileReader();
+reader.onloadend = async () => {
+  const base64String = reader.result;
+  setAvatarPreview(base64String);
+  
+  // 1. Save locally for instant UI feedback
+  localStorage.setItem(`avatar_${user.name}`, base64String);
 
-        // TODO: Send base64String or FormData to your backend API here
-      };
-      reader.readAsDataURL(file); // Convert image to Base64 string
+  // 2. 🚀 Send to your backend so other computers can see it!
+  try {
+    await fetch(`https://ambarmishradb.onrender.com/api/users/update-avatar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: user.name, avatar: base64String })
+    });
+  } catch (err) {
+    console.error("Failed to sync avatar to backend:", err);
+  }
+};
+reader.readAsDataURL(file);// Convert image to Base64 string
     }
   };
   // --- 1. CALCULATE ALL-TIME STATS ---
