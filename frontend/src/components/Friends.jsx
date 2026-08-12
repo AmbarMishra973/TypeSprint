@@ -262,120 +262,115 @@ const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
           </div>
 
           {/* CHALLENGE INBOX */}
-          {pendingChallenges.length > 0 && (
-            <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
-              <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
-                <Swords size={20}/> Match Challenges ({pendingChallenges.length})
-              </h2>
-              <div style={styles.list}>
-                {pendingChallenges.map((challenge) => (
-                  <div key={challenge.id} style={styles.friendRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={styles.avatarMini}><User size={16}/></div>
-                      {/* Replace your old <span style={styles.friendName}> with this clickable version */}
-<div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <ZoomableAvatar 
-                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
-                      name={friendName} 
-                    />
-                    <span 
-                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-                      onClick={() => setSelectedFriendProfile(friendName)}
-                    >
-                      {friendName}
-                    </span>
-                  </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
-                      <button onClick={() => handleChallengeResponse(challenge.id, "DECLINED")} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* FRIEND REQUEST INBOX */}
-          {friendRequests.length > 0 && (
-            <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
-              <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
-                <Mail size={20}/> Friend Requests ({friendRequests.length})
-              </h2>
-              <div style={styles.list}>
-                {friendRequests.map((req, idx) => (
-                  <div key={idx} style={styles.friendRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={styles.avatarMini}><User size={16}/></div>
-                      {/* Replace your old <span style={styles.friendName}> with this clickable version */}
-<div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <ZoomableAvatar 
-                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
-                      name={friendName} 
-                    />
-                    <span 
-                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-                      onClick={() => setSelectedFriendProfile(friendName)}
-                    >
-                      {friendName}
-                    </span>
-                  </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => acceptRequest(req)} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
-                      <button onClick={() => rejectRequest(req)} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* MY FRIENDS LIST */}
-          <div style={styles.card}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
-              <Users size={20} /> My Friends ({myFriends.length})
-            </h2>
-            {myFriends.length === 0 ? (
-              <p style={styles.emptyStateText}>You haven't added anyone yet.</p>
-            ) : (
-              <div style={styles.list}>
-                {myFriends.map((friendName, idx) => (
-                  <div key={idx} style={styles.friendRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={styles.avatarMini}><User size={16} /></div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <ZoomableAvatar 
-                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
-                      name={friendName} 
-                    />
-                    <span 
-                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-                      onClick={() => setSelectedFriendProfile(friendName)}
-                    >
-                      {friendName}
-                    </span>
-                  </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
-                        <Swords size={18} />
-                      </button>
-                      <button onClick={() => setFriendToRemove(friendName)} className="action-icon-btn reject" title="Remove Friend">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+{pendingChallenges.length > 0 && (
+  <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
+    <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
+      <Swords size={20}/> Match Challenges ({pendingChallenges.length})
+    </h2>
+    <div style={styles.list}>
+      {pendingChallenges.map((challenge) => (
+        <div key={challenge.id} style={styles.friendRow}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <ZoomableAvatar 
+              avatarUrl={challenge.senderAvatar || challenge.avatar} 
+              name={challenge.senderName || challenge.username} 
+            />
+            <span 
+              style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+              onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+              onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+              onClick={() => setSelectedFriendProfile(challenge.senderName || challenge.username)}
+            >
+              {challenge.senderName || challenge.username}
+            </span>
           </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
+            <button onClick={() => handleChallengeResponse(challenge.id, "DECLINED")} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{/* FRIEND REQUEST INBOX */}
+{friendRequests.length > 0 && (
+  <div style={{...styles.card, border: "1px solid var(--accent-color)"}}>
+    <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: "var(--accent-color)" }}>
+      <Mail size={20}/> Friend Requests ({friendRequests.length})
+    </h2>
+    <div style={styles.list}>
+      {friendRequests.map((req, idx) => (
+        <div key={idx} style={styles.friendRow}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <ZoomableAvatar 
+              avatarUrl={req.avatar} 
+              name={typeof req === 'string' ? req : req.username} 
+            />
+            <span 
+              style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+              onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+              onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+              onClick={() => setSelectedFriendProfile(typeof req === 'string' ? req : req.username)}
+            >
+              {typeof req === 'string' ? req : req.username}
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={() => acceptRequest(req)} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
+            <button onClick={() => rejectRequest(req)} className="action-icon-btn reject" title="Decline"><X size={18}/></button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{/* MY FRIENDS LIST */}
+<div style={styles.card}>
+  <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-primary)' }}>
+    <Users size={20} /> My Friends ({myFriends.length})
+  </h2>
+  {myFriends.length === 0 ? (
+    <p style={styles.emptyStateText}>You haven't added anyone yet.</p>
+  ) : (
+    <div style={styles.list}>
+      {myFriends.map((friend, idx) => {
+        // Handles whether myFriends contains strings or objects
+        const friendName = typeof friend === 'string' ? friend : friend.name;
+        const friendAvatar = typeof friend === 'object' ? friend.avatar : null;
+
+        return (
+          <div key={idx} style={styles.friendRow}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <ZoomableAvatar 
+                avatarUrl={friendAvatar} 
+                name={friendName} 
+              />
+              <span 
+                style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                onClick={() => setSelectedFriendProfile(friendName)}
+              >
+                {friendName}
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
+                <Swords size={18} />
+              </button>
+              <button onClick={() => setFriendToRemove(friendName)} className="action-icon-btn reject" title="Remove Friend">
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
         </div>
 
         {/* RIGHT COLUMN: Find Friends */}
