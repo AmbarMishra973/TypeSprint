@@ -337,26 +337,27 @@ const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
   ) : (
     <div style={styles.list}>
       {myFriends.map((friend, idx) => {
-        // Handles whether myFriends contains strings or objects
-        const friendName = typeof friend === 'string' ? friend : friend.name;
-        const friendAvatar = typeof friend === 'object' ? friend.avatar : null;
+  const friendName = typeof friend === 'string' ? friend : friend.name;
+  
+  // 🚀 Check backend avatar first, then check if they saved an avatar locally on this browser
+  const friendAvatar = (typeof friend === 'object' ? friend.avatar : null) || localStorage.getItem(`avatar_${friendName}`);
 
-        return (
-          <div key={idx} style={styles.friendRow}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <ZoomableAvatar 
-                avatarUrl={friendAvatar} 
-                name={friendName} 
-              />
-              <span 
-                style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-                onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-                onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-                onClick={() => setSelectedFriendProfile(friendName)}
-              >
-                {friendName}
-              </span>
-            </div>
+  return (
+    <div key={idx} style={styles.friendRow}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <ZoomableAvatar 
+          avatarUrl={friendAvatar} 
+          name={friendName} 
+        />
+        <span 
+          style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+          onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+          onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+          onClick={() => setSelectedFriendProfile(friendName)}
+        >
+          {friendName}
+        </span>
+      </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
                 <Swords size={18} />
