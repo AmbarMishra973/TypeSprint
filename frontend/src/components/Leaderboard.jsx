@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getLeaderboard } from "../services/api";
 import { Trophy, Globe, Users, Ghost } from "lucide-react";
-
+import ZoomableAvatar from './ZoomableAvatar'; // Adjust path if needed
 export default function Leaderboard({ user }) {
   const [scope, setScope] = useState("global"); // "global" or "friends"
   const [timeRange, setTimeRange] = useState("all"); // "all", "month", "week"
@@ -199,9 +199,10 @@ export default function Leaderboard({ user }) {
                   </span>
                   <div style={{
                     ...styles.avatar, 
-                    ...(isMe ? { borderColor: 'var(--accent-color)', color: 'var(--accent-color)' } : {}),
-                    overflow: 'hidden' // Ensure the image stays a perfect circle
+                    ...(isMe ? { borderColor: 'var(--accent-color)', color: 'var(--accent-color)' } : {})
                   }}>
+                    {score.user?.name?.charAt(0).toUpperCase() || "?"}
+                  </div>
                     {/* Check if the user has an avatar from the DB, otherwise check local storage for the active user */}
                     {score.user?.avatar || (isMe && localStorage.getItem(`avatar_${user.name}`)) ? (
                       <img 

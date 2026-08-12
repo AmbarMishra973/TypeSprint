@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import FriendProfileModal from './FriendProfileModal';
+import ZoomableAvatar from './ZoomableAvatar'; // Adjust path if needed
 import { 
   Globe, Swords, Mail, User, Check, X, 
   Search, UserPlus, Trash2, Clock, Users 
@@ -272,14 +273,20 @@ const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16}/></div>
                       {/* Replace your old <span style={styles.friendName}> with this clickable version */}
-<span 
-  style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-  onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-  onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-  onClick={() => setSelectedFriendProfile(friendName)}
->
-  {friendName}
-</span>
+<div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <ZoomableAvatar 
+                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
+                      name={friendName} 
+                    />
+                    <span 
+                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                      onClick={() => setSelectedFriendProfile(friendName)}
+                    >
+                      {friendName}
+                    </span>
+                  </div>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => handleChallengeResponse(challenge.id, "ACCEPTED")} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
@@ -303,14 +310,20 @@ const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16}/></div>
                       {/* Replace your old <span style={styles.friendName}> with this clickable version */}
-<span 
-  style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-  onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-  onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-  onClick={() => setSelectedFriendProfile(friendName)}
->
-  {friendName}
-</span>
+<div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <ZoomableAvatar 
+                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
+                      name={friendName} 
+                    />
+                    <span 
+                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                      onClick={() => setSelectedFriendProfile(friendName)}
+                    >
+                      {friendName}
+                    </span>
+                  </div>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => acceptRequest(req)} className="action-icon-btn accept" title="Accept"><Check size={18}/></button>
@@ -335,14 +348,20 @@ const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
                   <div key={idx} style={styles.friendRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={styles.avatarMini}><User size={16} /></div>
-                      <span 
-                        style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
-                        onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
-                        onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
-                        onClick={() => setSelectedFriendProfile(friendName)}
-                      >
-                        {friendName}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <ZoomableAvatar 
+                      avatarUrl={friend.avatar} /* Adjust this if your backend uses a different property name for the avatar */
+                      name={friendName} 
+                    />
+                    <span 
+                      style={{...styles.friendName, cursor: 'pointer', textDecoration: 'underline', textDecorationColor: 'transparent', transition: 'all 0.2s'}} 
+                      onMouseEnter={(e) => e.target.style.textDecorationColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.target.style.textDecorationColor = 'transparent'}
+                      onClick={() => setSelectedFriendProfile(friendName)}
+                    >
+                      {friendName}
+                    </span>
+                  </div>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => setChallengeTarget(friendName)} className="action-icon-btn challenge" title="Challenge">
