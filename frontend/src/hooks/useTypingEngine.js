@@ -41,7 +41,6 @@ function useTypingEngine(user, onUserUpdate) {
     totalWords: 0, totalCharacters: 0, totalPracticeSeconds: 0,
     recentTests: [], globalMissedKeys: {}, unlockedAchievements: []
   };
-  const latestEngine = useRef(null);
 
   const storageKey = user && user.name ? `typingStats_${user.name}` : "typingStats_guest";
 
@@ -50,10 +49,10 @@ function useTypingEngine(user, onUserUpdate) {
     return saved ? JSON.parse(saved) : null;
   };
 
+  // ==========================================
+  // ALL HOOKS MUST STAY UNCONDITIONAL & AT THE TOP
+  // ==========================================
   const [stats, setStats] = useState({ ...defaultStats, ...(loadStats(storageKey) || {}) });
-
-  
-
   const [testMode, setTestMode] = useState("time");
   const [wordLimit, setWordLimit] = useState(25);
   const [words, setWords] = useState(generateWords(300));
@@ -64,7 +63,6 @@ function useTypingEngine(user, onUserUpdate) {
   const [time, setTime] = useState(30);
   const [selectedTime, setSelectedTime] = useState(30);
   const [startTime, setStartTime] = useState(null);
-  const startTimeRef = useRef(null);
   const [finalElapsed, setFinalElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -88,7 +86,10 @@ function useTypingEngine(user, onUserUpdate) {
   const [isQuoteMode, setIsQuoteMode] = useState(false);
   const [quoteAuthor, setQuoteAuthor] = useState("");
   const [repeatBestWpm, setRepeatBestWpm] = useState(0);
-  
+  const [bestRunHistory, setBestRunHistory] = useState([]); // Properly placed up top!
+
+  const latestEngine = useRef(null);
+  const startTimeRef = useRef(null);
   const timerRef = useRef(null);
   const wordStartTimeRef = useRef(performance.now());
   const ghostStartTime = useRef(null);
@@ -102,9 +103,6 @@ function useTypingEngine(user, onUserUpdate) {
     setStats({ ...defaultStats, ...(loadStats(storageKey) || {}) });
   }, [storageKey]);
 
-  // Fix: Handle both regular incrementing and time-mode countdowns cleanly
-  // 🚀 FIXED: Guaranteed single-interval timer loop
-  
   function fetchQuoteTest() {
     setIsQuoteMode(true);
     const randomQuote = sampleQuotes[Math.floor(Math.random() * sampleQuotes.length)];
@@ -159,7 +157,7 @@ function useTypingEngine(user, onUserUpdate) {
     } catch (e) {}
   }
 
-function handleKey(key) {
+  function handleKey(key) {
     if (finished) return;
 
     if (!isRunning) {
@@ -199,7 +197,6 @@ function handleKey(key) {
       playKeySound(false);
       const expected = words[currentIndex];
       
-      // 🚀 If space is pressed without typing anything, count it as an error!
       if (typed.length === 0) {
         setIncorrectCharacters((prev) => prev + 1);
         setWrongWords((prev) => prev + 1);
@@ -207,7 +204,6 @@ function handleKey(key) {
         setCorrectWords((prev) => prev + 1);
       } else {
         setWrongWords((prev) => prev + 1);
-        // Optional: Count length difference as incorrect characters if partially typed
         setIncorrectCharacters((prev) => prev + (expected.length - typed.length));
       }
       
@@ -273,21 +269,19 @@ function handleKey(key) {
     setFinished(true);
     if (timerRef.current) clearInterval(timerRef.current);
     const finalElapsedVal = Math.max(getElapsedSeconds(), 1);
-setFinalElapsed(finalElapsedVal);
-const wordsCompleted = currentIndex; 
-const charsTyped = correctCharacters + incorrectCharacters;
-// Ensure bounds are safe
-const safeCorrect = Math.max(correctCharacters, 0);
-const safeIncorrect = Math.max(incorrectCharacters, 0);
-const safeTotalAttempts = safeCorrect + safeIncorrect;
+    setFinalElapsed(finalElapsedVal);
+    const wordsCompleted = currentIndex; 
+    const charsTyped = correctCharacters + incorrectCharacters;
+    const safeCorrect = Math.max(correctCharacters, 0);
+    const safeIncorrect = Math.max(incorrectCharacters, 0);
+    const safeTotalAttempts = safeCorrect + safeIncorrect;
 
-const finalWpm = Math.round((safeCorrect / 5) / (finalElapsedVal / 60)) || 0;
-const finalRawWpm = Math.round(((safeCorrect + safeIncorrect) / 5) / (finalElapsedVal / 60)) || 0;
-const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorrect / safeTotalAttempts) * 100)) : 100;
+    const finalWpm = Math.round((safeCorrect / 5) / (finalElapsedVal / 60)) || 0;
+    const finalRawWpm = Math.round(((safeCorrect + safeIncorrect) / 5) / (finalElapsedVal / 60)) || 0;
+    const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorrect / safeTotalAttempts) * 100)) : 100;
 
     if (isRepeat && finalWpm > repeatBestWpm) setRepeatBestWpm(finalWpm);
 
-    // 🚀 1. Declare updatedStatsObj right here inside the state setter block
     let updatedStatsObj = null;
 
     setStats((prev) => {
@@ -318,7 +312,6 @@ const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorr
       return updatedStatsObj;
     });
     
-    // 🚀 2. Now safe to use updatedStatsObj down here!
     if (user && user.name && user.password) {
       syncUserStats(user.name, user.password, JSON.stringify(updatedStatsObj));
       
@@ -330,14 +323,12 @@ const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorr
       };
       saveTestScore(leaderboardPayload);
 
-      // 🚀 3. XP Update API Call
       const xpGained = Math.max(Math.round(finalWpm * 2 * (finalAccuracy / 100)), 10);
       
-      // 🚀 Send user.name instead of user.email
       fetch("https://ambarmishradb.onrender.com/api/users/update-xp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: user.name, xpGained }) // Changed to name!
+        body: JSON.stringify({ name: user.name, xpGained })
       })
         .then((res) => res.json())
         .then((updatedUser) => {
@@ -380,23 +371,44 @@ const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorr
     }
   }
 
-  function repeatTest() { resetTest(); setIsRepeat(true); setGhostWpm(repeatBestWpm); }
-  function newTest() { setWords(generateWords(testMode === "words" ? wordLimit : 300, punctuationFreq, numberFreq)); resetTest(); setIsRepeat(false); setRepeatBestWpm(0); }
-  function updateBest() { const current = calculateWPM(); if (current > bestRepeatedWpm) setBestRepeatedWpm(current); }
+  function repeatTest() {
+    const currentTestWpm = calculateWPM(); 
+    const currentTestHistory = wpmHistory;  
+
+    if (currentTestWpm > repeatBestWpm) {
+      setRepeatBestWpm(currentTestWpm);
+      setBestRunHistory(currentTestHistory); 
+    }
+
+    setIsRepeat(true);
+    resetTest(); 
+  }
+
+  function newTest() { 
+    setWords(generateWords(testMode === "words" ? wordLimit : 300, punctuationFreq, numberFreq)); 
+    resetTest(); 
+    setIsRepeat(false); 
+    setRepeatBestWpm(0); 
+    setBestRunHistory([]);
+  }
+
+  function updateBest() { 
+    const current = calculateWPM(); 
+    if (current > bestRepeatedWpm) setBestRepeatedWpm(current); 
+  }
+
   function clearStatistics() {
     resetStats(); setStats(defaultStats);
     if (user && user.name && user.password) syncUserStats(user.name, user.password, JSON.stringify(defaultStats));
   }
 
-  // 🚀 NEW: Point 'restart' exactly to 'resetTest'
   const restart = resetTest;
 
-  // 🚀 NEW: Intelligently convert multiplayer database string to an array!
   const handleSetWords = (newWords) => {
     if (typeof newWords === "string") {
-      setWords(newWords.split(" ")); // Convert backend string into an array
+      setWords(newWords.split(" ")); 
     } else {
-      setWords(newWords); // Normal array for solo mode
+      setWords(newWords); 
     }
   };
 
@@ -411,9 +423,9 @@ const finalAccuracy = safeTotalAttempts > 0 ? Math.min(100, Math.round((safeCorr
     bestRepeatedWpm, isRepeat, missedKeys, wordTimes, keystrokeLog, soundEnabled,
     setSoundEnabled, punctuationFreq, numberFreq, updateModifiers, isQuoteMode,
     quoteAuthor, fetchQuoteTest, changeTimeLimit, repeatBestWpm,
-    
-    restart, // Exported!
-    setWords: handleSetWords, // Safe backend string parser exported!
+    bestRunHistory, // 🚀 Exported for your ghost graph display!
+    restart, 
+    setWords: handleSetWords, 
     globalMissedKeys: stats.globalMissedKeys || {}
   };
 }

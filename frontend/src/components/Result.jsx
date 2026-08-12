@@ -16,10 +16,12 @@ function Result({
   missedKeys = {},
   wordTimes = [],
   keystrokeLog = [], 
-  words = []
+  words = [],
+  bestRunHistory = [] // 🚀 Added missing prop here!
 }) {
   const [showReplay, setShowReplay] = useState(false);
   const safeHistory = history?.length ? history : [];
+  const safeGhostHistory = bestRunHistory?.length ? bestRunHistory : [];
 
   // --- NEW GRAPH DIMENSIONS & PADDING ---
   const chartWidth = 800;
@@ -36,12 +38,16 @@ function Result({
   const maxWpm = Math.max(...safeHistory.map((item) => Number(item.wpm)), 50);
   const roundedMaxWpm = Math.ceil(maxWpm / 10) * 10; 
 
-  // Helper functions to map data to pixel coordinates
+  // Helper functions to map data to pixel coordinates (Must be defined BEFORE using them)
   const getX = (index) => padLeft + (index / Math.max(safeHistory.length - 1, 1)) * innerWidth;
   const getY = (val) => padTop + innerHeight - (val / roundedMaxWpm) * innerHeight;
 
-  // Generate the polyline path
+  // Generate the polyline paths now that coordinates helpers exist
   const points = safeHistory
+    .map((point, index) => `${getX(index)},${getY(Number(point.wpm))}`)
+    .join(" ");
+
+  const ghostPoints = safeGhostHistory
     .map((point, index) => `${getX(index)},${getY(Number(point.wpm))}`)
     .join(" ");
 
@@ -149,7 +155,20 @@ function Result({
             {elapsedTime}s
           </text>
 
-          {/* The Data Line */}
+          {/* 👻 GHOST BEST RUN LINE (Dotted Secondary Line) */}
+          {safeGhostHistory.length > 1 && (
+            <polyline 
+              points={ghostPoints} 
+              fill="none" 
+              stroke="var(--text-muted, #646669)" 
+              strokeWidth="2" 
+              strokeDasharray="4 4" 
+              strokeOpacity="0.5"
+              strokeLinejoin="round" 
+            />
+          )}
+
+          {/* MAIN DATA LINE */}
           {safeHistory.length > 1 && (
             <polyline 
               points={points} 

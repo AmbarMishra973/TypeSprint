@@ -57,6 +57,7 @@ function TypingBox({ engine, user, activeChallenge, setActiveChallenge }) {
     quoteAuthor,
     fetchQuoteTest,
     repeatBestWpm,
+    bestRunHistory,
   } = engine;
 
   const inputRef = useRef(null);
@@ -350,11 +351,13 @@ const playSound = (type) => {
     }
   }, [activeChallenge, engine]);
   // GHOST ANIMATION
+  // GHOST ANIMATION (Local Best WPM)
   useEffect(() => {
     let frame;
 
     function animate() {
-      if (!isRunning || ghostWpm <= 0 || !isRepeat) return;
+      // 🚀 FIX: Added !activeChallenge to prevent clash with multiplayer ghost
+      if (!isRunning || ghostWpm <= 0 || !isRepeat || activeChallenge) return;
 
       if (!ghostStartTime.current) {
         ghostStartTime.current = performance.now();
@@ -371,7 +374,7 @@ const playSound = (type) => {
       const skippedCharacters = userTrackPosition - userTypedEffort;
 
       const elapsed = (performance.now() - ghostStartTime.current) / 1000;
-      const speed = (ghostWpm * 5) / 60; 
+      const speed = (ghostWpm * 5) / 60; // 5 chars per word
 
       const finalPosition = Math.max(0, Math.floor((elapsed * speed) + skippedCharacters));
       
@@ -379,13 +382,12 @@ const playSound = (type) => {
       frame = requestAnimationFrame(animate);
     }
 
-    if (isRunning && isRepeat) {
+    if (isRunning && isRepeat && !activeChallenge) {
       frame = requestAnimationFrame(animate);
     }
 
     return () => cancelAnimationFrame(frame);
-  }, [isRunning, ghostWpm, isRepeat, setGhostPosition]);
-
+  }, [isRunning, ghostWpm, isRepeat, setGhostPosition, activeChallenge]);
   function keyHandler(e) {
     e.preventDefault();
     if (!isRunning) {
@@ -524,7 +526,7 @@ const playSound = (type) => {
 
       {finished && (
         <>
-          <Result wpm={calculateWPM()} rawWpm={calculateRawWPM()} accuracy={calculateAccuracy()} characters={correctCharacters} errors={incorrectCharacters} history={wpmHistory} bestWpm={stats.bestWpm} testHistory={stats.recentTests} elapsedTime={elapsedTime} repeatTest={repeatTest} newTest={newTest} missedKeys={missedKeys} wordTimes={wordTimes} keystrokeLog={keystrokeLog} words={words} />
+          <Result wpm={calculateWPM()} rawWpm={calculateRawWPM()} accuracy={calculateAccuracy()} characters={correctCharacters} errors={incorrectCharacters} history={wpmHistory} bestWpm={stats.bestWpm} testHistory={stats.recentTests} elapsedTime={elapsedTime} repeatTest={repeatTest} newTest={newTest} missedKeys={missedKeys} wordTimes={wordTimes} keystrokeLog={keystrokeLog} words={words} bestRunHistory={bestRunHistory}/>
         </>
       )}
       {/* 🚀 WAITING OVERLAY (Shows when you finish before opponent) */}
