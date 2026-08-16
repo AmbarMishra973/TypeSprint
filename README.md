@@ -15,6 +15,12 @@ Featuring real-time ghost racing, dynamic custom modifiers, and comprehensive st
 
 ---
 
+## 📸 App Previews
+
+| Home Screen | Result Screen | User Profile 1 | User Profile 2 |
+| :---: | :---: | :---: | :---: |
+| ![Home Screen](screenshots/home-screen.png) | ![Result Screen](screenshots/result-screen.png) | ![User Profile 1](screenshots/profile1.png) | ![User Profile 2](screenshots/profile2.png) |
+
 ## 🛠️ Tech Stack
 
 **Frontend**
