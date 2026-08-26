@@ -24,7 +24,7 @@ const DailyChallenge = ({ user }) => {
 
   useEffect(() => {
     fetch(
-      "[https://ambarmishradb.onrender.com/api/challenges/daily-text](https://ambarmishradb.onrender.com/api/challenges/daily-text)"
+      "https://ambarmishradb.onrender.com/api/challenges/daily-text"
     )
       .then((res) => res.text())
       .then((text) => {
@@ -38,7 +38,7 @@ const DailyChallenge = ({ user }) => {
 
   const fetchLeaderboard = () => {
     fetch(
-      "[https://ambarmishradb.onrender.com/api/challenges/daily-leaderboard](https://ambarmishradb.onrender.com/api/challenges/daily-leaderboard)"
+      "https://ambarmishradb.onrender.com/api/challenges/daily-leaderboard"
     )
       .then((res) => res.json())
       .then((data) => setLeaderboard(data))
