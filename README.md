@@ -54,7 +54,7 @@ To get a local copy up and running, follow these simple steps.
 
 1. Clone the repository and navigate to the backend folder:
    ```bash
-   git clone [https://github.com/your-username/typesprint.git](https://github.com/your-username/typesprint.git)
+   git clone [https://github.com/AmbarMishra973/typesprint.git](https://github.com/AmbarMishra973/typesprint.git)
    cd typesprint/backend
    ```
 2. Create a local PostgreSQL database named `typesprintdb`.
