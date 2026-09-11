@@ -1,140 +1,126 @@
-# TypeSprint ⌨️🚀
+# ⚡ TypeSprint — Modern Typing Platform & Speed Test
 
-TypeSprint is a feature-rich, full-stack typing speed test application designed to help developers and typists improve their speed, accuracy, and muscle memory. 
+[![Vite](https://img.shields.io/badge/Frontend-Vite%20%2B%20React%2019-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%203-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge)](LICENSE)
 
-Featuring real-time ghost racing, dynamic custom modifiers, and comprehensive statistics tracking, TypeSprint offers a highly customizable typing experience.
+**TypeSprint** is a high-performance, full-stack typing platform designed for developers, typists, and competitive speed-typers. Featuring real-time ghost racing, weak-key targeted practice, code snippet mode, live 1v1 challenges, custom sound profiles, and detailed analytics.
 
-## ✨ Features
+---
 
-* **Multiple Game Modes:** Practice by Time (15s, 30s, 60s, 120s), Word Count (10, 25, 50, 100), or type famous developer Quotes.
-* **Ghost Racing:** Compete against your own previous best WPM (Words Per Minute) with a visual ghost marker traversing the text.
-* **Custom Modifiers:** Adjust sliders to inject dynamic punctuation and numbers into the word bank to simulate real-world coding and typing scenarios.
-* **Real-time Analytics:** Tracks live WPM, Raw WPM, Accuracy, keystroke logs, and missed keys.
-* **User Authentication:** Secure signup and login to persist global statistics and test history across sessions.
-* **Interactive UI:** Features custom themes, sound effects, and a responsive typing viewport.
+## ✨ Features & Highlights
+
+- **⚡ Multiple Practice Modes**:
+  - **Time Mode**: 15s, 30s, 60s, 120s high-intensity typing sprints.
+  - **Words Mode**: Fixed count (10, 25, 50, 100 words).
+  - **Quote Mode**: Famous developer quotes with author attribution.
+  - **Code Mode**: Real-world programming code snippets (JavaScript, Python, Java, HTML/CSS).
+  - **Targeted Weak-Keys Mode**: Automatically generates custom tests focused on your most frequently missed keys.
+
+- **🏎️ Ghost Racer**:
+  - Compete against your personal best WPM run with a live ghost indicator tracking your historic pace in real time.
+
+- **⚔️ Live 1v1 Multiplayer Challenges**:
+  - Challenge friends or online opponents to live synchronized typing duels with live leaderboard rankings and head-to-head stats.
+
+- **📊 Comprehensive Analytics**:
+  - Live burst WPM graph, accuracy over time, keystroke log replays, error heatmaps, and consistency scoring.
+
+- **🎨 Themes & Sound Effects**:
+  - **8 Vibrant Color Themes**: Classic Yellow, Midnight Dark, Cyberpunk Neon, Nord Frost, Sunset Orange, Clean Light, Hacker Terminal, Dracula.
+  - **Web Audio API Keypress Sounds**: Audio feedback toggle directly on the control bar.
+
+- **🏆 Gamification & XP System**:
+  - Earn XP rewards, level up your profile badge, unlock achievements, and climb global and friends-only leaderboards.
 
 ---
 
 ## 📸 App Previews
 
-| Home Screen | Result Screen | User Profile 1 | User Profile 2 |
-| :---: | :---: | :---: | :---: |
-| ![Home Screen](screenshots/home-screen.png) | ![Result Screen](screenshots/result-screen.png) | ![User Profile 1](screenshots/profile1.png) | ![User Profile 2](screenshots/profile2.png) |
-
-## 🛠️ Tech Stack
-
-**Frontend**
-* React.js (Hooks: `useState`, `useEffect`, `useRef`)
-* CSS3 (Custom responsive styling and animations)
-* Axios / Fetch API
-
-**Backend**
-* Java 17
-* Spring Boot (v3.5.6)
-* Spring Data JPA / Hibernate
-* RESTful APIs & CORS Configuration
-
-**Database & Deployment**
-* PostgreSQL
-* Hosted on [Render](https://render.com/)
+| Home Typing Viewport | Test Result & Graph | Profile & Stats |
+| :---: | :---: | :---: |
+| ![Home Screen](screenshots/home-screen.png) | ![Result Screen](screenshots/result-screen.png) | ![User Profile](screenshots/profile1.png) |
 
 ---
 
-## 🚀 Getting Started (Local Development)
+## 🛠️ Tech Stack Architecture
 
-To get a local copy up and running, follow these simple steps.
+### Frontend
+- **Framework**: React 19 + Vite 8
+- **Icons**: Lucide React
+- **Styling**: Modern CSS3 (Custom Design System with dynamic CSS variables & Glassmorphism)
+- **Audio Engine**: Web Audio API (Synthesized click sound profiles)
 
-### Prerequisites
-* [Node.js](https://nodejs.org/) (v16+)
-* [Java JDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-* [PostgreSQL](https://www.postgresql.org/) (Installed locally)
-* [Maven](https://maven.apache.org/)
-
-### 1. Backend Setup (Spring Boot)
-
-1. Clone the repository and navigate to the backend folder:
-   ```bash
-   git clone [https://github.com/AmbarMishra973/typesprint.git](https://github.com/AmbarMishra973/typesprint.git)
-   cd typesprint/backend
-   ```
-2. Create a local PostgreSQL database named `typesprintdb`.
-3. Update your `src/main/resources/application.properties` to connect to your local database:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/typesprintdb
-   spring.datasource.username=postgres
-   spring.datasource.password=your_local_password
-   spring.jpa.hibernate.ddl-auto=update
-   ```
-4. Run the Spring Boot application:
-   ```bash
-   mvn spring-boot:run
-   ```
-   *The backend will start on `http://localhost:8080`*
-
-### 2. Frontend Setup (React)
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd ../frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Update your API configuration in `src/services/api.js` to point to your local backend:
-   ```javascript
-   const API_BASE_URL = "http://localhost:8080/api";
-   ```
-4. Start the development server:
-   ```bash
-   npm start
-   ```
-   *The frontend will start on `http://localhost:3000`*
+### Backend
+- **Framework**: Java 17 + Spring Boot 3
+- **Data Access**: Spring Data JPA / Hibernate
+- **Database**: PostgreSQL
+- **Hosting**: Render Cloud Services
 
 ---
 
-## 🌍 Production Deployment
+## 🚀 Local Development Setup
 
-This project is configured for cloud deployment.
+### 1. Prerequisites
+- **Node.js**: `v18+`
+- **Java JDK**: `17+`
+- **Maven**: `v3.8+`
+- **PostgreSQL Database**
 
-**Backend (Render):**
-* Ensure your Render Web Service has the following Environment Variables configured securely:
-  * `SPRING_DATASOURCE_URL`
-  * `SPRING_DATASOURCE_USERNAME`
-  * `SPRING_DATASOURCE_PASSWORD`
-* Ensure your Spring Boot `application.properties` uses placeholder syntax (e.g., `${SPRING_DATASOURCE_URL}`) to read these variables.
+### 2. Backend Setup (Spring Boot)
+```bash
+# Navigate to the backend directory
+cd backend
 
-**Frontend:**
-* Update the `API_BASE_URL` to point to your live Render backend URL before deploying (e.g., `https://your-backend.onrender.com/api`).
-* Ensure your Spring Boot backend has a Global CORS Configuration allowing requests from your frontend domain.
+# Build and run backend server
+mvn spring-boot:run
+```
+> The backend server will start on `http://localhost:8080`.
+
+### 3. Frontend Setup (React)
+```bash
+# Navigate to the frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start Vite dev server
+npm run dev
+```
+> The frontend application will start on `http://localhost:5173`.
 
 ---
 
-## 📂 Project Structure
+## 📂 Repository Structure
 
 ```text
-typesprint/
-├── backend/                   # Spring Boot application
-│   ├── src/main/java/...      # Controllers, Models, Repositories, Services
-│   └── src/main/resources/    # application.properties
+TypeSprint/
+├── backend/                    # Spring Boot REST API
+│   ├── src/main/java/com/ambar/portfolio/
+│   │   ├── config/             # CORS & Security Configuration
+│   │   ├── controller/         # Auth, TestScore, Challenge & User Controllers
+│   │   ├── model/              # JPA Entities (User, TestScore, Challenge)
+│   │   └── service/            # Business Logic & Matchmaking Services
+│   └── pom.xml
 │
-└── frontend/                  # React application
-    ├── public/                # index.html, assets
-    └── src/
-        ├── components/        # TypingBox, TypingViewport, Stats, etc.
-        ├── hooks/             # Custom useTypingEngine logic
-        ├── styles/            # CSS stylesheets
-        └── utils/             # API services and local storage handlers
+├── frontend/                   # React + Vite Application
+│   ├── src/
+│   │   ├── components/         # TypingBox, TypingViewport, Result, Leaderboard, etc.
+│   │   ├── data/               # Words bank, code snippets, quotes, weak key generator
+│   │   ├── hooks/              # Custom useTypingEngine logic
+│   │   ├── pages/              # Home, DailyChallenge
+│   │   ├── services/           # Centralized API service helpers
+│   │   └── styles/             # Modular CSS stylesheets
+│   ├── package.json
+│   └── vite.config.js
 ```
 
 ---
 
-## 🤝 Feedback & Issues
+## 📜 License & Community
 
-TypeSprint is a personal portfolio project. As such, **external Pull Requests are currently closed**, and only authorized contributors can push code changes.
+This project is licensed under the [MIT License](LICENSE).
 
-However, feedback from the community is highly appreciated! If you encounter a bug, have a feature suggestion, or experience any issues while using the application, you are more than welcome to raise an issue:
-
-1. Go to the [Issues page](https://github.com/your-username/typesprint/issues).
-2. Click on **New Issue**.
-3. Provide a clear description of the bug or your feature request.
+Contributions, feature suggestions, and bug reports are welcome! Feel free to open an issue on the [TypeSprint GitHub Repository](https://github.com/AmbarMishra973/TypeSprint/issues).

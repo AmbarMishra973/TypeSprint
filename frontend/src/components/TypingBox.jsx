@@ -47,6 +47,8 @@ function TypingBox({
     correctCharacters,
     incorrectCharacters,
     wpmHistory,
+    addWpmPoint,
+    finishTest,
     ghostPosition,
     setGhostPosition,
     ghostWpm,
