@@ -1,51 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { loadStats, saveStats, resetStats } from "../utils/statsStorage";
-import { syncUserStats, saveTestScore } from "../services/api";
+import { useState, useEffect, useRef } from "react";
+import { saveStats, resetStats } from "../utils/statsStorage";
+import { syncUserStats, saveTestScore, updateUserXp } from "../services/api";
 import { checkAchievements } from "../utils/achievements";
+import defaultWords, { quotes as sampleQuotes, codeSnippets, generateWeakKeyWords } from "../data/words";
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-const wordBank = [
-  "the",
-  "quick",
-  "brown",
-  "fox",
-  "jumps",
-  "over",
-  "lazy",
-  "dog",
-  "typing",
-  "speed",
-  "accuracy",
-  "practice",
-  "keyboard",
-  "developer",
-  "coding",
-  "javascript",
-  "react",
-  "spring",
-  "boot",
-  "database",
-  "project",
-  "learning",
-  "future",
-  "technology",
-  "computer",
-  "science",
-  "design",
-  "build",
-  "experience",
-  "improve",
-  "daily",
-  "challenge"
-];
-
-function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
+function generateWords(amount = 300, punctFreq = 0, numFreq = 0, sourceBank = defaultWords) {
   const result = [];
   const punctuations = [",", ".", "?", "!", ";", ":", '"', "()"];
+  const bank = sourceBank.length > 0 ? sourceBank : defaultWords;
 
   for (let i = 0; i < amount; i++) {
-    let word = wordBank[Math.floor(Math.random() * wordBank.length)];
+    let word = bank[Math.floor(Math.random() * bank.length)];
 
     if (numFreq > 0 && Math.random() * 100 < numFreq) {
       word = Math.floor(Math.random() * 1000).toString();
@@ -54,8 +21,7 @@ function generateWords(amount = 300, punctFreq = 0, numFreq = 0) {
         word = word.charAt(0).toUpperCase() + word.slice(1);
       }
 
-      const punc =
-        punctuations[Math.floor(Math.random() * punctuations.length)];
+      const punc = punctuations[Math.floor(Math.random() * punctuations.length)];
 
       if (punc === '"') {
         word = `"${word}"`;
@@ -576,28 +542,13 @@ function useTypingEngine(user, onUserUpdate) {
         10
       );
 
-      fetch(
-        "https://ambarmishradb.onrender.com/api/users/update-xp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            name: user.name,
-            xpGained
-          })
+      updateUserXp(user.name, xpGained).then((updatedUser) => {
+        if (updatedUser && onUserUpdate) {
+          onUserUpdate(updatedUser);
         }
-      )
-        .then((res) => res.json())
-        .then((updatedUser) => {
-          if (onUserUpdate) {
-            onUserUpdate(updatedUser);
-          }
-        })
-        .catch((err) =>
-          console.error("Error updating XP:", err)
-        );
+      }).catch((err) =>
+        console.error("Error updating XP:", err)
+      );
     }
   }
 
@@ -733,6 +684,24 @@ function useTypingEngine(user, onUserUpdate) {
     }
   };
 
+  function startWeakKeyPractice() {
+    setIsQuoteMode(false);
+    setQuoteAuthor("");
+    setTestMode("weak");
+    const practiceWords = generateWeakKeyWords(stats.globalMissedKeys || {}, testMode === "words" ? wordLimit : 40);
+    setWords(practiceWords);
+    resetTest();
+  }
+
+  function startCodeTest() {
+    setIsQuoteMode(false);
+    setQuoteAuthor("");
+    setTestMode("code");
+    const randomCode = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+    setWords(randomCode.split(" "));
+    resetTest();
+  }
+
   return {
     words,
     typed,
@@ -785,6 +754,8 @@ function useTypingEngine(user, onUserUpdate) {
     isQuoteMode,
     quoteAuthor,
     fetchQuoteTest,
+    startWeakKeyPractice,
+    startCodeTest,
     changeTimeLimit,
     repeatBestWpm,
     bestRunHistory,
