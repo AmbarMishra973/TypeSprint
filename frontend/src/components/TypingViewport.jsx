@@ -189,6 +189,16 @@ function TypingViewport({
                     </span>
                   );
                 })}
+                {active && typed.length > word.length && (
+                  typed.slice(word.length).split("").map((extraChar, extraIdx) => (
+                    <span
+                      key={`extra-${extraIdx}`}
+                      className="typing-char wrong-char extra-char"
+                    >
+                      {extraChar}
+                    </span>
+                  ))
+                )}
               </span>
             );
           })}

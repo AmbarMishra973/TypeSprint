@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import XpProgressBar from "./XpProgressBar";
 
 export default function ProfileModal({ user, stats, onClose }) {
   const [duelStats, setDuelStats] = useState(null);

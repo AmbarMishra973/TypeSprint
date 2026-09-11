@@ -5,11 +5,14 @@ import {
   Clock,
   Type,
   MessageSquareQuote,
+  CodeXml,
+  Target,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import TypingViewport from "./TypingViewport";
 import Stats from "./Stats";
 import Result from "./Result";
-import ModeSelector from "./ModeSelector";
 import ThemeSelector from "./ThemeSelector";
 import "../styles/typingBox.css";
 import MatchResultModal from "./MatchResultModal";
@@ -29,7 +32,6 @@ function TypingBox({
     time,
     setTime,
     selectedTime,
-    setSelectedTime,
     testMode,
     changeTestMode,
     wordLimit,
@@ -45,16 +47,13 @@ function TypingBox({
     correctCharacters,
     incorrectCharacters,
     wpmHistory,
-    addWpmPoint,
     ghostPosition,
     setGhostPosition,
     ghostWpm,
     setGhostWpm,
     getElapsedSeconds,
     stats,
-    clearStatistics,
     isRepeat,
-    finishTest,
     wordTimes,
     keystrokeLog,
     missedKeys = {},
@@ -67,6 +66,8 @@ function TypingBox({
     isQuoteMode,
     quoteAuthor,
     fetchQuoteTest,
+    startWeakKeyPractice,
+    startCodeTest,
     repeatBestWpm,
     bestRunHistory,
   } = engine;
@@ -74,9 +75,7 @@ function TypingBox({
   const inputRef = useRef(null);
   const ghostStartTime = useRef(null);
 
-  const [showModifiers, setShowModifiers] = useState(false);
   const [matchCountdown, setMatchCountdown] = useState(null);
-  const [matchResult, setMatchResult] = useState(null);
   const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const [completedMatch, setCompletedMatch] = useState(null);
 
@@ -226,7 +225,9 @@ function TypingBox({
             setGhostPosition(opponentIndex);
           }
         }
-      } catch (err) {}
+      } catch {
+        // Ignored
+      }
     }, 1000);
 
     return () => {
@@ -247,12 +248,12 @@ function TypingBox({
 
     const checkWinnerInterval = setInterval(async () => {
       try {
-        const res = await fetch(
+        await fetch(
           `https://ambarmishradb.onrender.com/api/challenges/${activeChallenge.id}/active`
         );
-
-        // If active returns empty, check full challenge details or status.
-      } catch (err) {}
+      } catch {
+        // Ignored
+      }
     }, 2000);
 
     return () => clearInterval(checkWinnerInterval);
@@ -657,6 +658,14 @@ function TypingBox({
               <Hash size={14} />
               numbers
             </button>
+            <button
+              className={`control-btn ${soundEnabled ? "active" : ""}`}
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              title={soundEnabled ? "Mute Sound" : "Enable Sound"}
+            >
+              {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+              {soundEnabled ? "sound on" : "sound off"}
+            </button>
           </div>
 
           <div className="control-divider" />
@@ -695,6 +704,27 @@ function TypingBox({
             >
               <MessageSquareQuote size={14} />
               quote
+            </button>
+
+            <button
+              className={`control-btn ${
+                testMode === "code" ? "active" : ""
+              }`}
+              onClick={startCodeTest}
+            >
+              <CodeXml size={14} />
+              code
+            </button>
+
+            <button
+              className={`control-btn ${
+                testMode === "weak" ? "active" : ""
+              }`}
+              onClick={startWeakKeyPractice}
+              title="Practice your most frequently missed keys"
+            >
+              <Target size={14} />
+              weak keys
             </button>
           </div>
 
