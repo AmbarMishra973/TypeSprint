@@ -4,9 +4,12 @@ import { Palette, Check } from "lucide-react";
 const themes = [
   { id: "original", name: "Classic Yellow", hex: "#e2b714" },
   { id: "dark", name: "Midnight Dark", hex: "#38bdf8" },
+  { id: "cyberpunk", name: "Cyberpunk Neon", hex: "#ff007f" },
+  { id: "nord", name: "Nord Frost", hex: "#88c0d0" },
+  { id: "sunset", name: "Sunset Orange", hex: "#ff7e5f" },
   { id: "light", name: "Clean Light", hex: "#3b82f6" },
   { id: "matrix", name: "Hacker Terminal", hex: "#4ade80" },
-  { id: "dracula", name: "Dracula Neon", hex: "#ff79c6" },
+  { id: "dracula", name: "Dracula", hex: "#ff79c6" },
 ];
 
 function ThemeSelector() {

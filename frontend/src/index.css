@@ -47,6 +47,33 @@
     --error-color: #ca4754;
 }
 
+[data-theme="cyberpunk"] {
+    --bg-primary: #181425;
+    --bg-secondary: #221c35;
+    --text-primary: #f1e9da;
+    --text-muted: #675887;
+    --accent-color: #ff007f;
+    --error-color: #00f0ff;
+}
+
+[data-theme="nord"] {
+    --bg-primary: #2e3440;
+    --bg-secondary: #3b4252;
+    --text-primary: #eceff4;
+    --text-muted: #4c566a;
+    --accent-color: #88c0d0;
+    --error-color: #bf616a;
+}
+
+[data-theme="sunset"] {
+    --bg-primary: #1c1917;
+    --bg-secondary: #292524;
+    --text-primary: #f5f5f4;
+    --text-muted: #78716c;
+    --accent-color: #ff7e5f;
+    --error-color: #ef4444;
+}
+
 * {
     margin: 0;
     padding: 0;
