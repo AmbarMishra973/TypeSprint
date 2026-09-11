@@ -1,7 +1,18 @@
 const API_URL = "https://ambarmishradb.onrender.com/api";
 
+// Server Wake-Up / Health Check
+export const wakeUpServer = async () => {
+  try {
+    const res = await fetch("https://ambarmishradb.onrender.com/");
+    return res.ok;
+  } catch (err) {
+    console.warn("Backend server waking up...", err);
+    return false;
+  }
+};
+
 // Leaderboard Functions
-export const getLeaderboard = async (filters) => {
+export const getLeaderboard = async (filters = {}) => {
   try {
     const query = new URLSearchParams();
 
@@ -41,23 +52,41 @@ export const saveTestScore = async (payload) => {
     return await response.json();
   } catch (error) {
     console.error("Leaderboard Save Error:", error);
-    throw error;
+    return null;
+  }
+};
+
+// User XP Update
+export const updateUserXp = async (username, xpGained) => {
+  try {
+    const response = await fetch(`${API_URL}/users/update-xp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: username,
+        xpGained,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update XP");
+
+    return await response.json();
+  } catch (error) {
+    console.error("XP Update Error:", error);
+    return null;
   }
 };
 
 // Authentication Functions
 export const loginUser = async (userData) => {
   try {
-    const response = await fetch(
-      "https://ambarmishradb.onrender.com/api/users/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      }
-    );
+    const response = await fetch(`${API_URL}/users/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -65,7 +94,6 @@ export const loginUser = async (userData) => {
     }
 
     const data = await response.json();
-
     return { success: true, data };
   } catch (error) {
     console.error("Login API Error:", error);
@@ -75,16 +103,13 @@ export const loginUser = async (userData) => {
 
 export const signupUser = async (userData) => {
   try {
-    const response = await fetch(
-      "https://ambarmishradb.onrender.com/api/users/signup",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      }
-    );
+    const response = await fetch(`${API_URL}/users/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -92,7 +117,6 @@ export const signupUser = async (userData) => {
     }
 
     const data = await response.json();
-
     return { success: true, data };
   } catch (error) {
     console.error("Signup API Error:", error);
@@ -118,5 +142,20 @@ export const syncUserStats = async (username, password, stats) => {
     return await response.json();
   } catch (error) {
     console.error("Sync Stats Error:", error);
+    return null;
   }
 };
+
+// Check active match
+export const fetchActiveMatch = async (username) => {
+  try {
+    const res = await fetch(`${API_URL}/challenges/${username}/active`);
+    if (res.status === 200) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.error("Matchmaker fetch error:", err);
+    return null;
+  }
+};

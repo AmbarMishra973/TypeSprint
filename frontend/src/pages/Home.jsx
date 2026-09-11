@@ -6,12 +6,11 @@ import Friends from "../components/Friends";
 import Leaderboard from "../components/Leaderboard";
 import Navbar from "../components/Navbar";
 import Profile from "../components/Profile";
-import ProfileModal from "../components/ProfileModal";
 import SettingsModal from "../components/SettingsModal";
 import TypingBox from "../components/TypingBox";
 import DailyChallenge from "../pages/DailyChallenge";
 import useTypingEngine from "../hooks/useTypingEngine";
-import { calculateXpReward } from "../utils/xpCalculator";
+import { wakeUpServer, fetchActiveMatch } from "../services/api";
 import "../styles/home.css";
 
 function Home() {
@@ -58,66 +57,28 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    fetch("https://ambarmishradb.onrender.com/")
-      .then(() => console.log("Backend server is awake!"))
-      .catch((err) => console.log("Waking up server...", err));
+    wakeUpServer();
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user.name) return;
 
     const checkActiveMatch = async () => {
-      try {
-        const res = await fetch(
-          `https://ambarmishradb.onrender.com/api/challenges/${user.name}/active`
-        );
-
-        if (res.status === 200) {
-          const match = await res.json();
-
-          if (!activeChallenge || activeChallenge.id !== match.id) {
-            setActiveChallenge(match);
-            setActiveView("typing");
-          }
-        } else if (res.status === 204 && activeChallenge) {
-          setActiveChallenge(null);
+      const match = await fetchActiveMatch(user.name);
+      if (match) {
+        if (!activeChallenge || activeChallenge.id !== match.id) {
+          setActiveChallenge(match);
+          setActiveView("typing");
         }
-      } catch (err) {
-        console.error("Matchmaker error:", err);
+      } else if (activeChallenge) {
+        setActiveChallenge(null);
       }
     };
 
-    const interval = setInterval(checkActiveMatch, 2500);
+    const interval = setInterval(checkActiveMatch, 3000);
 
     return () => clearInterval(interval);
   }, [user, activeChallenge]);
-
-  const handleTestComplete = (wpm, accuracy) => {
-    if (!user || !user.email) return;
-
-    const xpGained = Math.max(
-      Math.round(wpm * 2 * (accuracy / 100)),
-      10
-    );
-
-    fetch(
-      "https://ambarmishradb.onrender.com/api/users/update-xp",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: user.email,
-          xpGained,
-        }),
-      }
-    )
-      .then((res) => res.json())
-      .then((updatedUser) => {
-        setUser(updatedUser);
-        console.log(`Successfully added ${xpGained} XP!`);
-      })
-      .catch((err) => console.error("Failed to update XP:", err));
-  };
 
   return (
     <div className="home">
