@@ -3,7 +3,7 @@
 [![Vite](https://img.shields.io/badge/Frontend-Vite%20%2B%20React%2019-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%203-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 **TypeSprint** is a high-performance, full-stack typing platform designed for developers, typists, and competitive speed-typers. Featuring real-time ghost racing, weak-key targeted practice, code snippet mode, live 1v1 challenges, custom sound profiles, and detailed analytics.
 
@@ -41,6 +41,40 @@
 | Home Typing Viewport | Test Result & Graph | Profile & Stats |
 | :---: | :---: | :---: |
 | ![Home Screen](screenshots/home-screen.png) | ![Result Screen](screenshots/result-screen.png) | ![User Profile](screenshots/profile1.png) |
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Frontend_Tier ["Frontend Tier (React 19 + Vite)"]
+        UI["User Interface Components<br/>(TypingBox, TypingViewport, Stats, Leaderboard)"]
+        Engine["Typing Engine Hook<br/>(useTypingEngine, Stats Storage)"]
+        Audio["Audio Synth & Theme System<br/>(Web Audio API, CSS Variables)"]
+    end
+
+    subgraph Backend_Tier ["Backend Server (Spring Boot 3 + Java 17)"]
+        Router["REST API Controllers<br/>(Auth, TestScore, Challenge, User XP)"]
+        Services["Business Services<br/>(UserService, ChallengeService, DailyChallengeService)"]
+        JPA["Spring Data JPA / Hibernate"]
+    end
+
+    subgraph Database_Tier ["Database Tier"]
+        DB[("PostgreSQL Database<br/>Users, Scores, Challenges, Stats")]
+    end
+
+    subgraph Cloud_Hosting ["Cloud & Infrastructure"]
+        Render["Render Cloud Services<br/>(Production Web Hosting)"]
+    end
+
+    UI --> Engine
+    Engine -- REST API / JSON --> Router
+    Router --> Services
+    Services --> JPA
+    JPA --> DB
+    Services --> Render
+```
 
 ---
 
